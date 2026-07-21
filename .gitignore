@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+dist/
+build/
+
+# データは大容量かつ再取得可能なため追跡しない。配置方法は data/raw/README.md を参照。
+data/raw/*
+!data/raw/README.md
+data/processed/
+
+# 実行結果は EXPERIMENTS.md に要約を残し、生データ（チェックポイント等）は追跡しない。
+runs/*
+!runs/README.md

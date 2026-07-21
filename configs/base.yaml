@@ -1,0 +1,32 @@
+# 全実験に共通のデフォルト設定。実験ごとの差分は configs/experiments/*.yaml に書き、
+# `extends: ../base.yaml` でここを継承する。
+
+seed: 42
+
+data:
+  raw_root: data/raw
+  window_sec: 10 # レーダ入力窓の長さ[秒]（50Hzなのでseq_len=window_sec*50）
+  stride_sec: 1 # 窓のスライド幅[秒]
+  # 犬ID単位でsplitを切る（同一犬のウィンドウが複数splitに漏れるのを防ぐため）
+  dogs:
+    train: [No1, No2, No3, No4, No5, No6, No7]
+    val: [No8]
+    test: [No9, No10]
+
+task: hr # hr | br
+
+model:
+  name: transformer
+  d_model: 128
+  n_heads: 4
+  n_layers: 4
+  dim_feedforward: 256
+  dropout: 0.1
+  n_outputs: 1
+
+train:
+  batch_size: 32
+  epochs: 30
+  lr: 0.0001
+  weight_decay: 0.0001
+  num_workers: 2

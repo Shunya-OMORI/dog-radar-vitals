@@ -1,0 +1,3 @@
+# 001: 素朴なTransformer Encoderによる心拍数(HR)予測のベースライン。
+extends: ../base.yaml
+task: hr
