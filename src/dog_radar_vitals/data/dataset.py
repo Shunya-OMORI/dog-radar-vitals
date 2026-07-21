@@ -1,35 +1,21 @@
-"""レーダ時系列をスライディング窓に切り出し、窓終端時刻の心拍数/呼吸数を目的変数とするDataset。
+"""生のレーダ窓をそのまま入力とする深層モデル向けDataset。
 
-犬ごとに正規化統計量が変わりうるため、正規化は録音（犬）単位で行う。
-train/val/testの分割は「犬ID単位」で行い、同一犬のウィンドウが複数splitに跨って
-リークすることを防ぐ。
+犬ごとに正規化・窓切り出しを行うのは `windowing.py` の責務。ここは複数犬の窓を
+束ねてPyTorchの `Dataset` インタフェースに載せるだけに留める。
 """
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-from dog_radar_vitals.data.scenario1 import RADAR_FS_HZ, Recording, load_recording
-
-Task = Literal["hr", "br"]
-
-
-def _zscore(radar: np.ndarray) -> np.ndarray:
-    mean = radar.mean(axis=0, keepdims=True)
-    std = radar.std(axis=0, keepdims=True) + 1e-8
-    return (radar - mean) / std
+from dog_radar_vitals.data.scenario1 import load_recording
+from dog_radar_vitals.data.windowing import Task, iter_windows
 
 
 class WindowedVitalsDataset(Dataset):
-    """1つの録音を、`window_sec`秒幅・`stride_sec`秒刻みの窓に切り出したデータセット。
-
-    各サンプルは窓終端の1秒に対応する参照値（HRまたはBR）を目的変数とする。
-    """
-
     def __init__(
         self,
         raw_root: Path,
@@ -45,25 +31,7 @@ class WindowedVitalsDataset(Dataset):
         self._samples: list[tuple[np.ndarray, float]] = []
         for dog_id in dog_ids:
             rec = load_recording(raw_root, dog_id)
-            self._samples.extend(self._make_windows(rec))
-
-    def _make_windows(self, rec: Recording) -> list[tuple[np.ndarray, float]]:
-        radar = _zscore(rec.radar)
-        target_series = rec.hr if self.task == "hr" else rec.br
-
-        window_len = self.window_sec * RADAR_FS_HZ
-        stride = self.stride_sec * RADAR_FS_HZ
-
-        windows = []
-        n_steps = radar.shape[0]
-        for start in range(0, n_steps - window_len + 1, stride):
-            end = start + window_len
-            # 窓終端に対応する参照値（REF_FS_HZ=1Hzなのでend//RADAR_FS_HZ秒目）のインデックス
-            ref_idx = end // RADAR_FS_HZ - 1
-            if ref_idx < 0 or ref_idx >= len(target_series):
-                continue
-            windows.append((radar[start:end], float(target_series[ref_idx])))
-        return windows
+            self._samples.extend(iter_windows(rec, task, window_sec, stride_sec))
 
     def __len__(self) -> int:
         return len(self._samples)

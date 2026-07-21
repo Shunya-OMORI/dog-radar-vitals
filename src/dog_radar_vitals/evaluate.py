@@ -1,36 +1,29 @@
-"""学習済みrunをtest split（犬単位で学習に未使用の個体）で評価する。"""
+"""学習済みrunをtest split（犬単位で学習に未使用の個体）で評価するCLI。
+
+`train.py` と同様に `config["model"]["family"]` で deep/classical を振り分ける。
+"""
 from __future__ import annotations
 
 import argparse
 import json
 from pathlib import Path
 
-import torch
-from torch.utils.data import DataLoader
-
 from dog_radar_vitals.config import load_config
-from dog_radar_vitals.data.dataset import WindowedVitalsDataset
-from dog_radar_vitals.models.registry import build_model
-from dog_radar_vitals.train import REPO_ROOT, run_epoch
+from dog_radar_vitals.train import REPO_ROOT
+from dog_radar_vitals.training.classical_trainer import evaluate_classical
+from dog_radar_vitals.training.deep_trainer import evaluate_deep
+
+_EVAL_FNS = {"deep": evaluate_deep, "classical": evaluate_classical}
 
 
 def evaluate_run(run_dir: Path) -> dict[str, float]:
     config = load_config(run_dir / "config.yaml")
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    family = config["model"]["family"]
+    if family not in _EVAL_FNS:
+        raise ValueError(f"unknown model family '{family}'. expected one of {sorted(_EVAL_FNS)}")
 
-    data_cfg = config["data"]
-    raw_root = REPO_ROOT / data_cfg["raw_root"]
-    test_ds = WindowedVitalsDataset(
-        raw_root, data_cfg["dogs"]["test"], config["task"], data_cfg["window_sec"], data_cfg["stride_sec"]
-    )
-    test_loader = DataLoader(test_ds, batch_size=config["train"]["batch_size"], shuffle=False)
-
-    n_bins = test_ds[0][0].shape[-1]
-    model = build_model(n_bins=n_bins, **config["model"]).to(device)
-    model.load_state_dict(torch.load(run_dir / "best_model.pt", map_location=device))
-
-    test_metrics = run_epoch(model, test_loader, device)
-    print(f"test_loss={test_metrics['loss']:.4f} test_mae={test_metrics['mae']:.3f}")
+    test_metrics = _EVAL_FNS[family](run_dir, config, REPO_ROOT)
+    print(f"test_mae={test_metrics['mae']:.3f}")
 
     (run_dir / "test_metrics.json").write_text(json.dumps(test_metrics, indent=2))
     return test_metrics

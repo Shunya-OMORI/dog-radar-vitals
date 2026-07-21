@@ -11,8 +11,21 @@
 
 ## 新しいモデルを追加するとき
 
-- `src/dog_radar_vitals/models/` に新しいモジュールを追加し、`models/registry.py` の
-  `MODEL_REGISTRY` に1行足す。`train.py`・`evaluate.py` は変更しない。
+- 深層モデル(PyTorch)なら `src/dog_radar_vitals/models/deep/` に新しいモジュールを追加し、
+  `models/deep/registry.py` の `DEEP_MODEL_REGISTRY` に1行足す。
+- 古典MLモデル(scikit-learn)なら `models/classical/registry.py` の
+  `CLASSICAL_MODEL_REGISTRY` に1行足す。
+- どちらの場合も `train.py`・`evaluate.py`・`training/*.py` は変更しない
+  （`config["model"]["family"]` で自動的に振り分けられる）。
+- 1ファイル1責務を保つ。既存のモデルファイルに新モデルを追記せず、新しいファイル名で追加する。
+
+## 比較実験を回すとき
+
+- 単発の学習・評価は `train.py`/`evaluate.py`、複数モデルの一括比較は
+  `scripts/run_comparison.py`（実行）→ `scripts/make_comparison_report.py`（集計・グラフ化）
+  の順で使う。この2つは責務を分けているので、学習をやり直さずレポートだけ再生成できる。
+- 深層モデルはGPUが1枚のため逐次実行、古典MLモデルはCPU並列で実行される
+  （`run_comparison.py` が自動で振り分ける）。
 
 ## データを扱うとき
 

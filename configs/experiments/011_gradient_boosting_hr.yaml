@@ -1,0 +1,10 @@
+# 011: Gradient Boostingによる心拍数(HR)予測。窓から抽出した手作り特徴量(data/features.py)を使う。
+extends: ../base.yaml
+task: hr
+model:
+  family: classical
+  name: gradient_boosting
+  n_estimators: 300
+  max_depth: 3
+  learning_rate: 0.05
+  random_state: 42

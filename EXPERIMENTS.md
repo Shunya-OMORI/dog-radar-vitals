@@ -11,12 +11,42 @@
 
 | 日付 | run_dir | 設定 | 変更点・狙い | 結果 | 次の一手 |
 |---|---|---|---|---|---|
-| （未実施） | - | `configs/experiments/001_transformer_hr.yaml` | 初期実装。素朴なTransformer Encoderで心拍数を10秒窓から回帰する最小構成 | - | - |
+| 2026-07-22 | `runs/20260722-*_20260722_baseline`（12件、`reports/20260722_baseline/`に集約） | `configs/experiments/001`〜`012` 全件 | 深層3種（Transformer/CNN1D/LSTM、100 epoch、GPU）×古典ML3種（Ridge/RandomForest/GradientBoosting、`data/features.py`の手作り特徴量、CPU並列）を HR/BR 両タスクで一括比較。初回の本番実行 | **BR**: 全モデルがtest MAE 2.0〜2.2 bpmに収束（deep系がわずかに優位、transformer 2.000が最良）。**HR**: 古典ML3種が18.7〜18.9 bpmで最良、CNN1D/LSTMが19.6程度、Transformerが31.0で最下位。詳細は[`reports/20260722_baseline/table.md`](reports/20260722_baseline/table.md)・[`chart.png`](reports/20260722_baseline/chart.png) | 下の「本実行から分かったこと」参照 |
+
+## 本実行から分かったこと（2026-07-22）
+
+- **BRタスクはモデル間でほぼ差がつかない。** 全6モデルがtest MAE 2.0〜2.2 bpmの狭い範囲に
+  収まった。原因として、犬ごとのBR参照値がほぼ一定（`data/raw/README.md`記載の通り、
+  1頭内では15.5や18.5のような単一値に近い）ため、この課題は実質「テスト犬の個体差を
+  当てる」問題に近く、モデルの表現力による差が出にくいと考えられる。BRタスクでの
+  モデル比較は現状あまり情報を持たない可能性がある。
+- **HRタスクではTransformerが明確に劣後した（31.0 vs 他モデル18.7〜19.6）。**
+  学習曲線を確認すると、train MAEは100 epoch終盤でほぼ0（0.01〜0.02）まで低下した一方、
+  val MAEは31付近から単調減少を続けたまま100 epochで打ち切られており、**収束前に学習を
+  止めてしまっている**（過学習ではなく学習不足）。CNN1D・LSTMは同じepoch数・同程度の
+  学習率で19.6まで収束しており、Transformerだけがより多くのepochを要する可能性が高い。
+- **古典MLモデル（`data/features.py`の9次元手作り特徴量、Ridge/RandomForest/GradientBoosting）が
+  HRタスクで最良だった。** 深層モデルが生の467次元レンジビン系列を直接処理するのに対し、
+  古典MLは分散最大のレンジビンを選んで1次元信号に落とし、時間統計量とバンドパワーに
+  要約した特徴量を使っている。サンプル数が少ない（train 7頭分、約1200窓）ため、
+  次元を絞った特徴量表現の方が有利に働いた可能性がある。
+
+### 次に試すこと
+
+- Transformer(HR)のepoch数を増やす（200〜300程度）か、学習率スケジューラ（warmup+decay）を
+  導入し、CNN1D・LSTMと同等以上の水準まで収束させてから比較をやり直す。
+- BRタスクは、犬ごとの参照値がほぼ定数であるという性質を踏まえ、「テスト犬の識別＋
+  オフセット予測」のような定式化に切り替えるか、より変動の大きい別データセットで
+  再評価することを検討する。
+- 古典MLがHRで優位だった要因が「特徴量設計」なのか「サンプル数に対するモデル容量」
+  なのかを切り分けるため、深層モデルにも同じ特徴量（`data/features.py`の出力）を
+  入力するアブレーションを追加してもよい。
 
 ## 今後の拡張予定（研究計画の全体像）
 
-現行実装（`001_transformer_hr.yaml` / `002_transformer_br.yaml`）は素朴なTransformerによる
-単一タスク回帰のベースラインである。以下は卒業研究としての拡張方向（優先順位未確定）。
+現行実装は、深層モデル3種（Transformer/CNN1D/LSTM）と古典ML3種（Ridge/RandomForest/
+GradientBoosting）によるHR/BR単一タスク回帰のベースライン比較である。
+以下は卒業研究としての拡張方向（優先順位未確定）。
 
 - **マルチタスク学習**: 心拍数・呼吸数を同一エンコーダから同時予測する。
   `VitalsTransformer` は `n_outputs` を複数に増やせば構造上は対応できるが、

@@ -1,0 +1,16 @@
+# 004: 1次元CNNによる呼吸数(BR)予測。Transformerより軽量な比較対象。
+extends: ../base.yaml
+task: br
+model:
+  family: deep
+  name: cnn1d
+  channels: [64, 128, 128]
+  kernel_size: 7
+  dropout: 0.1
+  n_outputs: 1
+train:
+  batch_size: 32
+  epochs: 100
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

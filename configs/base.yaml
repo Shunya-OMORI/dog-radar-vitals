@@ -15,14 +15,12 @@ data:
 
 task: hr # hr | br
 
+# モデルの具体的なハイパーパラメータは各実験configで完全に指定する（ここでは定義しない）。
+# 理由: model.familyがdeep/classicalで受け付けるキーが全く異なるため、ここに共通の
+# デフォルトを置くと辞書マージ時に不要なキーが混入し、古典MLモデルの初期化が壊れる。
 model:
+  family: deep
   name: transformer
-  d_model: 128
-  n_heads: 4
-  n_layers: 4
-  dim_feedforward: 256
-  dropout: 0.1
-  n_outputs: 1
 
 train:
   batch_size: 32
