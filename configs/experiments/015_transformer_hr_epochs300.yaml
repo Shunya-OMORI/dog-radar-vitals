@@ -1,0 +1,19 @@
+# 015: Transformer(HR)のエポック数対照実験。001と同じlr=1e-4のままepochsだけ100->300に
+# 増やし、「単に学習時間が足りなかっただけ」という仮説を検証する。
+extends: ../base.yaml
+task: hr
+model:
+  family: deep
+  name: transformer
+  d_model: 128
+  n_heads: 4
+  n_layers: 4
+  dim_feedforward: 256
+  dropout: 0.1
+  n_outputs: 1
+train:
+  batch_size: 32
+  epochs: 300
+  lr: 0.0001
+  weight_decay: 0.0001
+  num_workers: 2

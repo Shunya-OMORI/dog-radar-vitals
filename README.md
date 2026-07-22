@@ -79,7 +79,8 @@ src/dog_radar_vitals/
 │       └── registry.py              # 古典MLモデル名→scikit-learn Estimatorの一元管理
 ├── training/
 │   ├── deep_trainer.py              # PyTorchの学習/評価ループ
-│   └── classical_trainer.py         # scikit-learnのfit/評価ループ
+│   ├── classical_trainer.py         # scikit-learnのfit/評価ループ
+│   └── schedulers.py                # 学習率スケジューラ（configで明示指定した場合のみ有効）
 ├── config.py                       # YAML設定の読み込み（extends継承）
 ├── seeding.py                      # 乱数シード固定
 ├── reproducibility.py              # gitコミット・パッケージ版の記録
@@ -87,7 +88,8 @@ src/dog_radar_vitals/
 └── evaluate.py                     # 評価CLI（同上）
 scripts/
 ├── run_comparison.py                # 複数configの一括学習・評価（実行の責務のみ）
-└── make_comparison_report.py        # マニフェストから比較表・グラフを生成（集計の責務のみ）
+├── make_comparison_report.py        # マニフェストから比較表・グラフを生成（集計の責務のみ）
+└── plot_learning_curves.py          # 複数runのval MAE学習曲線を重ねて比較（収束診断用）
 runs/                              # 学習結果（gitignore対象、README.md参照）
 reports/                           # run_comparisonの結果をまとめた表・グラフ（git管理下）
 tests/
@@ -103,6 +105,14 @@ EXPERIMENTS.md                     # 人間が維持する実験ログの正史
 2026-07-22に深層モデル3種（Transformer/CNN1D/LSTM）と古典ML3種（Ridge/Random Forest/
 Gradient Boosting）の初回比較を実施した。結果と考察は [`EXPERIMENTS.md`](EXPERIMENTS.md) の
 「本実行から分かったこと」、表とグラフは [`reports/20260722_baseline/`](reports/20260722_baseline/) を参照。
+
+同日、初回比較でTransformer(HR)が未収束だった件を学習率・スケジューラの対照実験で切り分けた
+（[`reports/20260722_hr_transformer_ablation/`](reports/20260722_hr_transformer_ablation/)）。
+学習率を上げれば古典MLを上回る水準まで改善する一方、**val犬1頭への過適合という、
+今回の犬分割（train 7・val 1・test 2の固定1分割）自体に起因するより重大な問題**が見つかった。
+詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「HR Transformer対照実験の結果」を参照。
+モデル比較を再度行う前に、この分割の信頼性（leave-few-dogs-out cross-validationの必要性）に
+対応することを最優先課題としている。
 
 RR Interval・ECG波形予測、マルチタスク学習、複素領域モデル、超次元コンピューティング、
 モデル小型化、健康モニタリングへの拡張予定は [`EXPERIMENTS.md`](EXPERIMENTS.md) の

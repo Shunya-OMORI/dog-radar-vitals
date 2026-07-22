@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 from dog_radar_vitals.data.dataset import WindowedVitalsDataset
 from dog_radar_vitals.models.deep.registry import build_deep_model
 from dog_radar_vitals.seeding import make_generator, set_all_seeds
+from dog_radar_vitals.training.schedulers import build_scheduler
 
 
 def _run_epoch(model: nn.Module, loader: DataLoader, device: torch.device, optimizer=None) -> dict[str, float]:
@@ -68,16 +69,19 @@ def train_deep(config: dict, run_dir: Path, repo_root: Path) -> None:
     model_kwargs = {k: v for k, v in config["model"].items() if k not in ("family", "name")}
     model = build_deep_model(config["model"]["name"], n_bins=n_bins, **model_kwargs).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=train_cfg["lr"], weight_decay=train_cfg["weight_decay"])
+    scheduler = build_scheduler(optimizer, train_cfg, total_epochs=train_cfg["epochs"])
 
     history = []
     best_val_mae = float("inf")
     for epoch in range(train_cfg["epochs"]):
+        if scheduler is not None:
+            scheduler.step()
         train_metrics = _run_epoch(model, train_loader, device, optimizer)
         val_metrics = _run_epoch(model, val_loader, device)
-        history.append({"epoch": epoch, "train": train_metrics, "val": val_metrics})
+        history.append({"epoch": epoch, "lr": optimizer.param_groups[0]["lr"], "train": train_metrics, "val": val_metrics})
         print(
-            f"[epoch {epoch}] train_loss={train_metrics['loss']:.4f} train_mae={train_metrics['mae']:.3f} "
-            f"val_loss={val_metrics['loss']:.4f} val_mae={val_metrics['mae']:.3f}"
+            f"[epoch {epoch}] lr={optimizer.param_groups[0]['lr']:.2e} train_loss={train_metrics['loss']:.4f} "
+            f"train_mae={train_metrics['mae']:.3f} val_loss={val_metrics['loss']:.4f} val_mae={val_metrics['mae']:.3f}"
         )
 
         if val_metrics["mae"] < best_val_mae:

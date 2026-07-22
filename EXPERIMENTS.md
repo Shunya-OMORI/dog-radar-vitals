@@ -12,6 +12,7 @@
 | 日付 | run_dir | 設定 | 変更点・狙い | 結果 | 次の一手 |
 |---|---|---|---|---|---|
 | 2026-07-22 | `runs/20260722-*_20260722_baseline`（12件、`reports/20260722_baseline/`に集約） | `configs/experiments/001`〜`012` 全件 | 深層3種（Transformer/CNN1D/LSTM、100 epoch、GPU）×古典ML3種（Ridge/RandomForest/GradientBoosting、`data/features.py`の手作り特徴量、CPU並列）を HR/BR 両タスクで一括比較。初回の本番実行 | **BR**: 全モデルがtest MAE 2.0〜2.2 bpmに収束（deep系がわずかに優位、transformer 2.000が最良）。**HR**: 古典ML3種が18.7〜18.9 bpmで最良、CNN1D/LSTMが19.6程度、Transformerが31.0で最下位。詳細は[`reports/20260722_baseline/table.md`](reports/20260722_baseline/table.md)・[`chart.png`](reports/20260722_baseline/chart.png) | 下の「本実行から分かったこと」参照 |
+| 2026-07-22 | `runs/20260722-1002xx〜1021xx_hr_transformer_20260722_hr_transformer_ablation`（4件、`reports/20260722_hr_transformer_ablation/`に集約） | `configs/experiments/013`〜`016` | 001のTransformer(HR)が100 epochで未収束だった件を受け、学習率・エポック数・スケジューラの対照実験。013: lr 1e-4→5e-4。014: lr 1e-4→1e-3。015: lrは1e-4のままepoch 100→300。016: 10epochウォームアップ+コサイン減衰（ピークlr 5e-4）、200epoch | 4件とも001(test MAE 31.0)から大幅改善: 013=17.45（最良、古典MLの18.7を上回る）、014=19.48、015=18.74、016=17.83。学習曲線（[`learning_curves.png`](reports/20260722_hr_transformer_ablation/learning_curves.png)）で001の学習率が単に低すぎたことを確認。ただし**別の問題が判明**（下記参照） | 下の「HR Transformer対照実験の結果」参照 |
 
 ## 本実行から分かったこと（2026-07-22）
 
@@ -33,14 +34,64 @@
 
 ### 次に試すこと
 
-- Transformer(HR)のepoch数を増やす（200〜300程度）か、学習率スケジューラ（warmup+decay）を
-  導入し、CNN1D・LSTMと同等以上の水準まで収束させてから比較をやり直す。
+- ~~Transformer(HR)のepoch数を増やす（200〜300程度）か、学習率スケジューラ（warmup+decay）を
+  導入し、CNN1D・LSTMと同等以上の水準まで収束させてから比較をやり直す。~~
+  → 2026-07-22実施済み。下記「HR Transformer対照実験の結果」参照。
 - BRタスクは、犬ごとの参照値がほぼ定数であるという性質を踏まえ、「テスト犬の識別＋
   オフセット予測」のような定式化に切り替えるか、より変動の大きい別データセットで
   再評価することを検討する。
 - 古典MLがHRで優位だった要因が「特徴量設計」なのか「サンプル数に対するモデル容量」
   なのかを切り分けるため、深層モデルにも同じ特徴量（`data/features.py`の出力）を
   入力するアブレーションを追加してもよい。
+- **【最優先】train/val/testの犬IDによる単一分割（7/1/2頭）の信頼性を疑う。**
+  詳細は下記「HR Transformer対照実験の結果」の3点目。現状のモデル間比較
+  （18.7 vs 19.6 vs 31.0 など）が、たまたま選んだ1頭のvalと2頭のtestに対する結果に
+  すぎない可能性が高く、犬を入れ替えたcross-validationなしに「どのモデルが優れているか」
+  を結論づけるのは早計。
+
+## HR Transformer対照実験の結果（2026-07-22）
+
+001（lr=1e-4, 100epoch）がtest MAE 31.0だった原因を切り分けるため、学習率・エポック数・
+スケジューラを変えた4パターンを対照実験した（[`reports/20260722_hr_transformer_ablation/`](reports/20260722_hr_transformer_ablation/)）。
+
+| 設定 | epoch | best_val_mae | final_train_mae | test_mae |
+|---|---|---|---|---|
+| 001 baseline (lr=1e-4) | 100 | 31.44 | 24.19 | 31.03 |
+| 013 lr=5e-4 | 100 | 2.21 | 0.47 | **17.45** |
+| 014 lr=1e-3 | 100 | 2.86 | 0.98 | 19.48 |
+| 015 lr=1e-4（epochのみ300に延長） | 300 | 0.99 | 0.47 | 18.74 |
+| 016 warmup(10ep)+cosine, peak lr=5e-4 | 200 | 1.76 | 0.30 | 17.83 |
+
+（参考: 同じHRタスクの最良の古典MLは random_forest で test_mae=18.74）
+
+**1. 「未収束」の診断は正しかった。** [`learning_curves.png`](reports/20260722_hr_transformer_ablation/learning_curves.png)
+の通り、001（青線）はval MAEがほぼ動かず高止まりして見えるのに対し、lrを上げる（013・014）か
+epochを延ばす（015）かスケジューラを使う（016）かのいずれでも、val MAEはepoch 100〜200前後で
+1〜3程度まで下がる。001の失敗は単純に学習率が低すぎたことによる学習不足であり、
+アーキテクチャの限界ではなかった。
+
+**2. lr=5e-4（013）が最良で、古典MLを上回った。** test MAE 17.45は、これまでの
+全12モデル中で最良の値（[`reports/20260722_baseline/table.md`](reports/20260722_baseline/table.md)参照）。
+lr=1e-3（014）はやや不安定（学習曲線に大きめの振動があり、best_val_mae 2.86とやや高い）で
+性能もやや劣る。過度に大きい学習率は収束を速めるが安定性を犠牲にする、という通常の傾向と一致する。
+
+**3. しかし、より重大な問題が見つかった: best_val_mae と test_mae が大きく乖離している。**
+013はbest_val_mae=2.21（bpm）まで下がっているのに、同じチェックポイントのtest_mae は17.45で
+**8倍近い差**がある。015に至ってはbest_val_mae=0.99（1 bpm未満）まで下がりながらtest_mae=18.74。
+train_mae も0.3〜1.0まで下がっている。これは「HRを予測する一般的な関数」を学習したというより、
+**val犬（No8）1頭の個体特有のレーダ信号パターンを実質的に記憶した**ことを示唆する。
+val split が1頭しかいないため、「val_mae最小のepochを選ぶ」というモデル選択の基準そのものが、
+未知個体への汎化ではなくその1頭への適合度を測ってしまっている。
+[`learning_curves.png`](reports/20260722_hr_transformer_ablation/learning_curves.png) の赤線
+（015, 300epoch）も、epoch 230付近でval MAEが1台から5台へ再上昇しており、val 1頭への
+過適合が進行している様子が見える。
+
+**この問題は今回の比較全体（001〜016）の犬分割（train 7頭・val 1頭・test 2頭の固定1分割）に
+共通する構造的な弱点であり、Transformer固有の問題ではない。** 全10頭という個体数の少なさに対し
+単一の固定分割で「モデルAはモデルBより優れている」と結論するのは、val・testに割り当てられた
+特定の3頭の個体差を見ているだけの可能性を否定できない。次にモデル比較をやり直す際は、
+犬を入れ替えたleave-few-dogs-out cross-validation（例: 10頭を5foldに分け、毎foldでtrain/val/testの
+犬を入れ替えて平均・分散を見る）を導入すべきである。
 
 ## 今後の拡張予定（研究計画の全体像）
 

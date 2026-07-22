@@ -1,0 +1,22 @@
+# 016: Transformer(HR)のスケジューラ対照実験。10epochの線形ウォームアップ後、
+# ピークlr=5e-4からコサイン減衰。200epochで十分な減衰カーブを描けるようにする。
+extends: ../base.yaml
+task: hr
+model:
+  family: deep
+  name: transformer
+  d_model: 128
+  n_heads: 4
+  n_layers: 4
+  dim_feedforward: 256
+  dropout: 0.1
+  n_outputs: 1
+train:
+  batch_size: 32
+  epochs: 200
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  scheduler:
+    type: warmup_cosine
+    warmup_epochs: 10
