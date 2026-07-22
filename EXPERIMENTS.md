@@ -49,6 +49,58 @@
   すぎない可能性が高く、犬を入れ替えたcross-validationなしに「どのモデルが優れているか」
   を結論づけるのは早計。
 
+## 【最重要】trivialベースラインとの比較（2026-07-22）
+
+「MAEはどのくらいなら理想的か」を判断するため、`scripts/compute_baselines.py` で2つの
+物差しを計算した（[`reports/baselines.md`](reports/baselines.md)）。
+
+- **trivial_mae**: レーダを一切使わず、train犬の目的変数の平均値を常に予測した場合のMAE。
+  モデルがこれを十分下回らなければ「レーダから何も学習していない」のと区別がつかない。
+- **oracle_mae**: 各test犬の真の平均値を知っていたと仮定した場合のMAE。個体差を除いた
+  窓内変動のみに起因する理論的な下限。
+
+| task | train_mean | test_range | trivial_mae | oracle_mae |
+|---|---|---|---|---|
+| hr | 115.13 | [102.0, 143.0] | **18.819** | 0.986 |
+| br | 17.21 | [15.5, 19.5] | **2.000** | 0.000 |
+
+これまでの全16モデル（001〜016）をtrivial_maeと比較すると:
+
+| task | trivial_maeを上回った(改善した)モデル | trivial_maeと同等以下(改善なし) |
+|---|---|---|
+| **hr** | 013 lr=5e-4 (17.45, +7.3%)、016 warmup (17.83, +5.3%) のみ、明確な改善 | 009 random_forest・015 ep300・007 ridge は trivial比+0.2〜0.4%でほぼ誤差範囲。011 gradient_boosting・014 lr=1e-3・003 cnn1d・005 lstm・001 baseline は **trivialより悪い** |
+| **br** | **1件もなし** | 002 transformer(baseline)が2.000でtrivialと完全一致。残る5モデル(lstm/cnn1d/ridge/random_forest/gradient_boosting)は**全てtrivialより悪い** |
+
+### 結論
+
+**BRタスクは、これまで試した6モデルのうち1つも「レーダの単純な平均予測」を上回れていない。**
+oracle_mae=0.000（犬ごとにBR値が完全な定数のため）という事実と合わせると、このタスクは
+現状の定式化では実質的に学習すべき信号がほとんど無く、モデル比較として機能していない。
+
+**HRタスクも、明確にtrivialを上回ったのは16モデル中2つ（013, 016、いずれもTransformerの
+学習率を上げた変種）のみで、改善幅も+5〜7%にとどまる。** これまでの「古典MLがHRで優位」
+という結論（本ファイル冒頭の「本実行から分かったこと」）は、実際には**古典MLがtrivialベースラインと
+ほぼ同じ性能だっただけ**であり、「古典MLが優れている」のではなく「深層モデルの大半がtrivialにすら
+届いていない」と読み替えるべきである。
+
+### 理想的なMAEの目安
+
+- **先行研究との比較**: 同一データセットの原著（Ahmed et al. 2024）は、**同一個体内**でのレーダ
+  vs 参照センサ比較においてHR MAE 3.7 bpm・BR MAE 2.3 breaths/minを報告している
+  （[`manager-agent/research/dog-mmwave-rri/summaries/03_Ahmed-2024_dog-uwb-public-dataset.md`](../manager-agent/research/dog-mmwave-rri/summaries/03_Ahmed-2024_dog-uwb-public-dataset.md)）。
+  ただし本リポジトリは**未知個体への汎化**（leave-dogs-out）を課題にしており、同一個体内比較より
+  本質的に難しい。単純に「3.7を切れば良い」とは言えない。
+- **現実的な目標**: 上記のtrivial/oracleを使い、
+  - HR: trivial=18.8を明確に下回る（目安として、013の17.5よりさらに踏み込んで**15以下**を
+    最初のマイルストーンとし、Ahmedの同一個体内精度3.7 bpmを最終的な目安とする）。
+    oracle=0.99が理論下限だが、未知個体への汎化ではここまでは近づけない可能性が高い。
+  - BR: 現行のScenario1（麻酔下）のままでは目標設定自体が無意味
+    （oracle=0.000＝学習すべき信号がほぼ無い）。**Scenario2（覚醒・自由行動、より変動の大きい
+    条件）や自前データ取得で、犬ごとにBRが変動する条件に切り替えない限り、モデル比較として
+    意味のある数値目標は立てられない。**
+- **今後の全てのモデル比較で、`scripts/compute_baselines.py` の出力をtable末尾に併記し、
+  trivial_maeを下回っているかを機械的にチェックする運用とする。**
+
 ## HR Transformer対照実験の結果（2026-07-22）
 
 001（lr=1e-4, 100epoch）がtest MAE 31.0だった原因を切り分けるため、学習率・エポック数・

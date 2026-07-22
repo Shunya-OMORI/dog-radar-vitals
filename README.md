@@ -111,6 +111,11 @@ Gradient Boosting）の初回比較を実施した。結果と考察は [`EXPERI
 学習率を上げれば古典MLを上回る水準まで改善する一方、**val犬1頭への過適合という、
 今回の犬分割（train 7・val 1・test 2の固定1分割）自体に起因するより重大な問題**が見つかった。
 詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「HR Transformer対照実験の結果」を参照。
+
+**さらに重要な確認: `scripts/compute_baselines.py` で「レーダを使わず訓練犬の平均値を常に
+予測するだけ」のtrivialベースラインを計算したところ、BRタスクは16モデル中1つもこれを
+上回れず、HRタスクも明確に上回ったのは2モデルのみだった。** 詳細と今後の方針は
+[`EXPERIMENTS.md`](EXPERIMENTS.md) の「【最重要】trivialベースラインとの比較」を参照。
 モデル比較を再度行う前に、この分割の信頼性（leave-few-dogs-out cross-validationの必要性）に
 対応することを最優先課題としている。
 
