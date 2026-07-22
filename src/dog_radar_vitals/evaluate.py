@@ -12,8 +12,9 @@ from dog_radar_vitals.config import load_config
 from dog_radar_vitals.train import REPO_ROOT
 from dog_radar_vitals.training.classical_trainer import evaluate_classical
 from dog_radar_vitals.training.deep_trainer import evaluate_deep
+from dog_radar_vitals.training.ecg_trainer import evaluate_ecg
 
-_EVAL_FNS = {"deep": evaluate_deep, "classical": evaluate_classical}
+_EVAL_FNS = {"deep": evaluate_deep, "classical": evaluate_classical, "ecg_seq2seq": evaluate_ecg}
 
 
 def evaluate_run(run_dir: Path) -> dict[str, float]:
@@ -23,7 +24,9 @@ def evaluate_run(run_dir: Path) -> dict[str, float]:
         raise ValueError(f"unknown model family '{family}'. expected one of {sorted(_EVAL_FNS)}")
 
     test_metrics = _EVAL_FNS[family](run_dir, config, REPO_ROOT)
-    print(f"test_mae={test_metrics['mae']:.3f}")
+    # familyによって主要指標のキーが異なる（deep/classicalはmae、ecg_seq2seqはcorr）ので存在するものを出す。
+    primary_key = "mae" if "mae" in test_metrics else "corr"
+    print(f"test_{primary_key}={test_metrics[primary_key]:.3f}")
 
     (run_dir / "test_metrics.json").write_text(json.dumps(test_metrics, indent=2))
     return test_metrics

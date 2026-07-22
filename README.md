@@ -1,6 +1,7 @@
 # dog-radar-vitals
 
-レーダ信号からイヌのバイタルサイン（心拍数・呼吸数）を推定するモデルの実装・実験リポジトリ。
+レーダ信号からイヌのバイタルサイン（心拍数・呼吸数、および手法検証としてヒトのECG波形）を
+推定するモデルの実装・実験リポジトリ。
 
 先行研究調査やテーマ選定の経緯は [`manager-agent/research/dog-mmwave-rri/`](../manager-agent/research/dog-mmwave-rri/) にある。
 このリポジトリの責務は**実装側の試行錯誤**に限定する。文献調査・テーマ設計は上記へ。
@@ -65,26 +66,32 @@ data/
 └── processed/                    # 前処理キャッシュ（gitignore対象、現在未使用）
 src/dog_radar_vitals/
 ├── data/
-│   ├── scenario1.py               # Ahmed et al. (2024) シナリオ1の読み込み
-│   ├── windowing.py                # スライディング窓切り出し（deep/classical共通）
-│   ├── dataset.py                  # 生の窓をそのまま使う深層モデル向けDataset
-│   └── features.py                 # 古典ML向けの手作り特徴量抽出
+│   ├── scenario1.py               # Ahmed et al. (2024) シナリオ1の読み込み（犬HR/BR）
+│   ├── windowing.py                # スライディング窓切り出し（犬deep/classical共通、窓->スカラ）
+│   ├── dataset.py                  # 生の窓をそのまま使う深層モデル向けDataset（犬HR/BR）
+│   ├── features.py                 # 古典ML向けの手作り特徴量抽出（犬HR/BR）
+│   ├── schellenberger.py           # Schellenberger et al. (2020) の読み込み（ヒトECG波形）
+│   ├── ecg_windowing.py            # 窓切り出し（ヒトECG、窓->同じ長さの波形）
+│   └── ecg_dataset.py              # レーダI/Q窓とECG波形窓のDataset（ヒトECG）
 ├── models/
 │   ├── deep/
-│   │   ├── transformer.py           # VitalsTransformer
-│   │   ├── cnn1d.py                 # VitalsCNN1D
-│   │   ├── lstm.py                  # VitalsLSTM
-│   │   └── registry.py              # 深層モデル名→クラスの一元管理
+│   │   ├── transformer.py           # VitalsTransformer（犬HR/BR）
+│   │   ├── cnn1d.py                 # VitalsCNN1D（犬HR/BR）
+│   │   ├── lstm.py                  # VitalsLSTM（犬HR/BR）
+│   │   ├── registry.py              # 犬HR/BR深層モデル名→クラスの一元管理
+│   │   ├── ecg_cnn1d.py             # ECGWaveformCNN1D（ヒトECG波形、sequence-to-sequence）
+│   │   └── ecg_registry.py          # ECG波形モデル名→クラスの一元管理（registry.pyとは別、入出力の形が違うため）
 │   └── classical/
 │       └── registry.py              # 古典MLモデル名→scikit-learn Estimatorの一元管理
 ├── training/
-│   ├── deep_trainer.py              # PyTorchの学習/評価ループ
-│   ├── classical_trainer.py         # scikit-learnのfit/評価ループ
+│   ├── deep_trainer.py              # 犬HR/BR: PyTorchの学習/評価ループ（窓->スカラ）
+│   ├── classical_trainer.py         # 犬HR/BR: scikit-learnのfit/評価ループ
+│   ├── ecg_trainer.py               # ヒトECG波形: 学習/評価ループ（窓->波形、指標は相関係数）
 │   └── schedulers.py                # 学習率スケジューラ（configで明示指定した場合のみ有効）
 ├── config.py                       # YAML設定の読み込み（extends継承）
 ├── seeding.py                      # 乱数シード固定
 ├── reproducibility.py              # gitコミット・パッケージ版の記録
-├── train.py                        # 学習CLI（familyでdeep/classicalを振り分け）
+├── train.py                        # 学習CLI（familyでdeep/classical/ecg_seq2seqを振り分け）
 └── evaluate.py                     # 評価CLI（同上）
 scripts/
 ├── run_comparison.py                # 複数configの一括学習・評価（実行の責務のみ）
@@ -128,3 +135,16 @@ Gradient Boosting）の初回比較を実施した。結果と考察は [`EXPERI
 RR Interval・ECG波形予測、マルチタスク学習、複素領域モデル、超次元コンピューティング、
 モデル小型化、健康モニタリングへの拡張予定は [`EXPERIMENTS.md`](EXPERIMENTS.md) の
 「今後の拡張予定」を参照。
+
+## ヒトデータでの手法検証（ECG波形推定）
+
+イヌのHR/BR予測が個体内の時間変動を全く追えていなかったため、目標を「他センサの波形推定」に
+広げる方向を検証している。イヌには波形の正解データが無いため、まずヒトの公開データセット
+（Schellenberger et al. 2020、CW radar + 同期ECG）で手法を確立する
+（`configs/experiments/101_ecg_cnn1d_resting.yaml`）。
+
+初回実行でtest_corr=0.524を得た。イヌHR/BRのwithin_dog_corr（実質ゼロ）とは対照的に、
+未知の被験者でも一貫して有意な相関が出ており、「レーダから他センサ波形を推定する」方向性
+自体は少なくともヒトデータでは成立することを確認した。ただしQRS波の鋭い形状の再現はまだ弱い。
+詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「ヒトECG波形推定（手法検証）の結果」、
+波形の可視化は [`reports/20260722_ecg_resting/`](reports/20260722_ecg_resting/) を参照。

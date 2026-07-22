@@ -1,4 +1,5 @@
-このリポジトリは、レーダ→イヌのバイタルサイン推定モデルの実装・実験を行う場所である。
+このリポジトリは、レーダ→イヌのバイタルサイン推定モデルの実装・実験を行う場所である
+（加えて、手法検証のためのヒトデータでのECG波形推定も含む）。
 コーディングエージェントによる試行錯誤が前提のため、人間が後から経緯を追えることを最優先する。
 
 ## 新しい実験を追加するとき
@@ -11,12 +12,20 @@
 
 ## 新しいモデルを追加するとき
 
-- 深層モデル(PyTorch)なら `src/dog_radar_vitals/models/deep/` に新しいモジュールを追加し、
-  `models/deep/registry.py` の `DEEP_MODEL_REGISTRY` に1行足す。
-- 古典MLモデル(scikit-learn)なら `models/classical/registry.py` の
+- 犬HR/BR用の深層モデル(PyTorch)なら `src/dog_radar_vitals/models/deep/` に新しいモジュールを
+  追加し、`models/deep/registry.py` の `DEEP_MODEL_REGISTRY` に1行足す。
+- 犬HR/BR用の古典MLモデル(scikit-learn)なら `models/classical/registry.py` の
   `CLASSICAL_MODEL_REGISTRY` に1行足す。
-- どちらの場合も `train.py`・`evaluate.py`・`training/*.py` は変更しない
-  （`config["model"]["family"]` で自動的に振り分けられる）。
+- ヒトECG波形推定用の深層モデルなら `models/deep/ecg_registry.py` の
+  `ECG_MODEL_REGISTRY` に1行足す（`registry.py`とは別。窓->スカラ と 窓->波形 で
+  呼び出し規約が異なるためレジストリを分けている）。
+- 既存の3つのfamily（deep/classical/ecg_seq2seq）の範囲内でモデルを追加するだけなら
+  `train.py`・`evaluate.py`・`training/*.py` は変更しない（`config["model"]["family"]` で
+  自動的に振り分けられる）。**新しいfamily自体を追加する場合**（例: 犬でも波形推定を
+  始める、複素領域モデル用に別の入出力形が要る等）は、対応する`training/*_trainer.py`を
+  新設した上で`train.py`/`evaluate.py`の`_TRAIN_FNS`/`_EVAL_FNS`辞書に1行足す
+  （これは既存family内のモデル追加とは別の変更単位であり、README.mdのディレクトリ構成も
+  合わせて更新する）。
 - 1ファイル1責務を保つ。既存のモデルファイルに新モデルを追記せず、新しいファイル名で追加する。
 
 ## 比較実験を回すとき
@@ -38,6 +47,14 @@
 
 - 既存のconfigファイルを書き換えて過去の実験を上書きしない。新しい設定は新しいファイルとして追加する。
 - `runs/` の中身をgit管理下に置かない（チェックポイントは大きく、再現は `config.yaml` から可能なため）。
-- RR Interval・ECG波形予測は、現行データセットに正解ラベルがないため実装しない
+- **イヌのRR Interval・ECG波形予測**は、現行の犬データセットに正解ラベルがないため実装しない
   （経緯は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「今後の拡張予定」、データの制約は
-  [`data/raw/README.md`](data/raw/README.md) を参照）。
+  [`data/raw/README.md`](data/raw/README.md) を参照）。**ヒトのECG波形推定**（手法検証、
+  Schellenbergerデータセット、family="ecg_seq2seq"）はこれとは別物で実装済み。混同しない。
+
+## configの番号帯
+
+- `001`〜: 犬HR/BR予測（deep/classical）
+- `101`〜: ヒトデータでの手法検証（ecg_seq2seq等）
+新しいfamilyや対象（例: 犬でのECG波形推定、複素領域モデル等）を追加する際は、
+100番台ずつ新しい帯を割り当て、このAGENTS.mdに追記する。

@@ -13,6 +13,7 @@
 |---|---|---|---|---|---|
 | 2026-07-22 | `runs/20260722-*_20260722_baseline`（12件、`reports/20260722_baseline/`に集約） | `configs/experiments/001`〜`012` 全件 | 深層3種（Transformer/CNN1D/LSTM、100 epoch、GPU）×古典ML3種（Ridge/RandomForest/GradientBoosting、`data/features.py`の手作り特徴量、CPU並列）を HR/BR 両タスクで一括比較。初回の本番実行 | **BR**: 全モデルがtest MAE 2.0〜2.2 bpmに収束（deep系がわずかに優位、transformer 2.000が最良）。**HR**: 古典ML3種が18.7〜18.9 bpmで最良、CNN1D/LSTMが19.6程度、Transformerが31.0で最下位。詳細は[`reports/20260722_baseline/table.md`](reports/20260722_baseline/table.md)・[`chart.png`](reports/20260722_baseline/chart.png) | 下の「本実行から分かったこと」参照 |
 | 2026-07-22 | `runs/20260722-1002xx〜1021xx_hr_transformer_20260722_hr_transformer_ablation`（4件、`reports/20260722_hr_transformer_ablation/`に集約） | `configs/experiments/013`〜`016` | 001のTransformer(HR)が100 epochで未収束だった件を受け、学習率・エポック数・スケジューラの対照実験。013: lr 1e-4→5e-4。014: lr 1e-4→1e-3。015: lrは1e-4のままepoch 100→300。016: 10epochウォームアップ+コサイン減衰（ピークlr 5e-4）、200epoch | 4件とも001(test MAE 31.0)から大幅改善: 013=17.45（最良、古典MLの18.7を上回る）、014=19.48、015=18.74、016=17.83。学習曲線（[`learning_curves.png`](reports/20260722_hr_transformer_ablation/learning_curves.png)）で001の学習率が単に低すぎたことを確認。ただし**別の問題が判明**（下記参照） | 下の「HR Transformer対照実験の結果」参照 |
+| 2026-07-22 | `runs/20260722-153929_ecg_ecg_cnn1d`（`reports/20260722_ecg_resting/`に集約） | `configs/experiments/101_ecg_cnn1d_resting.yaml` | イヌHR/BRでの個体内相関ほぼゼロという結果を受け、目標を「スカラ値予測」から「他センサ波形推定」に転換する手法検証。Schellenberger et al. (2020) ヒトデータセット（24GHz CW radar、fs=2000Hzで同期したECG）でレーダI/Q→ECG波形をsequence-to-sequenceで推定する全畳み込み1D CNNを実装、Restingシナリオ7/1/2名で学習 | test_corr=0.524（test被験者2名個別でも0.459・0.580と一貫）。train_corr=0.905まで到達し、val_corr(0.47〜0.51)との間に過学習傾向あり。波形を可視化すると心拍のタイミング（R波の出現位置）はおおむね捉えているが、QRSの鋭い振幅・形状の再現は弱い（[`waveform_example.png`](reports/20260722_ecg_resting/waveform_example.png)） | 下の「ヒトECG波形推定（手法検証）の結果」参照 |
 
 ## 本実行から分かったこと（2026-07-22）
 
@@ -120,6 +121,61 @@ oracle_mae=0.000（犬ごとにBR値が完全な定数のため）という事�
 「その犬自身の平常時からの逸脱を検知する」という機能は、(a) 個体内の時間変動を追えていない、
 (b) そもそも麻酔下3分間という単発スナップショットのデータには同一個体の複数時点データが
 存在しないため、現状の評価設計では原理的に検証しようがない。
+
+## ヒトECG波形推定（手法検証）の結果（2026-07-22）
+
+ユーザからの提案で、目標をHR/BRという**スカラ値の予測**から、**他センサの時系列波形の推定**へ
+広げる方向を検討した。イヌのデータには加速度・ECG波形の正解が一切存在しない
+（`data/raw/README.md`参照）ため、まずヒトの公開データセットで手法を検証することにした。
+
+MMECG（Chen et al. 2022、ミリ波、ヒト）は同意書署名＋メール申請が必要で承認まで約1週間かかり
+即時には使えなかった。代わりに、申請不要でFigshareから即時ダウンロードできる
+**Schellenberger et al. (2020)** データセット（24GHz CW radar、健常者30名、ECG・
+インピーダンス心図・連続血圧を同期記録、レーダI/QとECGが**同一サンプリングレート2000Hz・
+同一長で記録**されている）を使うことにした。
+
+### 実装
+
+- `data/schellenberger.py`: `.mat`ファイルの読み込み（radar_i, radar_q, tfm_ecg1等）
+- `data/ecg_windowing.py`: 窓切り出し。**GDN0003のECGに41サンプル(20ms)のNaN欠損が
+  実データに存在**し、素朴に窓全体をz-score正規化すると欠損が録音全体を汚染してNaN学習に
+  なることが分かったため、`np.nanmean`/`np.nanstd`で正規化しつつ、欠損を含む窓は
+  スキップする処理を入れた（テストで固定化済み: `tests/test_ecg.py`）
+- `models/deep/ecg_cnn1d.py`: 全畳み込み1D CNN（dilation 1,2,4,8,16,32、`padding='same'`で
+  入力と出力の長さを厳密に一致させるsequence-to-sequenceモデル）
+- `training/ecg_trainer.py`: 損失はMSEだが、評価指標は窓内Pearson相関係数（振幅・位相のズレに
+  頑健、波形の「形」が合っているかを見る）。`train.py`/`evaluate.py`の`family`振り分けに
+  `"ecg_seq2seq"`を追加（既存の`deep`/`classical`はそのまま、1ファイル1責務を維持）
+- Restingシナリオ、被験者7(train)/1(val)/2(test)、window_sec=4, stride_sec=2、50 epoch
+
+### 結果
+
+`configs/experiments/101_ecg_cnn1d_resting.yaml`、test_corr=**0.524**
+（test被験者個別でもGDN0009=0.459、GDN0010=0.580と一貫）。train_corr=0.905まで到達し
+val_corr(0.47〜0.51)との間に相応の過学習傾向があるが、**未知の被験者2名それぞれで
+個別に有意な正の相関が出ている**点が、イヌHR/BRの結果（within_dog_corr -0.12〜0.17、
+実質ゼロ）と決定的に異なる。
+
+波形を可視化すると（[`reports/20260722_ecg_resting/waveform_example.png`](reports/20260722_ecg_resting/waveform_example.png)）、
+心拍のタイミング（R波が出現する位置）はおおむね追えているが、QRS波特有の鋭い振幅・形状
+（真値では振幅3〜4に達する鋭いスパイク）は再現できておらず、なだらかな山型に鈍っている。
+`padding='same'`のみで受容野を広げるダウンサンプリングなしの畳み込みスタックは、鋭い遷移を
+平滑化しやすい構造的な弱点を持つと考えられる。
+
+### 含意・次に試すこと
+
+- **「レーダから他センサの時系列波形を推定する」という方向自体は、少なくともヒトデータでは
+  ゼロではない信号が確かに存在することを確認できた。** イヌのHR/BR予測で個体内相関が
+  実質ゼロだったのとは対照的であり、目標の転換（ユーザ提案）は方向性として筋が良いと言える。
+- ただし波形の**形**（QRS振幅・鋭さ）の再現度はまだ低く、健康モニタリングに使える水準
+  （例えばR波タイミングからHRV/RR Intervalを高精度に逆算できる水準）には遠い。
+  次のステップとして、(a) ダウンサンプリング+アップサンプリング構造（U-Net的）や
+  周波数領域損失の導入、(b) Valsalva/TiltUp/TiltDownなど自律神経賦活シナリオでの検証
+  （現在はRestingのみ）、(c) より多くの被験者（現在は10名中7/1/2、残り20名も取得可能）
+  でのcross-validationを検討する。
+- **イヌへの転用は、イヌ側にECG波形の正解データが存在しない限り不可能**（`data/raw/README.md`
+  参照）。転用の前提として、イヌの拍単位データ取得（Polar H10等、manager-agent側の未解決事項）
+  が必要になる。
 
 ### 理想的なMAEの目安
 

@@ -1,0 +1,33 @@
+# 101: レーダI/Q -> ECG波形推定（ヒト、Schellenberger et al. 2020データセット、Restingシナリオ）。
+#
+# 番号帯の意味: 001-0xx は犬HR/BR予測（本題）、101- はヒトデータでの手法検証（EXPERIMENTS.md参照、
+# イヌの拍単位データが手に入った際に転用する前提）。データのフィールド構成が犬用base.yamlと
+# 大きく異なる（dogs->subjects、1Hzスカラ->同一fsの波形）ため、extendsは使わず自己完結させる。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  scenario: Resting
+  window_sec: 4 # 4秒窓 = fs(2000Hz)*4 = 8000サンプル
+  stride_sec: 2
+  # 被験者ID単位でsplitを切る（犬データセットのdogs分割と同じ理由でリークを防ぐ）
+  subjects:
+    train: [GDN0001, GDN0002, GDN0003, GDN0004, GDN0005, GDN0006, GDN0007]
+    val: [GDN0008]
+    test: [GDN0009, GDN0010]
+
+model:
+  family: ecg_seq2seq
+  name: ecg_cnn1d
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

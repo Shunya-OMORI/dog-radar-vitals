@@ -1,8 +1,9 @@
 """設定ファイル(YAML)を受け取り、1つのモデルを学習してrunsディレクトリに記録するCLI。
 
-`config["model"]["family"]` が "deep" なら `training/deep_trainer.py`、
-"classical" なら `training/classical_trainer.py` に処理を委ねる。
-どちらも runs/{run_id}/ に config.yaml・environment.json・metrics.json・
+`config["model"]["family"]` で処理を振り分ける: "deep"->`training/deep_trainer.py`
+（犬HR/BR、窓->スカラ回帰）、"classical"->`training/classical_trainer.py`（同、scikit-learn）、
+"ecg_seq2seq"->`training/ecg_trainer.py`（ヒトレーダI/Q->ECG波形、窓->波形回帰）。
+いずれも runs/{run_id}/ に config.yaml・environment.json・metrics.json・
 モデル重みを残す（詳細は runs/README.md）。
 """
 from __future__ import annotations
@@ -18,10 +19,11 @@ from dog_radar_vitals.config import load_config
 from dog_radar_vitals.reproducibility import capture_environment
 from dog_radar_vitals.training.classical_trainer import train_classical
 from dog_radar_vitals.training.deep_trainer import train_deep
+from dog_radar_vitals.training.ecg_trainer import train_ecg
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-_TRAIN_FNS = {"deep": train_deep, "classical": train_classical}
+_TRAIN_FNS = {"deep": train_deep, "classical": train_classical, "ecg_seq2seq": train_ecg}
 
 
 def make_run_dir(config: dict, tag: str | None = None) -> Path:
