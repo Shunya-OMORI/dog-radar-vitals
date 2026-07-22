@@ -16,6 +16,7 @@
 | 2026-07-22 | `runs/20260722-153929_ecg_ecg_cnn1d`（`reports/20260722_ecg_resting/`に集約） | `configs/experiments/101_ecg_cnn1d_resting.yaml` | イヌHR/BRでの個体内相関ほぼゼロという結果を受け、目標を「スカラ値予測」から「他センサ波形推定」に転換する手法検証。Schellenberger et al. (2020) ヒトデータセット（24GHz CW radar、fs=2000Hzで同期したECG）でレーダI/Q→ECG波形をsequence-to-sequenceで推定する全畳み込み1D CNNを実装、Restingシナリオ7/1/2名で学習 | test_corr=0.524（test被験者2名個別でも0.459・0.580と一貫）。train_corr=0.905まで到達し、val_corr(0.47〜0.51)との間に過学習傾向あり。波形を可視化すると心拍のタイミング（R波の出現位置）はおおむね捉えているが、QRSの鋭い振幅・形状の再現は弱い（[`waveform_example.png`](reports/20260722_ecg_resting/waveform_example.png)） | 下の「ヒトECG波形推定（手法検証）の結果」参照 |
 | 2026-07-23 | `runs/_cross_validation/cv10_013_transformer_hr.json`, `cv10_009_random_forest_hr.json` | 013・009をLeave-One-Dog-Out CV（n_folds=10）で再検証、`scripts/test_cv_significance.py`で対応のある検定を追加 | 013: 3/10foldでtrivial超え、平均差+5.13（悪化）、Wilcoxon片側p=0.92。009: 3/10fold、平均差+0.53、p=0.84。**5foldの結果と一致し、trivialとの差は統計的に有意ではないことが10foldでも裏付けられた** | 下の「Leave-One-Dog-Out CVと統計検定」参照 |
 | 2026-07-23 | `runs/20260723-003215_ecg_rpeak_cnn1d`（`reports/20260723_ecg_vs_rpeak/`に集約） | `configs/experiments/102_rpeak_cnn1d_resting.yaml` | RR Intervalは波形再構成と定式化・アーキテクチャが異なるはず、というユーザ仮説を検証。101と同一データ・split・windowで、密な波形回帰ではなく「R波位置のガウシアンheatmap」を回帰する別モデル(sigmoid出力+BCE損失)を試作 | test_corr=0.335(heatmap相関)。101(ecg_cnn1d)との比較は下記「101 vs 102」参照。R波検出F1・RR Interval誤差でみると、101は被験者間で大きく変動(F1 0.08〜0.52)する一方、102はより安定(F1 0.32・0.32、RR MAE 9.6ms・12.2ms) | 下の「101 vs 102: 波形回帰とheatmap回帰の比較」参照 |
+| 2026-07-23 | `runs/_cross_validation/ecg_cv_20260723.json`（`reports/20260723_ecg_vs_rpeak/cv_paired_scatter.png`に集約） | 101・102を5-fold CVで再検証。被験者11-30を追加取得し全**30被験者**に拡大 | F1(n=30): ecg_cnn1d 0.504±0.171 vs rpeak_cnn1d 0.474±0.237（Wilcoxon p=0.289、有意差なし）。RR Interval MAE(n=30): 16.0ms vs 14.0ms（**Wilcoxon p=0.033、有意**）。訓練被験者を7→23名に増やしたことでF1自体も大きく改善した | 下の「101 vs 102のcross-validation（全30被験者）」参照 |
 
 ## 本実行から分かったこと（2026-07-22）
 
@@ -201,12 +202,63 @@ test被験者2名のみに基づく予備的な結果である点には注意が
 
 ### 次に試すこと
 
-- test被験者を増やす（被験者11-30を追加取得）、または101・102双方をcross-validationで
-  再評価し、この傾向が2名だけの偶然でないかを確認する。
+- ~~test被験者を増やす（被験者11-30を追加取得）、または101・102双方をcross-validationで
+  再評価し、この傾向が2名だけの偶然でないかを確認する。~~ → 2026-07-23実施済み。
+  下記「101 vs 102のcross-validation（全30被験者）」参照。
 - 102のrecallの低さ（0.2程度）を改善するため、heatmapのσ（現在10ms）や検出閾値、
   クラス不均衡に強い損失（focal loss等）を検討する。
 - RR Interval誤差の評価を「マッチしたペアのみ」ではなく、見逃し・過検出も加味した
   総合指標（例: 一定時間窓内の平均心拍数のMAE）でも別途評価し、用途に応じた指標を選ぶ。
+
+## 101 vs 102のcross-validation（全30被験者、2026-07-23）
+
+上記の2被験者だけの比較が偶然でないかを確認するため、Schellenbergerデータセットの
+被験者11-30を追加取得し（Figshareから申請不要で即時ダウンロード）、**全30被験者**で
+`scripts/run_ecg_cross_validation.py`による5-fold cross-validationを実施した。
+
+- fold構成: 被験者をシャッフルして5fold(各fold test 6名)に分割、残り24名のうち
+  val 1名・train 23名。101・102とも同一のfold構成で学習（比較のペアが対応するように）。
+- 評価ロジックは`compare_ecg_vs_rpeak.py`と共有化（`rpeak_evaluation.py`に切り出し）。
+- 各(fold, test被験者)の組についてF1・RR Interval MAEを求め、30被験者ぶんの対応のある
+  ペアに対してWilcoxon符号順位検定を実施。
+
+### 結果
+
+| 指標 | ecg_cnn1d（波形） | rpeak_cnn1d（heatmap） | Wilcoxon p値 |
+|---|---|---|---|
+| F1（n=30） | 0.504 ± 0.171 | 0.474 ± 0.237 | 0.289（有意差なし） |
+| RR Interval MAE（n=30） | 16.0ms | 14.0ms | **0.033（有意）** |
+
+（散布図: [`reports/20260723_ecg_vs_rpeak/cv_paired_scatter.png`](reports/20260723_ecg_vs_rpeak/cv_paired_scatter.png)。
+対角線より下がheatmap回帰の勝ち）
+
+### 解釈
+
+**訓練データを7名→23名に増やしたことで、両モデルのF1が大きく改善した**
+（前回の2被験者テストでは101が0.08〜0.52、102が0.32・0.32だったのに対し、
+今回はいずれも平均0.47〜0.50まで底上げされた）。これは、このタスクにとって
+訓練被験者数がボトルネックの一つだったことを示唆する。
+
+**F1（検出できたか）では両モデルに有意差はない（p=0.289）が、RR Interval MAE
+（検出できた拍の間隔がどれだけ正確か）ではheatmap回帰(102)が統計的に有意に優れている
+（14.0ms vs 16.0ms, p=0.033）。** これは前回の予備的な観察（heatmap回帰の方がRR誤差が
+安定して小さい）を、n=2からn=30に増やした上でより確からしい形で再確認したことになる。
+
+**含意**: 「拍を検出できるかどうか」自体はどちらの定式化でも同程度だが、**検出した拍の
+タイミング精度（RR Interval用途で本質的に重要な指標）は、疎なイベント検出として定式化する
+方が優れる**という、ユーザの当初の見立てを支持する結果が、統計的に有意な形で得られた。
+拍単位のタイミング推定を目的とするなら、密な波形再構成よりheatmap／イベント検出型の
+アプローチを優先すべきという設計指針が得られた。
+
+### 次に試すこと
+
+- 30名でもF1は0.5前後に留まり、臨床応用に耐える水準ではない。訓練データをさらに増やす
+  （Valsalva/TiltUp/TiltDown等、他シナリオも学習に含める）か、モデル容量・アーキテクチャ
+  （U-Net的な多重解像度構造等）を見直す。
+- RR Interval MAE(14〜16ms)がheatmap回帰で有意に改善した要因（振幅を無視できることの
+  効果か、BCE損失の勾配特性か）を、アブレーションで切り分ける。
+- この知見をイヌのデータに転用するには、イヌ側の拍単位正解データの取得が依然として前提となる
+  （`data/raw/README.md`参照）。
 
 ## 【最重要】trivialベースラインとの比較（2026-07-22）
 

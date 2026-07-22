@@ -40,9 +40,9 @@ def test_iter_windows_skips_windows_overlapping_nan():
 
 
 @pytest.mark.skipif(not HAS_DATA, reason="data/raw/schellenberger_human が未配置")
-def test_list_subjects_finds_ten():
+def test_list_subjects_finds_thirty():
     subjects = list_subjects(RAW_ROOT)
-    assert len(subjects) == 10
+    assert len(subjects) == 30
     assert subjects[0] == "GDN0001"
 
 

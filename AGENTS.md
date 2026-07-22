@@ -46,6 +46,11 @@
   を必ず添える。連続量の回帰誤差にはチャンスレベルが無いため、fold平均を目で比べるだけでは
   「有意な差」なのか「偶然」なのか判断できない（2026-07-23、`EXPERIMENTS.md`
   「Leave-One-Dog-Out CVと統計検定」参照）。
+- **ヒトECGモデル（101 ecg_cnn1d と 102 rpeak_cnn1d 等）の比較も同様に単発1分割で結論を
+  出さない。** `scripts/run_ecg_cross_validation.py`で被験者入れ替えCVを行い、
+  `rpeak_evaluation.py`のR波検出ベースの指標（F1・RR Interval MAE）で対応のある
+  Wilcoxon検定まで実施する。被験者数が少ないと結論が変わりうる（2被験者→30被験者で
+  F1自体が大きく底上げされた例が`EXPERIMENTS.md`「101 vs 102のcross-validation」にある）。
 
 ## データを扱うとき
 

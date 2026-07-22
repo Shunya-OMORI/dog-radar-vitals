@@ -97,6 +97,7 @@ src/dog_radar_vitals/
 ├── seeding.py                      # 乱数シード固定
 ├── reproducibility.py              # gitコミット・パッケージ版の記録
 ├── baselines.py                    # trivial/oracleベースラインの計算（固定分割・CV両方から使う）
+├── rpeak_evaluation.py             # 101/102をR波検出・RR Interval精度で評価する共有ロジック
 ├── train.py                        # 学習CLI（familyでdeep/classical/ecg_seq2seq/rpeak_seq2seqを振り分け）
 └── evaluate.py                     # 評価CLI（同上）
 scripts/
@@ -107,7 +108,8 @@ scripts/
 ├── diagnose_within_dog_signal.py    # あるrunが個体内の時間変動を追えているか診断
 ├── run_dog_cross_validation.py      # 犬を入れ替えたn-fold cross-validation（--n-folds 10でLODO）
 ├── test_cv_significance.py          # CV結果とtrivialの対応のある差を符号検定・Wilcoxon検定で検証
-└── compare_ecg_vs_rpeak.py           # 波形回帰(101)とheatmap回帰(102)をRR Interval精度で比較
+├── compare_ecg_vs_rpeak.py           # 波形回帰(101)とheatmap回帰(102)を単発runで比較
+└── run_ecg_cross_validation.py       # 101・102を被験者入れ替えCVで比較（対応のあるWilcoxon検定込み）
 runs/                              # 学習結果（gitignore対象、README.md参照）
 reports/                           # run_comparisonの結果をまとめた表・グラフ（git管理下）
 tests/
@@ -179,3 +181,13 @@ R波位置をheatmapとして回帰する別モデル（`configs/experiments/102
 問題設定を変えると挙動が変わるという見立ては支持されたが、両者とも本番水準には遠い。
 詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「101 vs 102: 波形回帰とheatmap回帰の比較」、
 比較グラフは [`reports/20260723_ecg_vs_rpeak/`](reports/20260723_ecg_vs_rpeak/) を参照。
+
+**この傾向が2被験者だけの偶然でないかを確認するため、被験者11-30を追加取得して全30名に
+拡大し、`scripts/run_ecg_cross_validation.py`で5-fold CVを行った。** F1（拍を検出できたか）
+には両モデルで有意差が無かった（0.504 vs 0.474、Wilcoxon p=0.289）一方、**RR Interval MAE
+（検出できた拍の間隔精度）はheatmap回帰(102)が統計的に有意に優れていた**（16.0ms vs
+14.0ms、**p=0.033**）。訓練被験者を7→23名に増やしたことで両モデルのF1自体も大きく改善
+（前回0.08〜0.52 → 今回いずれも平均0.47〜0.50）しており、訓練データ量もボトルネックの
+一つだったことが分かった。詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の
+「101 vs 102のcross-validation（全30被験者）」、散布図は
+[`reports/20260723_ecg_vs_rpeak/cv_paired_scatter.png`](reports/20260723_ecg_vs_rpeak/cv_paired_scatter.png) を参照。

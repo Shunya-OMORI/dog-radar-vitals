@@ -82,8 +82,9 @@ Schellenberger et al., *Scientific Data* 7:291 (2020)。健常者30名、24GHz C
 - 取得元: Figshare, DOI [10.1038/s41597-020-00629-5](https://doi.org/10.1038/s41597-020-00629-5)
   （データ本体は [Figshare 12186516](https://doi.org/10.6084/m9.figshare.12186516)）
 - **申請不要でFigshare APIから直接ダウンロード可能**（イヌデータと異なり、MMECGのような
-  同意書署名は不要）。現在は被験者01-10のみ配置（`datasets_subject_01_to_10_scidata.zip`）。
-  被験者11-30が必要になれば同様に取得する。
+  同意書署名は不要）。**被験者01-30全員を配置済み**（`datasets_subject_01_to_10/11_to_20/21_to_30_scidata.zip`
+  の3ファイル、計約5.6GB）。2026-07-23、101・102モデルの5-fold cross-validationのため
+  01-10から30名全員に拡張した。
 
 ```
 data/raw/schellenberger_human/
