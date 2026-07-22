@@ -8,9 +8,11 @@ from __future__ import annotations
 from typing import Any
 
 from dog_radar_vitals.models.deep.ecg_cnn1d import ECGWaveformCNN1D
+from dog_radar_vitals.models.deep.rpeak_cnn1d import RPeakCNN1D
 
 ECG_MODEL_REGISTRY: dict[str, type] = {
     "ecg_cnn1d": ECGWaveformCNN1D,
+    "rpeak_cnn1d": RPeakCNN1D,
 }
 
 

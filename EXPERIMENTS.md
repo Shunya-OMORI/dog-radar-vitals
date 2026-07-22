@@ -14,6 +14,8 @@
 | 2026-07-22 | `runs/20260722-*_20260722_baseline`（12件、`reports/20260722_baseline/`に集約） | `configs/experiments/001`〜`012` 全件 | 深層3種（Transformer/CNN1D/LSTM、100 epoch、GPU）×古典ML3種（Ridge/RandomForest/GradientBoosting、`data/features.py`の手作り特徴量、CPU並列）を HR/BR 両タスクで一括比較。初回の本番実行 | **BR**: 全モデルがtest MAE 2.0〜2.2 bpmに収束（deep系がわずかに優位、transformer 2.000が最良）。**HR**: 古典ML3種が18.7〜18.9 bpmで最良、CNN1D/LSTMが19.6程度、Transformerが31.0で最下位。詳細は[`reports/20260722_baseline/table.md`](reports/20260722_baseline/table.md)・[`chart.png`](reports/20260722_baseline/chart.png) | 下の「本実行から分かったこと」参照 |
 | 2026-07-22 | `runs/20260722-1002xx〜1021xx_hr_transformer_20260722_hr_transformer_ablation`（4件、`reports/20260722_hr_transformer_ablation/`に集約） | `configs/experiments/013`〜`016` | 001のTransformer(HR)が100 epochで未収束だった件を受け、学習率・エポック数・スケジューラの対照実験。013: lr 1e-4→5e-4。014: lr 1e-4→1e-3。015: lrは1e-4のままepoch 100→300。016: 10epochウォームアップ+コサイン減衰（ピークlr 5e-4）、200epoch | 4件とも001(test MAE 31.0)から大幅改善: 013=17.45（最良、古典MLの18.7を上回る）、014=19.48、015=18.74、016=17.83。学習曲線（[`learning_curves.png`](reports/20260722_hr_transformer_ablation/learning_curves.png)）で001の学習率が単に低すぎたことを確認。ただし**別の問題が判明**（下記参照） | 下の「HR Transformer対照実験の結果」参照 |
 | 2026-07-22 | `runs/20260722-153929_ecg_ecg_cnn1d`（`reports/20260722_ecg_resting/`に集約） | `configs/experiments/101_ecg_cnn1d_resting.yaml` | イヌHR/BRでの個体内相関ほぼゼロという結果を受け、目標を「スカラ値予測」から「他センサ波形推定」に転換する手法検証。Schellenberger et al. (2020) ヒトデータセット（24GHz CW radar、fs=2000Hzで同期したECG）でレーダI/Q→ECG波形をsequence-to-sequenceで推定する全畳み込み1D CNNを実装、Restingシナリオ7/1/2名で学習 | test_corr=0.524（test被験者2名個別でも0.459・0.580と一貫）。train_corr=0.905まで到達し、val_corr(0.47〜0.51)との間に過学習傾向あり。波形を可視化すると心拍のタイミング（R波の出現位置）はおおむね捉えているが、QRSの鋭い振幅・形状の再現は弱い（[`waveform_example.png`](reports/20260722_ecg_resting/waveform_example.png)） | 下の「ヒトECG波形推定（手法検証）の結果」参照 |
+| 2026-07-23 | `runs/_cross_validation/cv10_013_transformer_hr.json`, `cv10_009_random_forest_hr.json` | 013・009をLeave-One-Dog-Out CV（n_folds=10）で再検証、`scripts/test_cv_significance.py`で対応のある検定を追加 | 013: 3/10foldでtrivial超え、平均差+5.13（悪化）、Wilcoxon片側p=0.92。009: 3/10fold、平均差+0.53、p=0.84。**5foldの結果と一致し、trivialとの差は統計的に有意ではないことが10foldでも裏付けられた** | 下の「Leave-One-Dog-Out CVと統計検定」参照 |
+| 2026-07-23 | `runs/20260723-003215_ecg_rpeak_cnn1d`（`reports/20260723_ecg_vs_rpeak/`に集約） | `configs/experiments/102_rpeak_cnn1d_resting.yaml` | RR Intervalは波形再構成と定式化・アーキテクチャが異なるはず、というユーザ仮説を検証。101と同一データ・split・windowで、密な波形回帰ではなく「R波位置のガウシアンheatmap」を回帰する別モデル(sigmoid出力+BCE損失)を試作 | test_corr=0.335(heatmap相関)。101(ecg_cnn1d)との比較は下記「101 vs 102」参照。R波検出F1・RR Interval誤差でみると、101は被験者間で大きく変動(F1 0.08〜0.52)する一方、102はより安定(F1 0.32・0.32、RR MAE 9.6ms・12.2ms) | 下の「101 vs 102: 波形回帰とheatmap回帰の比較」参照 |
 
 ## 本実行から分かったこと（2026-07-22）
 
@@ -113,6 +115,98 @@
 - n_folds=5・test 2頭/foldは10頭という個体数からくる制約であり、統計的検出力は本質的に
   低い。イヌの拍単位データを自前で追加取得する場合、個体数の確保を精度以上に優先すべき
   である。
+
+## Leave-One-Dog-Out CVと統計検定（2026-07-23）
+
+ユーザから「連続量には明確なチャンスレベルが無いので、誤差が大きいか小さいか判断しづらい」
+との指摘を受け、2点を追加した。
+
+1. **n_folds=5(test 2頭/fold)→n_folds=10(test 1頭/fold, Leave-One-Dog-Out)へ変更。**
+   `run_dog_cross_validation.py`は`--n-folds 10`を渡すだけで対応（コード変更不要、10頭で
+   n_folds=10なら自動的に1fold=1頭になる）。各foldの訓練犬が7頭→8頭に増え、評価点も
+   5個→10個に増える。
+2. **`scripts/test_cv_significance.py`を新設し、fold毎の(model_mae, trivial_mae)の
+   対応のある差を符号検定・Wilcoxon符号順位検定で検定する。** 連続量の絶対誤差だけでは
+   「良い/悪い」の基準がないため、trivialとの対応のある比較を検定に落とし込むことで
+   「たまたま良く見えているだけ」なのかを判定できるようにした。
+
+### 結果
+
+| model | n_folds | trivialを上回ったfold数 | 平均差(model-trivial) | 符号検定p値 | Wilcoxon p値(片側) |
+|---|---|---|---|---|---|
+| transformer (013, lr=5e-4) | 5 | 2/5 | +4.097 | 1.000 | 0.844 |
+| transformer (013, lr=5e-4) | **10 (LODO)** | 3/10 | **+5.125** | 0.344 | 0.920 |
+| random_forest (009) | 5 | 1/5 | +0.777 | 0.375 | 0.906 |
+| random_forest (009) | **10 (LODO)** | 3/10 | **+0.530** | 0.344 | 0.839 |
+
+**foldをtest 2頭→1頭に増やし、対応のある検定を追加しても結論は変わらなかった。**
+両モデルとも、trivialとの平均差はプラス（trivialより悪い）であり、符号検定・Wilcoxon
+検定のいずれもp値は0.3以上（有意水準0.05を大きく超える）。10頭のうち、trivialを
+明確に上回ったのは各モデルとも3頭のみで、これは偶然の範囲を出ない。
+
+**結論: 現行データ（イヌ10頭、麻酔下、Scenario1）でのHR予測は、モデルをどう選んでも
+trivialベースライン（訓練犬の平均値を常に返すだけ）を統計的に有意には上回れていない。**
+この結果は、モデル実装の問題というより、(a) oracle_mae≈1bpmが示す通り個体内変動が
+ほぼ無く学習すべき動的信号が乏しいこと、(b) train8頭・test1頭という個体数の少なさが
+統計的検出力を本質的に制限していること、の2点に起因すると考えられる
+（[`reports/progress_report_2026-07-22.md`](reports/progress_report_2026-07-22.md)の
+解釈も参照）。モデル改良より個体数確保を優先すべきという結論を、より強い根拠とともに
+再確認した。
+
+## 101 vs 102: 波形回帰とheatmap回帰の比較（2026-07-23）
+
+ユーザから「RR Interval予測は一般的に問題設定もアーキテクチャも異なるはず」との指摘を受け、
+101(ecg_cnn1d、密な波形振幅を回帰)とは別に、**R波の位置だけを疎なイベントとして回帰する
+モデル**を試作した（`configs/experiments/102_rpeak_cnn1d_resting.yaml`）。
+
+- ターゲット: 真のECGからR波を検出し（`data/rpeaks.py`の閾値+不応期検出器）、
+  各R波位置にガウシアン(σ=10ms)を立てて重ね合わせたheatmap（値域[0,1]）
+- モデル: 101と同じ全畳み込みバックボーンだが、出力層にsigmoidを追加し、損失もMSEから
+  BCEに変更（`models/deep/rpeak_cnn1d.py`）
+- 評価: 101と102の予測（波形 or heatmap）それぞれから改めてR波を検出し、真のR波との
+  タイミング一致度（±50ms許容、F1）とRR Interval誤差（マッチしたペアのみ、MAE[ms]）を
+  共通の物差しで比較（`scripts/compare_ecg_vs_rpeak.py`、`data/rpeaks.py`の`match_peaks`）
+
+### 結果
+
+| 被験者 | モデル | precision | recall | F1 | RR Interval MAE |
+|---|---|---|---|---|---|
+| GDN0009 | 101 ecg_cnn1d（波形） | 0.089 | 0.075 | 0.081 | 7.2ms（マッチ数少なくノイジー） |
+| GDN0009 | 102 rpeak_cnn1d（heatmap） | 0.581 | 0.223 | **0.323** | 9.6ms |
+| GDN0010 | 101 ecg_cnn1d（波形） | 0.647 | 0.439 | **0.523** | 26.7ms |
+| GDN0010 | 102 rpeak_cnn1d（heatmap） | 0.718 | 0.208 | 0.322 | 12.2ms |
+
+（[`reports/20260723_ecg_vs_rpeak/comparison.png`](reports/20260723_ecg_vs_rpeak/comparison.png)）
+
+### 解釈
+
+**両アプローチともR波検出としては絶対水準は低い（F1 0.08〜0.52）が、性質が明確に異なる。**
+
+- **101(波形回帰)は被験者間で結果が大きく振れる**（F1 0.081 vs 0.523、RR MAE 7.2ms vs
+  26.7ms）。以前の可視化で確認した通り、QRSの鋭い振幅の再現度は被験者ごとにばらつきが
+  大きく、それがそのままピーク検出の成否に直結していると考えられる。
+- **102(heatmap回帰)は被験者間で相対的に安定している**（F1 0.323 vs 0.322、RR MAE
+  9.6ms vs 12.2ms）。振幅そのものを再現する必要がなく「ここにR波があるはず」という
+  確信度だけを学習するため、被験者ごとの波形の個人差に対して頑健になっていると考えられる。
+  ただしrecallは両被験者とも0.2程度に留まり、検出漏れは多い。
+- **RR Interval誤差（マッチしたペアのみ）は102の方が値の範囲が狭く安定している**
+  （9.6〜12.2ms vs 7.2〜26.7ms）。101のGDN0009における7.2msは、マッチ数が少ない
+  （recall 0.075、約48拍）ことによる少数サンプルの見かけ上の低さである可能性が高く、
+  額面通りには受け取れない。
+
+**「RR Interval予測は問題設定・アーキテクチャが異なる」というユーザの見立ては支持された。**
+少なくともこのヒトデータでの試作では、イベント検出（heatmap回帰）に定式化し直すことで
+被験者間の安定性が向上する傾向が見えた。ただし両者とも本番水準には遠く、この比較自体も
+test被験者2名のみに基づく予備的な結果である点には注意が必要。
+
+### 次に試すこと
+
+- test被験者を増やす（被験者11-30を追加取得）、または101・102双方をcross-validationで
+  再評価し、この傾向が2名だけの偶然でないかを確認する。
+- 102のrecallの低さ（0.2程度）を改善するため、heatmapのσ（現在10ms）や検出閾値、
+  クラス不均衡に強い損失（focal loss等）を検討する。
+- RR Interval誤差の評価を「マッチしたペアのみ」ではなく、見逃し・過検出も加味した
+  総合指標（例: 一定時間窓内の平均心拍数のMAE）でも別途評価し、用途に応じた指標を選ぶ。
 
 ## 【最重要】trivialベースラインとの比較（2026-07-22）
 

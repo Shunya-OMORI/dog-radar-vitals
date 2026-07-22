@@ -16,10 +16,11 @@
   追加し、`models/deep/registry.py` の `DEEP_MODEL_REGISTRY` に1行足す。
 - 犬HR/BR用の古典MLモデル(scikit-learn)なら `models/classical/registry.py` の
   `CLASSICAL_MODEL_REGISTRY` に1行足す。
-- ヒトECG波形推定用の深層モデルなら `models/deep/ecg_registry.py` の
-  `ECG_MODEL_REGISTRY` に1行足す（`registry.py`とは別。窓->スカラ と 窓->波形 で
-  呼び出し規約が異なるためレジストリを分けている）。
-- 既存の3つのfamily（deep/classical/ecg_seq2seq）の範囲内でモデルを追加するだけなら
+- ヒトECG関連（波形回帰・R波heatmap回帰とも）の深層モデルなら `models/deep/ecg_registry.py` の
+  `ECG_MODEL_REGISTRY` に1行足す（`registry.py`とは別。窓->スカラ と 窓->系列 で
+  呼び出し規約が異なるためレジストリを分けている。波形回帰とheatmap回帰は呼び出し規約が
+  同じなので同じレジストリに同居させている）。
+- 既存の4つのfamily（deep/classical/ecg_seq2seq/rpeak_seq2seq）の範囲内でモデルを追加するだけなら
   `train.py`・`evaluate.py`・`training/*.py` は変更しない（`config["model"]["family"]` で
   自動的に振り分けられる）。**新しいfamily自体を追加する場合**（例: 犬でも波形推定を
   始める、複素領域モデル用に別の入出力形が要る等）は、対応する`training/*_trainer.py`を
@@ -40,6 +41,11 @@
   ことが実証された（[`EXPERIMENTS.md`](EXPERIMENTS.md)「犬入れ替えcross-validationの結果」）。
   「モデルAがモデルBより優れている」と主張する際は `scripts/run_dog_cross_validation.py`
   でfold平均・foldごとのtrivial比較を必ず添える。単一分割の結果は動作確認以上の意味を持たない。
+- **fold平均・fold数(n_folds)は`--n-folds 10`（10頭でLeave-One-Dog-Out）を既定とする。**
+  さらに`scripts/test_cv_significance.py`で対応のある統計検定（符号検定・Wilcoxon符号順位検定）
+  を必ず添える。連続量の回帰誤差にはチャンスレベルが無いため、fold平均を目で比べるだけでは
+  「有意な差」なのか「偶然」なのか判断できない（2026-07-23、`EXPERIMENTS.md`
+  「Leave-One-Dog-Out CVと統計検定」参照）。
 
 ## データを扱うとき
 
@@ -54,12 +60,13 @@
 - `runs/` の中身をgit管理下に置かない（チェックポイントは大きく、再現は `config.yaml` から可能なため）。
 - **イヌのRR Interval・ECG波形予測**は、現行の犬データセットに正解ラベルがないため実装しない
   （経緯は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「今後の拡張予定」、データの制約は
-  [`data/raw/README.md`](data/raw/README.md) を参照）。**ヒトのECG波形推定**（手法検証、
-  Schellenbergerデータセット、family="ecg_seq2seq"）はこれとは別物で実装済み。混同しない。
+  [`data/raw/README.md`](data/raw/README.md) を参照）。**ヒトのECG波形推定・R波検出**
+  （手法検証、Schellenbergerデータセット、family="ecg_seq2seq"/"rpeak_seq2seq"）は
+  これとは別物で実装済み。混同しない。
 
 ## configの番号帯
 
 - `001`〜: 犬HR/BR予測（deep/classical）
-- `101`〜: ヒトデータでの手法検証（ecg_seq2seq等）
+- `101`〜: ヒトデータでの手法検証（ecg_seq2seq, rpeak_seq2seq等）
 新しいfamilyや対象（例: 犬でのECG波形推定、複素領域モデル等）を追加する際は、
 100番台ずつ新しい帯を割り当て、このAGENTS.mdに追記する。

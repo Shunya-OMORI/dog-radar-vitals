@@ -72,27 +72,32 @@ src/dog_radar_vitals/
 │   ├── features.py                 # 古典ML向けの手作り特徴量抽出（犬HR/BR）
 │   ├── schellenberger.py           # Schellenberger et al. (2020) の読み込み（ヒトECG波形）
 │   ├── ecg_windowing.py            # 窓切り出し（ヒトECG、窓->同じ長さの波形）
-│   └── ecg_dataset.py              # レーダI/Q窓とECG波形窓のDataset（ヒトECG）
+│   ├── ecg_dataset.py              # レーダI/Q窓とECG波形窓のDataset（ヒトECG）
+│   ├── rpeaks.py                   # R波検出・heatmap生成・ピークマッチング・RR Interval計算
+│   ├── rpeak_windowing.py          # 窓切り出し（ヒトECG、窓->R波heatmap）
+│   └── rpeak_dataset.py            # レーダI/Q窓とR波heatmap窓のDataset（ヒトECG）
 ├── models/
 │   ├── deep/
 │   │   ├── transformer.py           # VitalsTransformer（犬HR/BR）
 │   │   ├── cnn1d.py                 # VitalsCNN1D（犬HR/BR）
 │   │   ├── lstm.py                  # VitalsLSTM（犬HR/BR）
 │   │   ├── registry.py              # 犬HR/BR深層モデル名→クラスの一元管理
-│   │   ├── ecg_cnn1d.py             # ECGWaveformCNN1D（ヒトECG波形、sequence-to-sequence）
-│   │   └── ecg_registry.py          # ECG波形モデル名→クラスの一元管理（registry.pyとは別、入出力の形が違うため）
+│   │   ├── ecg_cnn1d.py             # ECGWaveformCNN1D（ヒトECG波形、密な波形回帰）
+│   │   ├── rpeak_cnn1d.py           # RPeakCNN1D（ヒトECG、R波heatmap回帰、sigmoid出力）
+│   │   └── ecg_registry.py          # ECG関連モデル名→クラスの一元管理（registry.pyとは別、入出力の形が違うため）
 │   └── classical/
 │       └── registry.py              # 古典MLモデル名→scikit-learn Estimatorの一元管理
 ├── training/
 │   ├── deep_trainer.py              # 犬HR/BR: PyTorchの学習/評価ループ（窓->スカラ）
 │   ├── classical_trainer.py         # 犬HR/BR: scikit-learnのfit/評価ループ
-│   ├── ecg_trainer.py               # ヒトECG波形: 学習/評価ループ（窓->波形、指標は相関係数）
+│   ├── ecg_trainer.py               # ヒトECG波形: 学習/評価ループ（窓->波形、指標は相関係数、MSE損失）
+│   ├── rpeak_trainer.py             # ヒトECG R波heatmap: 学習/評価ループ（窓->heatmap、BCE損失）
 │   └── schedulers.py                # 学習率スケジューラ（configで明示指定した場合のみ有効）
 ├── config.py                       # YAML設定の読み込み（extends継承）
 ├── seeding.py                      # 乱数シード固定
 ├── reproducibility.py              # gitコミット・パッケージ版の記録
 ├── baselines.py                    # trivial/oracleベースラインの計算（固定分割・CV両方から使う）
-├── train.py                        # 学習CLI（familyでdeep/classical/ecg_seq2seqを振り分け）
+├── train.py                        # 学習CLI（familyでdeep/classical/ecg_seq2seq/rpeak_seq2seqを振り分け）
 └── evaluate.py                     # 評価CLI（同上）
 scripts/
 ├── run_comparison.py                # 複数configの一括学習・評価（実行の責務のみ）
@@ -100,7 +105,9 @@ scripts/
 ├── plot_learning_curves.py          # 複数runのval MAE学習曲線を重ねて比較（収束診断用）
 ├── compute_baselines.py             # 固定分割でのtrivial/oracleベースラインCLI
 ├── diagnose_within_dog_signal.py    # あるrunが個体内の時間変動を追えているか診断
-└── run_dog_cross_validation.py      # 犬を入れ替えた5-fold cross-validation（1モデルにつき5run）
+├── run_dog_cross_validation.py      # 犬を入れ替えたn-fold cross-validation（--n-folds 10でLODO）
+├── test_cv_significance.py          # CV結果とtrivialの対応のある差を符号検定・Wilcoxon検定で検証
+└── compare_ecg_vs_rpeak.py           # 波形回帰(101)とheatmap回帰(102)をRR Interval精度で比較
 runs/                              # 学習結果（gitignore対象、README.md参照）
 reports/                           # run_comparisonの結果をまとめた表・グラフ（git管理下）
 tests/
@@ -142,6 +149,12 @@ trivialベースラインを安定して上回れないことが判明した（[
 詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「犬入れ替えcross-validationの結果」を参照。
 今後のモデル比較は単一分割ではなくこのCV手順を標準とする。
 
+**さらにfold数を5→10（Leave-One-Dog-Out）に増やし、`scripts/test_cv_significance.py`で
+trivialとの対応のある統計検定（符号検定・Wilcoxon符号順位検定）を追加した。** 結果は変わらず、
+両モデルともtrivialとの差は統計的に有意ではなかった（p値はいずれも0.3超）。「現行データでは
+モデル選択によらずtrivialを有意に上回れない」ことを、より強い統計的根拠とともに確認した。
+詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「Leave-One-Dog-Out CVと統計検定」を参照。
+
 RR Interval・ECG波形予測、マルチタスク学習、複素領域モデル、超次元コンピューティング、
 モデル小型化、健康モニタリングへの拡張予定は [`EXPERIMENTS.md`](EXPERIMENTS.md) の
 「今後の拡張予定」を参照。
@@ -158,3 +171,11 @@ RR Interval・ECG波形予測、マルチタスク学習、複素領域モデル
 自体は少なくともヒトデータでは成立することを確認した。ただしQRS波の鋭い形状の再現はまだ弱い。
 詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「ヒトECG波形推定（手法検証）の結果」、
 波形の可視化は [`reports/20260722_ecg_resting/`](reports/20260722_ecg_resting/) を参照。
+
+**RR Interval予測は問題設定・アーキテクチャが波形回帰とは異なるはず、との考えから、
+R波位置をheatmapとして回帰する別モデル（`configs/experiments/102_rpeak_cnn1d_resting.yaml`）を
+試作し比較した。** R波検出F1・RR Interval誤差でみると、101(波形回帰)は被験者間で結果が
+大きく振れる（F1 0.08〜0.52）のに対し、102(heatmap回帰)は相対的に安定していた（F1 0.32・0.32）。
+問題設定を変えると挙動が変わるという見立ては支持されたが、両者とも本番水準には遠い。
+詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「101 vs 102: 波形回帰とheatmap回帰の比較」、
+比較グラフは [`reports/20260723_ecg_vs_rpeak/`](reports/20260723_ecg_vs_rpeak/) を参照。

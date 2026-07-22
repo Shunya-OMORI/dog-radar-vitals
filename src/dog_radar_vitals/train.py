@@ -20,10 +20,16 @@ from dog_radar_vitals.reproducibility import capture_environment
 from dog_radar_vitals.training.classical_trainer import train_classical
 from dog_radar_vitals.training.deep_trainer import train_deep
 from dog_radar_vitals.training.ecg_trainer import train_ecg
+from dog_radar_vitals.training.rpeak_trainer import train_rpeak
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-_TRAIN_FNS = {"deep": train_deep, "classical": train_classical, "ecg_seq2seq": train_ecg}
+_TRAIN_FNS = {
+    "deep": train_deep,
+    "classical": train_classical,
+    "ecg_seq2seq": train_ecg,
+    "rpeak_seq2seq": train_rpeak,
+}
 
 
 def make_run_dir(config: dict, tag: str | None = None) -> Path:

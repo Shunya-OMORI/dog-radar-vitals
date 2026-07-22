@@ -13,8 +13,14 @@ from dog_radar_vitals.train import REPO_ROOT
 from dog_radar_vitals.training.classical_trainer import evaluate_classical
 from dog_radar_vitals.training.deep_trainer import evaluate_deep
 from dog_radar_vitals.training.ecg_trainer import evaluate_ecg
+from dog_radar_vitals.training.rpeak_trainer import evaluate_rpeak
 
-_EVAL_FNS = {"deep": evaluate_deep, "classical": evaluate_classical, "ecg_seq2seq": evaluate_ecg}
+_EVAL_FNS = {
+    "deep": evaluate_deep,
+    "classical": evaluate_classical,
+    "ecg_seq2seq": evaluate_ecg,
+    "rpeak_seq2seq": evaluate_rpeak,
+}
 
 
 def evaluate_run(run_dir: Path) -> dict[str, float]:

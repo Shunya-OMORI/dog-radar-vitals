@@ -1,0 +1,29 @@
+# 102: レーダI/Q -> R波heatmap（疎なイベント検出）。101(ecg_cnn1d、密な波形回帰)との比較用。
+# データ・split・window設定は101と揃え、タスク定式化（heatmap回帰 vs 波形回帰）の違いだけを見る。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  scenario: Resting
+  window_sec: 4
+  stride_sec: 2
+  subjects:
+    train: [GDN0001, GDN0002, GDN0003, GDN0004, GDN0005, GDN0006, GDN0007]
+    val: [GDN0008]
+    test: [GDN0009, GDN0010]
+
+model:
+  family: rpeak_seq2seq
+  name: rpeak_cnn1d
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
