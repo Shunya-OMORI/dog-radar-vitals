@@ -91,12 +91,16 @@ src/dog_radar_vitals/
 ├── config.py                       # YAML設定の読み込み（extends継承）
 ├── seeding.py                      # 乱数シード固定
 ├── reproducibility.py              # gitコミット・パッケージ版の記録
+├── baselines.py                    # trivial/oracleベースラインの計算（固定分割・CV両方から使う）
 ├── train.py                        # 学習CLI（familyでdeep/classical/ecg_seq2seqを振り分け）
 └── evaluate.py                     # 評価CLI（同上）
 scripts/
 ├── run_comparison.py                # 複数configの一括学習・評価（実行の責務のみ）
 ├── make_comparison_report.py        # マニフェストから比較表・グラフを生成（集計の責務のみ）
-└── plot_learning_curves.py          # 複数runのval MAE学習曲線を重ねて比較（収束診断用）
+├── plot_learning_curves.py          # 複数runのval MAE学習曲線を重ねて比較（収束診断用）
+├── compute_baselines.py             # 固定分割でのtrivial/oracleベースラインCLI
+├── diagnose_within_dog_signal.py    # あるrunが個体内の時間変動を追えているか診断
+└── run_dog_cross_validation.py      # 犬を入れ替えた5-fold cross-validation（1モデルにつき5run）
 runs/                              # 学習結果（gitignore対象、README.md参照）
 reports/                           # run_comparisonの結果をまとめた表・グラフ（git管理下）
 tests/
@@ -129,8 +133,14 @@ Gradient Boosting）の初回比較を実施した。結果と考察は [`EXPERI
 母集団平均への回帰にすぎないことが判明した**（詳細は[`EXPERIMENTS.md`](EXPERIMENTS.md)の
 「追試: HRでtrivialを上回った2モデルは健康モニタリングに使えるか」）。現行データ
 （麻酔下・1頭1回のスナップショット）は、そもそも個体内の状態変化を検証できる構造になっていない。
-モデル比較を再度行う前に、この分割の信頼性（leave-few-dogs-out cross-validationの必要性）に
-対応することを最優先課題としている。
+
+**最優先課題だった単一分割の信頼性検証も完了した。** `scripts/run_dog_cross_validation.py` で
+犬を入れ替えた5-fold cross-validationを実施したところ、単一分割で「勝者」に見えていた
+2モデル（Transformer lr=5e-4、Random Forest）はいずれもfold間で結果が大きく揺れ、
+trivialベースラインを安定して上回れないことが判明した（[`reports/20260722_dog_cross_validation/`](reports/20260722_dog_cross_validation/)）。
+**単一分割に基づくこれまでの「どのモデルが優れているか」という結論は再現しなかった。**
+詳細は [`EXPERIMENTS.md`](EXPERIMENTS.md) の「犬入れ替えcross-validationの結果」を参照。
+今後のモデル比較は単一分割ではなくこのCV手順を標準とする。
 
 RR Interval・ECG波形予測、マルチタスク学習、複素領域モデル、超次元コンピューティング、
 モデル小型化、健康モニタリングへの拡張予定は [`EXPERIMENTS.md`](EXPERIMENTS.md) の

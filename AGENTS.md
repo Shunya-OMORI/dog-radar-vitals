@@ -35,6 +35,11 @@
   の順で使う。この2つは責務を分けているので、学習をやり直さずレポートだけ再生成できる。
 - 深層モデルはGPUが1枚のため逐次実行、古典MLモデルはCPU並列で実行される
   （`run_comparison.py` が自動で振り分ける）。
+- **犬HR/BRのモデル比較は、単一のtrain/val/test分割だけで結論を出さない。**
+  2026-07-22のcross-validationで、単一分割での「勝者」がfoldを入れ替えると再現しない
+  ことが実証された（[`EXPERIMENTS.md`](EXPERIMENTS.md)「犬入れ替えcross-validationの結果」）。
+  「モデルAがモデルBより優れている」と主張する際は `scripts/run_dog_cross_validation.py`
+  でfold平均・foldごとのtrivial比較を必ず添える。単一分割の結果は動作確認以上の意味を持たない。
 
 ## データを扱うとき
 
