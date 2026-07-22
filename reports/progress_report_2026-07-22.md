@@ -25,6 +25,13 @@
 | Ahmed et al. (2024) UWB-DVS シナリオ1 | イヌ10頭（麻酔下、3分間） | UWB radar (8.75GHz) + BM7Vet Pro心電センサ | 本題（HR/BR予測） |
 | Schellenberger et al. (2020) | ヒト30名中10名を取得 | CW radar (24GHz) + 同期ECG (2000Hz) | 手法検証（他センサ波形推定） |
 
+**イヌ側レーダCSV（`RawData_No*.csv`、9000行×467列）の列構成について**: 原論文本文には
+明示的な記述が無く、機材仕様（サンプリング周波数23.32GHz等）との整合性から、467列は
+「複数センサの多重化」ではなく**単一のUWBレーダが1フレームごとに取得する高速時間方向の
+レンジビン**であると推定した（`467/23.32GHz≈20ns≈片道3mの観測窓`という計算が、被験体
+距離0.3mと矛盾しない）。詳細な根拠は [`data/raw/README.md`](../data/raw/README.md) の
+「RawData_No*.csv の列構成」を参照。
+
 イヌ側データはHR/BRとも1Hzへ平均化されたスカラ値のみで、ECG波形・加速度は一切含まれない
 （[`data/raw/README.md`](../data/raw/README.md)）。
 
