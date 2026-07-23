@@ -1,4 +1,4 @@
-# 研究進捗報告（2026-07-22時点）
+# 研究進捗報告（2026-07-22〜23時点）
 
 **テーマ**: レーダによるイヌのバイタルサイン推定（卒業研究、2026年度）
 **対象リポジトリ**: `dog-radar-vitals`（実装・実験）／
@@ -23,7 +23,7 @@
 | データセット | 対象 | モダリティ | 用途 |
 |---|---|---|---|
 | Ahmed et al. (2024) UWB-DVS シナリオ1 | イヌ10頭（麻酔下、3分間） | UWB radar (8.75GHz) + BM7Vet Pro心電センサ | 本題（HR/BR予測） |
-| Schellenberger et al. (2020) | ヒト30名中10名を取得 | CW radar (24GHz) + 同期ECG (2000Hz) | 手法検証（他センサ波形推定） |
+| Schellenberger et al. (2020) | ヒト30名全員を取得 | CW radar (24GHz) + 同期ECG (2000Hz) | 手法検証（他センサ波形推定） |
 
 **イヌ側レーダCSV（`RawData_No*.csv`、9000行×467列）の列構成について**: 原論文本文には
 明示的な記述が無く、機材仕様（サンプリング周波数23.32GHz等）との整合性から、467列は
@@ -42,7 +42,8 @@
 - 設定はYAML宣言（`configs/experiments/*.yaml`、1実験1ファイル、番号は増分専用で上書きしない）
 - モデルはPyTorch深層モデル(`family=deep`: Transformer/CNN1D/LSTM)・scikit-learn古典ML
   (`family=classical`: Ridge/RandomForest/GradientBoosting)・ヒトECG波形推定
-  (`family=ecg_seq2seq`: 全畳み込みCNN)の3ファミリーをレジストリで一元管理
+  (`family=ecg_seq2seq`: 全畳み込みCNN)・ヒトR波heatmap推定(`family=rpeak_seq2seq`:
+  同バックボーン+sigmoid出力)の4ファミリーをレジストリで一元管理
 - 乱数シード固定・gitコミット記録による再現性の作り込み（`seeding.py`, `reproducibility.py`）
 - 実行結果は`runs/`（gitignore）に出るが、人間が維持する`EXPERIMENTS.md`が正史
 - 詳細は [`README.md`](../README.md) のディレクトリ構成を参照
@@ -105,6 +106,62 @@ trivialを上回った2モデルについて、個体内の時間変動を実際
 うち、trivialを明確に上回ったのはわずか3通りだった。これまでの「Transformerが優れている」
 「学習率5e-4が最適」といった結論は、特定の犬の組み合わせに固有の偶然だったと判断している。
 
+### 4.7 Leave-One-Dog-Out CVと統計検定
+
+「連続量の誤差には明確なチャンスレベルが無く、fold平均を目で比べるだけでは有意な差なのか
+偶然なのか判断できない」という指摘を受け、2点を追加した。
+
+1. fold数を5(test 2頭/fold)→10(test 1頭/fold、Leave-One-Dog-Out)に増やし、各foldの
+   訓練犬を7頭→8頭に拡大。
+2. `scripts/test_cv_significance.py`を新設し、fold毎の(モデル誤差, trivial誤差)という
+   対応のあるペアに符号検定・Wilcoxon符号順位検定を適用。
+
+| model | n_folds | trivialを上回ったfold数 | 平均差(model-trivial) | Wilcoxon p値 |
+|---|---|---|---|---|
+| Transformer(lr=5e-4) | 5 | 2/5 | +4.10 | 0.844 |
+| Transformer(lr=5e-4) | 10(LODO) | 3/10 | +5.13 | 0.920 |
+| RandomForest | 5 | 1/5 | +0.78 | 0.906 |
+| RandomForest | 10(LODO) | 3/10 | +0.53 | 0.839 |
+
+**fold数を倍にし対応のある検定を追加しても結論は変わらなかった。** 両モデルとも
+trivialとの平均差はプラス（trivialより悪い）で、p値はいずれも0.8を超え有意水準0.05を
+大きく上回る。「現行データではモデル選択によらずtrivialを統計的に有意には上回れない」
+ことを、より強い統計的根拠とともに再確認した。
+
+### 4.8 RR Interval予測は問題設定を変えるべきか: heatmap回帰モデルの試作（小規模）
+
+「RR Interval予測は密な波形再構成とは問題設定・アーキテクチャが異なるはず」という提案を
+受け、101(ecg_cnn1d、波形振幅を回帰)とは別に、**R波の位置だけを疎なイベントとして
+回帰するモデル**(102 rpeak_cnn1d、sigmoid出力+BCE損失)を試作した。真のR波はECGから
+閾値+不応期検出器で求め、101・102それぞれの予測から改めてR波を検出して、タイミング
+一致度(F1)・RR Interval誤差(MAE)という共通の物差しで比較した。
+
+test被験者2名での予備比較では、101は被験者間で結果が大きく振れた（F1 0.081 vs
+0.523）のに対し、102は相対的に安定していた（F1 0.323 vs 0.322）。ただし被験者2名の
+予備結果に過ぎず、確度は低かった。
+
+### 4.9 101 vs 102の検証: 全30被験者でのcross-validation
+
+4.8の傾向が偶然でないかを確認するため、Schellenbergerデータセットの被験者11-30を
+追加取得し(申請不要でFigshareから即時取得可能)、**全30被験者**で5-fold
+cross-validationを実施した(`scripts/run_ecg_cross_validation.py`、101・102を
+同一fold構成で学習し、対応のあるWilcoxon検定まで実施)。
+
+| 指標 | 101 ecg_cnn1d(波形) | 102 rpeak_cnn1d(heatmap) | Wilcoxon p値 |
+|---|---|---|---|
+| F1（拍を検出できたか、n=30） | 0.504 ± 0.171 | 0.474 ± 0.237 | 0.289（有意差なし） |
+| RR Interval MAE（検出精度、n=30） | 16.0ms | 14.0ms | **0.033（有意）** |
+
+**訓練被験者を7名→23名に増やしたことで、両モデルのF1がいずれも平均0.47〜0.50まで
+大きく底上げされた**（4.8時点の0.08〜0.52という散らばりから改善）。これは訓練データ量が
+このタスクのボトルネックの一つだったことを示す。
+
+その上で、**「拍を検出できるか」自体には両モデルで有意差が無い（p=0.289）一方、
+「検出できた拍のタイミング精度」はheatmap回帰(102)が統計的に有意に優れていた
+（16.0ms vs 14.0ms、p=0.033）。** これは4.8の予備的な観察を、n=2からn=30に増やした上で
+統計的に裏付けたものであり、「RR Interval用途では密な波形再構成よりイベント検出型の
+定式化を優先すべき」という提案を支持する結果である。
+
 ## 5. 現時点での解釈: モデル実装の問題か、データ・タスク設計の問題か
 
 **犬HR/BRについては、モデル実装上の問題ではなく、データ・タスク設計側の制約が主因だと考えている。**
@@ -122,17 +179,38 @@ trivialを上回った2モデルについて、個体内の時間変動を実際
 畳み込みスタックが鋭い一瞬のスパイクを平滑化してしまう構造的弱点であり、これは
 U-Net的な多重解像度構造やピーク重み付き損失など、既知の対処法がある課題である。
 
+**4.9の結果は、この「モデル側の問題」という解釈にさらに具体性を与える。** F1(検出できるか)
+自体は101・102で差が無いことから、両モデルとも「レーダから心拍タイミングの手がかりを
+拾う」という点では同程度の能力を持つと考えられる。にもかかわらずRR Interval精度で
+有意差が出たのは、101の「振幅まで再現しようとする」定式化そのものが、タイミング推定に
+とっては不要な自由度（QRSの高さ・形状の再現失敗）を増やし、そこから逆算するピーク位置に
+ノイズを乗せているためだと考えられる。**つまり同じ受容野・同じバックボーンでも、
+出力層と損失関数（＝タスクの定式化）を変えるだけでRR Interval精度が有意に変わっており、
+「アーキテクチャ／タスク設計の問題」という解釈は狭い意味でのモデル改良（層を増やす等）
+ではなく、この定式化の選択のレベルで効いていることが分かった。**
+
+**犬HR/BRの「trivialを有意に上回れない」という結論も、4.7でfold数と検定を強化した上で
+再確認された。** これによりモデル改良（アーキテクチャ探索・ハイパーパラメータ調整）の
+優先度は下がり、個体数確保（データ収集）が最優先課題であるという結論の確度が上がった。
+
 ## 6. 今後の課題
 
 - **犬データ**: BRタスクは現行データ（麻酔下）では学習すべき信号がほぼ無い
   （oracle_mae=0.000）ため、Scenario2（覚醒・自由行動）や自前データ取得の検討が必要。
-  個体数の少なさ自体がボトルネックであり、精度改善よりも個体数確保を優先すべき。
-- **ヒトECG波形推定**: U-Net的な多重解像度アーキテクチャ、QRS区間への重み付け損失の導入。
-  Valsalva/TiltUp/TiltDownなど自律神経賦活シナリオでの検証、被験者数を増やしてのCV。
+  個体数の少なさ自体がボトルネックであり、精度改善よりも個体数確保を優先すべき
+  （4.7のLeave-One-Dog-Out CV・統計検定で再確認済み）。
+- **ヒトECG/R波推定**: 30名でもF1は0.5前後に留まり本番水準には遠い。訓練データの
+  さらなる拡大（Valsalva/TiltUp/TiltDown等の他シナリオを学習に含める）、U-Net的な
+  多重解像度アーキテクチャ、RR Interval精度がheatmap回帰で改善した要因（振幅を無視
+  できることの効果か、BCE損失の勾配特性か）の切り分けを次に検討する。
 - **イヌへの転用**: イヌ側にECG波形・加速度の正解データが無い限り不可能。転用のためには
   Polar H10等でのイヌの拍単位データ取得が前提になる（manager-agent側の未解決事項）。
-- **研究の型としての今後のモデル比較**: 単一分割ではなく`scripts/run_dog_cross_validation.py`
-  によるcross-validationを標準とし、fold平均とfold毎のtrivial比較をセットで報告する。
+  ヒトデータで「イベント検出型の定式化がRR Interval精度で有利」という知見が得られたため、
+  イヌデータが手に入った際はこの知見を最初から適用できる。
+- **研究の型としての今後のモデル比較**: 犬モデルは単一分割ではなく
+  `scripts/run_dog_cross_validation.py`（既定`--n-folds 10`）と`scripts/test_cv_significance.py`
+  による対応のある検定をセットで、ヒトECGモデルは`scripts/run_ecg_cross_validation.py`による
+  被験者入れ替えCVと対応のあるWilcoxon検定をセットで、それぞれ標準の比較手順とする。
 
 ## 参考資料
 
@@ -141,5 +219,8 @@ U-Net的な多重解像度構造やピーク重み付き損失など、既知の
 - Transformer学習率対照実験: [`reports/20260722_hr_transformer_ablation/`](20260722_hr_transformer_ablation/)
 - trivial/oracleベースライン: [`reports/baselines.md`](baselines.md)
 - ヒトECG波形推定: [`reports/20260722_ecg_resting/`](20260722_ecg_resting/)
-- 犬入れ替えcross-validation: [`reports/20260722_dog_cross_validation/`](20260722_dog_cross_validation/)
+- 犬入れ替えcross-validation（5-fold）: [`reports/20260722_dog_cross_validation/`](20260722_dog_cross_validation/)
+- Leave-One-Dog-Out CV・統計検定: `runs/_cross_validation/cv10_013_transformer_hr.json`,
+  `cv10_009_random_forest_hr.json`（`EXPERIMENTS.md`「Leave-One-Dog-Out CVと統計検定」参照）
+- 101 vs 102（波形回帰 vs heatmap回帰）予備比較・全30被験者CV: [`reports/20260723_ecg_vs_rpeak/`](20260723_ecg_vs_rpeak/)
 - 文献調査・テーマ選定の経緯: [`manager-agent/research/dog-mmwave-rri/README.md`](../../manager-agent/research/dog-mmwave-rri/README.md)
