@@ -1,0 +1,29 @@
+# 225: ecg_ncpのデータ効率実験(train被験者2名版)。NCPは少データでの汎化性がRNN/CNNより
+# 優れると文献で報告されており(LTC/Liquid Neural Networks)、train被験者数を7->4->2と
+# 減らして性能劣化カーブをecg_cnn1d/ecg_unet1dと比較する(EXPERIMENTS.md参照)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_seq2seq
+  name: ecg_ncp
+  in_channels: 50
+  units: 64
+  output_dim: 1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

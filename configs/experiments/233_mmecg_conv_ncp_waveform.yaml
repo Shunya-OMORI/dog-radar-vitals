@@ -1,0 +1,34 @@
+# 233: RCG(mmWave, 50ch) -> ECG波形推定。NCP進化系(局所畳み込み前処理+CfC、mixed_memory)。
+# Conformerが素のTransformerの未収束問題を局所畳み込みの帰納バイアスで解消したのと
+# 同じ発想をNCPに適用する（EXPERIMENTS.md「NCPの進化系」参照）。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_seq2seq
+  name: ecg_conv_ncp
+  in_channels: 50
+  conv_channels: 32
+  conv_kernel_size: 15
+  conv_layers: 3
+  ncp_units: 64
+  ncp_output_dim: 8
+  n_ncp_layers: 2
+  mixed_memory: true
+
+train:
+  batch_size: 32
+  epochs: 20
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

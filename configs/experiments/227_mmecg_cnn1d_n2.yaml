@@ -1,0 +1,29 @@
+# 227: ecg_cnn1dのデータ効率実験(train被験者2名版)。225と対、NCPとの劣化カーブ比較用。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4 # 4秒窓 = fs(200Hz)*4 = 800サンプル
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_seq2seq
+  name: ecg_cnn1d
+  in_channels: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

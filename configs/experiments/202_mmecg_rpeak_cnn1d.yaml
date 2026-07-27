@@ -1,0 +1,30 @@
+# 202: RCG(mmWave, 50ch) -> R波heatmap推定。201と同一データ・split・windowで、
+# タスク定式化（heatmap回帰 vs 波形回帰）の違いだけを見る（102と同じ狙い）。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_cnn1d
+  in_channels: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

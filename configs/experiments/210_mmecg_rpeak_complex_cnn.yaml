@@ -1,0 +1,29 @@
+# 210: RCG(mmWave, 50ch)のanalytic signal(Hilbert変換)-> R波heatmap推定。
+# 複素領域CNN(209のheatmap版)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: true
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_complex_cnn
+  in_channels: 50
+  channels: 32
+  n_layers: 6
+  kernel_size: 15
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

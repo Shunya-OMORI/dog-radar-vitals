@@ -1,0 +1,35 @@
+# 237: RCG(mmWave, 50ch) + posXYZ -> R波heatmap推定。空間融合生成器(232, これまで最高F1=0.545)
+# にPatchGAN判別器(222と同じ)を追加した敵対的リファインメント版。ユーザ提案「空間座標を
+# GANにも使ってみては」を受けた実験。222(rpeak_unet1d+GAN)ではGANが悪化させたが、
+# 異なるバックボーン(空間融合)でも同じ傾向か検証する。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_heatmap_gan
+  name: rpeak_spatial_fusion
+  n_points: 50
+  embed_dim: 32
+  n_heads: 4
+  n_attn_layers: 2
+  adv_weight: 0.1
+  discriminator:
+    condition_proj_channels: 8
+    channels: 32
+    n_layers: 4
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

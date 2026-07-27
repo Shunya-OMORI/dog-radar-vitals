@@ -1,0 +1,16 @@
+{
+  "rr_interval": [
+    {
+      "run": "20260727-095911_ecg_rpeak_spatial_fusion",
+      "model": "rpeak_spatial_fusion",
+      "family": "mmecg_spatial_heatmap_gan",
+      "n_trials": 44,
+      "f1_mean": 0.37887068818222447,
+      "f1_std": 0.22218731525470706,
+      "rr_mae_ms_mean": 20.90734140711617,
+      "rr_mae_ms_std": 8.730151542940506,
+      "n_trials_with_rr": 44
+    }
+  ],
+  "beatgraph": []
+}

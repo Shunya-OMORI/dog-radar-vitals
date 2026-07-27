@@ -1,0 +1,27 @@
+# 226: ecg_ncpのデータ効率実験(train被験者4名版)。225/230と対。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_seq2seq
+  name: ecg_ncp
+  in_channels: 50
+  units: 64
+  output_dim: 1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

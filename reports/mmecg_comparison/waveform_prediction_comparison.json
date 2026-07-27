@@ -1,0 +1,101 @@
+[
+  {
+    "model": "ecg_cnn1d",
+    "example_trial_corr": 0.2765927091240883,
+    "example_window_corrs": [
+      0.21143122017383575,
+      0.3417541980743408
+    ],
+    "full_test_corr": 0.22388527676618347
+  },
+  {
+    "model": "ecg_conv_ncp",
+    "example_trial_corr": 0.3139483481645584,
+    "example_window_corrs": [
+      0.308368980884552,
+      0.3195277154445648
+    ],
+    "full_test_corr": 0.21002595121972262
+  },
+  {
+    "model": "ecg_unet1d",
+    "example_trial_corr": 0.20111924409866333,
+    "example_window_corrs": [
+      0.19521364569664001,
+      0.20702484250068665
+    ],
+    "full_test_corr": 0.20870268639409914
+  },
+  {
+    "model": "ecg_transformer",
+    "example_trial_corr": 0.5602043122053146,
+    "example_window_corrs": [
+      0.6461653709411621,
+      0.47424325346946716
+    ],
+    "full_test_corr": 0.2053435963112861
+  },
+  {
+    "model": "ecg_spatial_gnn",
+    "example_trial_corr": 0.3772331029176712,
+    "example_window_corrs": [
+      0.37294092774391174,
+      0.38152527809143066
+    ],
+    "full_test_corr": 0.18792475843802095
+  },
+  {
+    "model": "ecg_complex_cnn",
+    "example_trial_corr": 0.23438329994678497,
+    "example_window_corrs": [
+      0.3431229591369629,
+      0.12564364075660706
+    ],
+    "full_test_corr": 0.17052930273736516
+  },
+  {
+    "model": "ecg_complex_cnn_v2",
+    "example_trial_corr": 0.09387945756316185,
+    "example_window_corrs": [
+      0.04278332740068436,
+      0.14497558772563934
+    ],
+    "full_test_corr": 0.15140849167170625
+  },
+  {
+    "model": "ecg_spatial_fusion",
+    "example_trial_corr": 0.28558987379074097,
+    "example_window_corrs": [
+      0.27614277601242065,
+      0.2950369715690613
+    ],
+    "full_test_corr": 0.1496550639392808
+  },
+  {
+    "model": "ecg_conformer",
+    "example_trial_corr": 0.15041987225413322,
+    "example_window_corrs": [
+      0.06671877950429916,
+      0.23412096500396729
+    ],
+    "full_test_corr": 0.1348715235479176
+  },
+  {
+    "model": "ecg_lstm",
+    "example_trial_corr": 0.13101431727409363,
+    "example_window_corrs": [
+      0.13283170759677887,
+      0.1291969269514084
+    ],
+    "full_test_corr": 0.13358649775230635
+  },
+  {
+    "model": "ecg_ncp",
+    "example_trial_corr": 0.11731219664216042,
+    "example_window_corrs": [
+      -0.04802616685628891,
+      0.28265056014060974
+    ],
+    "full_test_corr": 0.11333024651588251
+  }
+]

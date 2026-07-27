@@ -1,0 +1,29 @@
+# 214: RCG beat segment(50ch, R波中心±0.4秒) -> PQRST 5点グラフ(時刻オフセット, 振幅)。
+# 本命モデルの1つ、GNN(GraphAttention、P-Q-R-S-T鎖状エッジ)。正解のP/Q/S/T位置は
+# neurokit2のECGデリニエーション(method='peak')による疑似正解（臨床アノテーションではない、
+# AGENTS.md参照）。201-213と同一の被験者split。
+seed: 42
+task: beatgraph
+
+data:
+  raw_root: data/raw
+  segment_sec: 0.8
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_beatgraph
+  name: beatgraph_gnn
+  in_channels: 50
+  embed_dim: 32
+  gat_hidden: 32
+  n_gat_layers: 3
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

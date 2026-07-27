@@ -17,10 +17,18 @@ import yaml
 
 from dog_radar_vitals.config import load_config
 from dog_radar_vitals.reproducibility import capture_environment
+from dog_radar_vitals.training.beatgraph_gan_trainer import train_beatgraph_gan
+from dog_radar_vitals.training.beatgraph_trainer import train_beatgraph
 from dog_radar_vitals.training.classical_trainer import train_classical
 from dog_radar_vitals.training.deep_trainer import train_deep
 from dog_radar_vitals.training.ecg_trainer import train_ecg
+from dog_radar_vitals.training.heatmap_gan_trainer import train_heatmap_gan
+from dog_radar_vitals.training.mmecg_classical_trainer import train_mmecg_classical
+from dog_radar_vitals.training.mmecg_rpeak_trainer import train_mmecg_rpeak
+from dog_radar_vitals.training.mmecg_trainer import train_mmecg
 from dog_radar_vitals.training.rpeak_trainer import train_rpeak
+from dog_radar_vitals.training.spatial_fusion_trainer import train_spatial_fusion
+from dog_radar_vitals.training.spatial_heatmap_gan_trainer import train_spatial_heatmap_gan
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -29,6 +37,14 @@ _TRAIN_FNS = {
     "classical": train_classical,
     "ecg_seq2seq": train_ecg,
     "rpeak_seq2seq": train_rpeak,
+    "mmecg_seq2seq": train_mmecg,
+    "mmecg_rpeak_seq2seq": train_mmecg_rpeak,
+    "mmecg_classical_rr": train_mmecg_classical,
+    "mmecg_beatgraph": train_beatgraph,
+    "mmecg_beatgraph_gan": train_beatgraph_gan,
+    "mmecg_heatmap_gan": train_heatmap_gan,
+    "mmecg_spatial_seq2seq": train_spatial_fusion,
+    "mmecg_spatial_heatmap_gan": train_spatial_heatmap_gan,
 }
 
 

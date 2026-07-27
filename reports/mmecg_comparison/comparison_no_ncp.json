@@ -1,0 +1,141 @@
+{
+  "rr_interval": [
+    {
+      "run": "20260725-011631_ecg_rpeak_cnn1d",
+      "model": "rpeak_cnn1d",
+      "family": "mmecg_rpeak_seq2seq",
+      "n_trials": 44,
+      "f1_mean": 0.255564776488736,
+      "f1_std": 0.23076178134748723,
+      "rr_mae_ms_mean": 10.695294339768084,
+      "rr_mae_ms_std": 8.793557378286113,
+      "n_trials_with_rr": 40
+    },
+    {
+      "run": "20260725-020511_ecg_rpeak_complex_cnn",
+      "model": "rpeak_complex_cnn",
+      "family": "mmecg_rpeak_seq2seq",
+      "n_trials": 44,
+      "f1_mean": 0.4153815161845781,
+      "f1_std": 0.22959770836180485,
+      "rr_mae_ms_mean": 18.4811754062973,
+      "rr_mae_ms_std": 8.662468018143908,
+      "n_trials_with_rr": 44
+    },
+    {
+      "run": "20260725-020023_ecg_ecg_complex_cnn",
+      "model": "ecg_complex_cnn",
+      "family": "mmecg_seq2seq",
+      "n_trials": 44,
+      "f1_mean": 0.37265808932493416,
+      "f1_std": 0.22962059295427142,
+      "rr_mae_ms_mean": 19.390274711203435,
+      "rr_mae_ms_std": 10.39877832926913,
+      "n_trials_with_rr": 44
+    },
+    {
+      "run": "20260725-015749_ecg_rpeak_lstm",
+      "model": "rpeak_lstm",
+      "family": "mmecg_rpeak_seq2seq",
+      "n_trials": 44,
+      "f1_mean": 0.4581831872470316,
+      "f1_std": 0.24379232700989228,
+      "rr_mae_ms_mean": 20.317761508692445,
+      "rr_mae_ms_std": 8.145852905485638,
+      "n_trials_with_rr": 44
+    },
+    {
+      "run": "20260725-011349_ecg_ecg_cnn1d",
+      "model": "ecg_cnn1d",
+      "family": "mmecg_seq2seq",
+      "n_trials": 44,
+      "f1_mean": 0.47912825039360335,
+      "f1_std": 0.23116431284569006,
+      "rr_mae_ms_mean": 21.21467696501539,
+      "rr_mae_ms_std": 10.61077832148702,
+      "n_trials_with_rr": 44
+    },
+    {
+      "run": "20260725-015511_ecg_ecg_lstm",
+      "model": "ecg_lstm",
+      "family": "mmecg_seq2seq",
+      "n_trials": 44,
+      "f1_mean": 0.3497871142993388,
+      "f1_std": 0.20350157851049155,
+      "rr_mae_ms_mean": 21.520884201766183,
+      "rr_mae_ms_std": 7.658762229816282,
+      "n_trials_with_rr": 44
+    },
+    {
+      "run": "20260725-011908_ecg_ecg_transformer",
+      "model": "ecg_transformer",
+      "family": "mmecg_seq2seq",
+      "n_trials": 44,
+      "f1_mean": 0.43637533134445544,
+      "f1_std": 0.21135273849616446,
+      "rr_mae_ms_mean": 23.45741570680441,
+      "rr_mae_ms_std": 5.5272084947924425,
+      "n_trials_with_rr": 44
+    },
+    {
+      "run": "20260725-005323_rr_interval_ridge",
+      "model": "ridge",
+      "family": "mmecg_classical_rr",
+      "n_trials": null,
+      "f1_mean": null,
+      "f1_std": null,
+      "rr_mae_ms_mean": 94.47386169433594,
+      "rr_mae_ms_std": null,
+      "n_trials_with_rr": null
+    },
+    {
+      "run": "20260725-005342_rr_interval_random_forest",
+      "model": "random_forest",
+      "family": "mmecg_classical_rr",
+      "n_trials": null,
+      "f1_mean": null,
+      "f1_std": null,
+      "rr_mae_ms_mean": 95.36358821870706,
+      "rr_mae_ms_std": null,
+      "n_trials_with_rr": null
+    },
+    {
+      "run": "20260725-005403_rr_interval_gradient_boosting",
+      "model": "gradient_boosting",
+      "family": "mmecg_classical_rr",
+      "n_trials": null,
+      "f1_mean": null,
+      "f1_std": null,
+      "rr_mae_ms_mean": 96.88103470204358,
+      "rr_mae_ms_std": null,
+      "n_trials_with_rr": null
+    },
+    {
+      "run": "20260725-013706_ecg_rpeak_transformer",
+      "model": "rpeak_transformer",
+      "family": "mmecg_rpeak_seq2seq",
+      "n_trials": 44,
+      "f1_mean": 0.0003669402650028205,
+      "f1_std": 0.0017063935462511,
+      "rr_mae_ms_mean": null,
+      "rr_mae_ms_std": null,
+      "n_trials_with_rr": 0
+    }
+  ],
+  "beatgraph": [
+    {
+      "run": "20260725-020958_beatgraph_beatgraph_gnn",
+      "model": "beatgraph_gnn",
+      "family": "mmecg_beatgraph",
+      "time_mae_ms": 14.192349584555148,
+      "amp_mae": 0.4960026420079745
+    },
+    {
+      "run": "20260725-021404_beatgraph_beatgraph_gnn_gan",
+      "model": "beatgraph_gnn_gan",
+      "family": "mmecg_beatgraph_gan",
+      "time_mae_ms": 17.38786285238521,
+      "amp_mae": 0.4813874539822639
+    }
+  ]
+}

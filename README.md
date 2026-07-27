@@ -75,30 +75,50 @@ src/dog_radar_vitals/
 │   ├── ecg_dataset.py              # レーダI/Q窓とECG波形窓のDataset（ヒトECG）
 │   ├── rpeaks.py                   # R波検出・heatmap生成・ピークマッチング・RR Interval計算
 │   ├── rpeak_windowing.py          # 窓切り出し（ヒトECG、窓->R波heatmap）
-│   └── rpeak_dataset.py            # レーダI/Q窓とR波heatmap窓のDataset（ヒトECG）
+│   ├── rpeak_dataset.py            # レーダI/Q窓とR波heatmap窓のDataset（ヒトECG）
+│   ├── mmecg.py                     # MMECG(Chen et al. 2022, mmWave)の読み込み。被験者ID⇔トライアルID変換も担う
+│   ├── mmecg_windowing.py           # 窓切り出し（MMECG、複素入力(Hilbert変換)対応）
+│   ├── mmecg_dataset.py             # RCG窓とECG波形窓のDataset（MMECG）
+│   ├── mmecg_rpeak_windowing.py     # 窓切り出し（MMECG、窓->R波heatmap）
+│   ├── mmecg_rpeak_dataset.py       # RCG窓とR波heatmap窓のDataset（MMECG）
+│   ├── mmecg_features.py            # 古典ML向け手作り特徴量（MMECG、RR Interval[ms]回帰用）
+│   └── mmecg_beatgraph_dataset.py   # 拍単位RCG segment→PQRST 5点グラフのDataset（GNN/GAN用、neurokit2疑似正解）
 ├── models/
 │   ├── deep/
 │   │   ├── transformer.py           # VitalsTransformer（犬HR/BR）
 │   │   ├── cnn1d.py                 # VitalsCNN1D（犬HR/BR）
 │   │   ├── lstm.py                  # VitalsLSTM（犬HR/BR）
 │   │   ├── registry.py              # 犬HR/BR深層モデル名→クラスの一元管理
-│   │   ├── ecg_cnn1d.py             # ECGWaveformCNN1D（ヒトECG波形、密な波形回帰）
-│   │   ├── rpeak_cnn1d.py           # RPeakCNN1D（ヒトECG、R波heatmap回帰、sigmoid出力）
-│   │   └── ecg_registry.py          # ECG関連モデル名→クラスの一元管理（registry.pyとは別、入出力の形が違うため）
+│   │   ├── ecg_cnn1d.py             # ECGWaveformCNN1D（ヒトECG波形、密な波形回帰。MMECGでもin_channels=50で流用）
+│   │   ├── rpeak_cnn1d.py           # RPeakCNN1D（ヒトECG、R波heatmap回帰、sigmoid出力。同上）
+│   │   ├── ecg_transformer.py / rpeak_transformer.py   # Transformerベースライン（MMECG）
+│   │   ├── ecg_lstm.py / rpeak_lstm.py                 # LSTMベースライン（MMECG）
+│   │   ├── ecg_ncp.py / rpeak_ncp.py                   # NCP(ncps.torch.CfC+AutoNCP、MMECGの本命1)
+│   │   ├── complex_layers.py                           # 複素領域モデル用共有レイヤ(ModReLU)
+│   │   ├── ecg_complex_cnn.py / rpeak_complex_cnn.py   # 複素畳み込みCNN（MMECGの本命2、Hilbert変換入力）
+│   │   ├── beatgraph_gnn.py                            # BeatGraphGNN（MMECGの本命3、PQRST 5点グラフ回帰）
+│   │   ├── beatgraph_discriminator.py                  # GAN拡張用の判別器
+│   │   └── ecg_registry.py          # ECG/MMECG系seq2seqモデル名→クラスの一元管理（registry.pyとは別、入出力の形が違うため）
 │   └── classical/
-│       └── registry.py              # 古典MLモデル名→scikit-learn Estimatorの一元管理
+│       └── registry.py              # 古典MLモデル名→scikit-learn Estimatorの一元管理（MMECGのRR Interval回帰でも共用）
 ├── training/
 │   ├── deep_trainer.py              # 犬HR/BR: PyTorchの学習/評価ループ（窓->スカラ）
 │   ├── classical_trainer.py         # 犬HR/BR: scikit-learnのfit/評価ループ
 │   ├── ecg_trainer.py               # ヒトECG波形: 学習/評価ループ（窓->波形、指標は相関係数、MSE損失）
 │   ├── rpeak_trainer.py             # ヒトECG R波heatmap: 学習/評価ループ（窓->heatmap、BCE損失）
+│   ├── mmecg_trainer.py             # MMECG波形回帰: 学習/評価ループ（家族mmecg_seq2seq）
+│   ├── mmecg_rpeak_trainer.py       # MMECG heatmap回帰: 学習/評価ループ（家族mmecg_rpeak_seq2seq）
+│   ├── mmecg_classical_trainer.py   # MMECG古典ML(RR Interval scalar回帰): fit/評価ループ
+│   ├── beatgraph_trainer.py         # MMECG PQRSTグラフ回帰(GNN): 学習/評価ループ（家族mmecg_beatgraph）
+│   ├── beatgraph_gan_trainer.py     # 同上+判別器との敵対的学習（家族mmecg_beatgraph_gan）
 │   └── schedulers.py                # 学習率スケジューラ（configで明示指定した場合のみ有効）
 ├── config.py                       # YAML設定の読み込み（extends継承）
 ├── seeding.py                      # 乱数シード固定
 ├── reproducibility.py              # gitコミット・パッケージ版の記録
 ├── baselines.py                    # trivial/oracleベースラインの計算（固定分割・CV両方から使う）
 ├── rpeak_evaluation.py             # 101/102をR波検出・RR Interval精度で評価する共有ロジック
-├── train.py                        # 学習CLI（familyでdeep/classical/ecg_seq2seq/rpeak_seq2seqを振り分け）
+├── mmecg_rpeak_evaluation.py       # MMECG版rpeak_evaluation（201-210をR波検出・RR Interval精度で評価）
+├── train.py                        # 学習CLI（familyでdeep/classical/ecg_seq2seq/rpeak_seq2seq/mmecg_*を振り分け）
 └── evaluate.py                     # 評価CLI（同上）
 scripts/
 ├── run_comparison.py                # 複数configの一括学習・評価（実行の責務のみ）
@@ -109,7 +129,8 @@ scripts/
 ├── run_dog_cross_validation.py      # 犬を入れ替えたn-fold cross-validation（--n-folds 10でLODO）
 ├── test_cv_significance.py          # CV結果とtrivialの対応のある差を符号検定・Wilcoxon検定で検証
 ├── compare_ecg_vs_rpeak.py           # 波形回帰(101)とheatmap回帰(102)を単発runで比較
-└── run_ecg_cross_validation.py       # 101・102を被験者入れ替えCVで比較（対応のあるWilcoxon検定込み）
+├── run_ecg_cross_validation.py       # 101・102を被験者入れ替えCVで比較（対応のあるWilcoxon検定込み）
+└── compare_mmecg_models.py           # MMECG全系統(201-215)を横断比較（RR Interval MAE表+ビートグラフ形状表）
 runs/                              # 学習結果（gitignore対象、README.md参照）
 reports/                           # run_comparisonの結果をまとめた表・グラフ（git管理下）
 tests/

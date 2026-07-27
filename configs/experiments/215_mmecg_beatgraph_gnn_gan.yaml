@@ -1,0 +1,28 @@
+# 215: 214と同一タスク・データだが、生成器(BeatGraphGNN)を判別器と敵対的に学習するGAN拡張。
+# 214(MSE回帰のみ)との比較対象。
+seed: 42
+task: beatgraph
+
+data:
+  raw_root: data/raw
+  segment_sec: 0.8
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_beatgraph_gan
+  name: beatgraph_gnn_gan
+  in_channels: 50
+  embed_dim: 32
+  gat_hidden: 32
+  n_gat_layers: 3
+  adv_weight: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

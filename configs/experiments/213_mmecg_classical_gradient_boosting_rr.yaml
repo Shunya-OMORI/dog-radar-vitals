@@ -1,0 +1,19 @@
+# 213: RCG(mmWave, 50ch) -> 窓内平均RR Interval[ms]。古典ML(GradientBoosting)。211/212と対。
+seed: 42
+task: rr_interval
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_classical_rr
+  name: gradient_boosting
+  n_estimators: 200
+  max_depth: 3
+  random_state: 42

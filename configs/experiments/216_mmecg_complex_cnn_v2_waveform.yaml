@@ -1,0 +1,29 @@
+# 216: RCG(mmWave, 50ch)のanalytic signal -> ECG波形推定。複素領域モデルv2
+# (Complex Batch Normalization + 複素残差接続、209との比較用)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: true
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_seq2seq
+  name: ecg_complex_cnn_v2
+  in_channels: 50
+  channels: 32
+  n_blocks: 6
+  kernel_size: 15
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

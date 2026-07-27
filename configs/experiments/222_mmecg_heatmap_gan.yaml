@@ -1,0 +1,37 @@
+# 222: RCG(mmWave, 50ch) -> R波heatmap推定。heatmap敵対的リファインメント(GAN、フェーズE)。
+# 生成器はフェーズDのrpeak_unet1dをそのまま流用し、1D PatchGAN判別器
+# (models/deep/heatmap_patch_discriminator.py)との交互学習(LSGAN)を追加する。
+# 215(PQRSTグラフへのGAN適用)は疎な座標回帰でGANが効かなかったのに対し、こちらは
+# 密なheatmap表現へのGAN適用という対照実験（EXPERIMENTS.md「GANベース手法」参照）。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_heatmap_gan
+  name: rpeak_unet1d
+  in_channels: 50
+  base_channels: 32
+  depth: 3
+  kernel_size: 9
+  adv_weight: 0.1
+  discriminator:
+    condition_proj_channels: 8
+    channels: 32
+    n_layers: 4
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

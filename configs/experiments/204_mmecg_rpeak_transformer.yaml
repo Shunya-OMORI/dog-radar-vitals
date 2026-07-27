@@ -1,0 +1,30 @@
+# 204: RCG(mmWave, 50ch) -> R波heatmap推定。Transformerベースライン（202のCNNと対）。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_transformer
+  in_channels: 50
+  d_model: 128
+  n_heads: 4
+  n_layers: 4
+  dim_feedforward: 256
+  dropout: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

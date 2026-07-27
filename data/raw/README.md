@@ -100,3 +100,39 @@ data/raw/schellenberger_human/
 `data/ecg_windowing.py`のNaN検出で該当窓を自動的にスキップする。
 
 現行の実装（`configs/experiments/101_ecg_cnn1d_resting.yaml`）はRestingシナリオのみを対象とする。
+
+## MMECGデータセット（mmWave radar、拍単位ECG同期、2026-07-24追加）
+
+イヌのRR Interval・ECG波形予測という本題に、拍単位の正解付きデータセットで初めて直接取り組めるようになった。
+Chen, Jinbo, et al. (2022)、*mmECG: Contactless Electrocardiogram Monitoring With Millimeter Wave Radar*
+（TI AWR1843 mmWave radar + DCA1000、3Tx4Rxの仮想12chアレイ、フレームレート200Hz）。
+ユーザから同意書契約済みの配布物 `MMECG202211.rar` を直接受け取り配置した（申請不要のSchellenbergerとは異なり、
+機関印付き契約書の送付が必要な制限付き配布のデータセットである点に注意。再配布不可）。
+
+- 参照実装（未取得、データ構造の説明のみREADMEで確認）: [github.com/jinbochen0823/RCG2ECG](https://github.com/jinbochen0823/RCG2ECG)
+- 展開には `unrar`（RAR5形式）が必要。本環境にはapt経由でインストールできなかった（sudoパスワード必須）ため、
+  RARLAB公式サイトの静的バイナリ（`https://www.rarlab.com/rar/rarlinux-x64-621.tar.gz`、インストール不要）を使って展開した。
+
+```
+data/raw/mmecg/
+└── finalPartialPublicData20221108/
+    ├── 1.mat ... 91.mat   # 91トライアル（.matファイル）
+```
+
+各`.mat`はMATLAB構造体`data`1つを含み、scipy.io.loadmat(struct_as_record=False, squeeze_me=True)で読める。フィールド:
+
+- `RCG`: shape `(35505, 50)` float64 — 50点の3D心臓表面変位計測（Radar CardioGram）。fs=200Hz（35505サンプル≈177.5秒≈3分）
+- `ECG`: shape `(35505,)` float64 — 同期ECG波形（真値、1リード）
+- `posXYZ`: shape `(50, 3)` float64 — RCGの50点それぞれの3D座標
+- `id`: int — 被験者ID、`gender`: str（'boy'/'girl'）、`age`: int
+- `physistatus`: str — 生理状態。'NB'(通常呼吸)・'IB'(不規則呼吸)・'PE'(運動後)・'SP'(睡眠)
+
+**注意: 91トライアルは11被験者分（id: 1, 2, 5, 9, 10, 13, 14, 16, 17, 29, 30）に集約される。**
+1被験者あたり2〜23トライアルと非常に偏っている（id=29が23トライアルで最多）。
+**トライアル単位ではなく被験者ID単位でtrain/val/test分割しないと個体リークが起きる**
+（イヌデータのCVで実証済みの教訓と同型の罠。`AGENTS.md`参照）。11被験者という少なさは、
+イヌ10頭のケースと同様、単一分割の結論を鵜呑みにできない規模であることを意味する。
+
+現行の実装（`configs/experiments/201_*.yaml`〜、`EXPERIMENTS.md`参照）は、11被験者を
+`train: [1,2,5,9,10,13,14]` / `val: [16]` / `test: [17,29,30]` に分割した単一splitから開始し、
+後段でLeave-Subjects-Out cross-validationに拡張する方針（101/102と同じ育て方）。

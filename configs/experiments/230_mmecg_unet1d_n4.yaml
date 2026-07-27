@@ -1,0 +1,28 @@
+# 230: ecg_unet1dのデータ効率実験(train被験者4名版)。226/228と対。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_seq2seq
+  name: ecg_unet1d
+  in_channels: 50
+  base_channels: 32
+  depth: 3
+  kernel_size: 9
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

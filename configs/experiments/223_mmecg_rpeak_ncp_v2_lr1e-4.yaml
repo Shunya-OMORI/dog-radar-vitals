@@ -1,0 +1,32 @@
+# 223: RCG(mmWave, 50ch) -> R波heatmap推定。NCP v2。208はBCE損失が学習中に定数付近で
+# 停滞し崩壊した（corr≈0で停滞）。lr 5e-4→1e-4に下げ、epochsも15→50（他モデルと同条件）に
+# 戻して収束するか検証する。崩壊の仮説: LTC/CfCは連続時間の"liquid"なダイナミクスを持ち
+# 本質的にローパス的（緩やかな時定数で状態を積分する）ため、heatmapが要求する鋭く疎な
+# スパイク（σ=10ms、fs=200Hzで幅わずか2サンプル程度）の生成には構造的に不向きな可能性がある
+# （一方、滑らかに連続変化するECG波形回帰(207/ecg_ncp)では通常DNNと同等の精度を出せている）。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_ncp
+  in_channels: 50
+  units: 64
+  output_dim: 1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0001
+  weight_decay: 0.0001
+  num_workers: 2

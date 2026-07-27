@@ -1,0 +1,33 @@
+# 234: RCG(mmWave, 50ch) -> R波heatmap推定。NCP進化系(233のheatmap版)。
+# 207/208フェーズでrpeak_ncpが崩壊した問題を、局所畳み込み前処理で解消できるか検証する。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_conv_ncp
+  in_channels: 50
+  conv_channels: 32
+  conv_kernel_size: 15
+  conv_layers: 3
+  ncp_units: 64
+  ncp_output_dim: 8
+  n_ncp_layers: 2
+  mixed_memory: true
+
+train:
+  batch_size: 32
+  epochs: 20
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

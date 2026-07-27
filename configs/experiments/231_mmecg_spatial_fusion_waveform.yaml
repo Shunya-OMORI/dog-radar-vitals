@@ -1,0 +1,31 @@
+# 231: RCG(mmWave, 50ch) + posXYZ(50点の3D座標) -> ECG波形推定。
+# Chen et al. (2022, RCG2ECG、同一データセットの原著論文)のアーキテクチャで使われている
+# 「50点を3D空間分布を持つ点群として扱い、位置埋め込みをTransformerで融合する」という発想を
+# 導入した空間融合モデル。既存の201-224フェーズはposXYZを一切使っていなかった
+# (EXPERIMENTS.md「精度をさらに追求する」参照)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: ecg_spatial_fusion
+  n_points: 50
+  embed_dim: 32
+  n_heads: 4
+  n_attn_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

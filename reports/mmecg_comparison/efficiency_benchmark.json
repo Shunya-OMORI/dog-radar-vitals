@@ -1,0 +1,134 @@
+[
+  {
+    "model": "ecg_cnn1d",
+    "n_params": 356417,
+    "macs": 285748000,
+    "cpu_latency_ms": 2.009017299860716
+  },
+  {
+    "model": "rpeak_cnn1d",
+    "n_params": 356417,
+    "macs": 285748000,
+    "cpu_latency_ms": 2.0218274599756114
+  },
+  {
+    "model": "ecg_transformer",
+    "n_params": 536577,
+    "macs": 1094452000,
+    "cpu_latency_ms": 6.998291120107751
+  },
+  {
+    "model": "rpeak_transformer",
+    "n_params": 536577,
+    "macs": 1094452000,
+    "cpu_latency_ms": 8.145387939875945
+  },
+  {
+    "model": "ecg_lstm",
+    "n_params": 158849,
+    "macs": 129127200,
+    "cpu_latency_ms": 4.728344820032362
+  },
+  {
+    "model": "rpeak_lstm",
+    "n_params": 158849,
+    "macs": 129127200,
+    "cpu_latency_ms": 4.147584540187381
+  },
+  {
+    "model": "ecg_ncp",
+    "n_params": 24981,
+    "macs": 8014400,
+    "cpu_latency_ms": 108.99608125997474
+  },
+  {
+    "model": "rpeak_ncp",
+    "n_params": 24981,
+    "macs": 8014400,
+    "cpu_latency_ms": 107.03902175999247
+  },
+  {
+    "model": "ecg_complex_cnn",
+    "n_params": 101249,
+    "macs": 80845600,
+    "cpu_latency_ms": 4.3924928398337215
+  },
+  {
+    "model": "rpeak_complex_cnn",
+    "n_params": 101249,
+    "macs": 80845600,
+    "cpu_latency_ms": 4.468354040000122
+  },
+  {
+    "model": "ecg_complex_cnn_v2",
+    "n_params": 188705,
+    "macs": 149120800,
+    "cpu_latency_ms": 11.201620420033578
+  },
+  {
+    "model": "rpeak_complex_cnn_v2",
+    "n_params": 188705,
+    "macs": 149120800,
+    "cpu_latency_ms": 11.298568900092505
+  },
+  {
+    "model": "ecg_conformer",
+    "n_params": 1118721,
+    "macs": 1560781600,
+    "cpu_latency_ms": 10.112979600089602
+  },
+  {
+    "model": "rpeak_conformer",
+    "n_params": 1118721,
+    "macs": 1560781600,
+    "cpu_latency_ms": 9.51288445998216
+  },
+  {
+    "model": "ecg_unet1d",
+    "n_params": 2028193,
+    "macs": 364890400,
+    "cpu_latency_ms": 4.559562100039329
+  },
+  {
+    "model": "rpeak_unet1d",
+    "n_params": 2028193,
+    "macs": 364890400,
+    "cpu_latency_ms": 4.31952413986437
+  },
+  {
+    "model": "ecg_conv_ncp",
+    "n_params": 137933,
+    "macs": 94580000,
+    "cpu_latency_ms": 278.4989859201596
+  },
+  {
+    "model": "rpeak_conv_ncp",
+    "n_params": 137933,
+    "macs": 94580000,
+    "cpu_latency_ms": 285.47857319994364
+  },
+  {
+    "model": "ecg_spatial_fusion",
+    "n_params": 48833,
+    "macs": 271844000,
+    "cpu_latency_ms": 4.704586919979192
+  },
+  {
+    "model": "rpeak_spatial_fusion",
+    "n_params": 48833,
+    "macs": 271844000,
+    "cpu_latency_ms": 4.72738873999333
+  },
+  {
+    "model": "ecg_spatial_gnn",
+    "n_params": 33985,
+    "macs": 152724000,
+    "cpu_latency_ms": 8.305226159864105
+  },
+  {
+    "model": "rpeak_spatial_gnn",
+    "n_params": 33985,
+    "macs": 152724000,
+    "cpu_latency_ms": 8.36722899985034
+  }
+]

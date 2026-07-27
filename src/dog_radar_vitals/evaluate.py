@@ -10,16 +10,32 @@ from pathlib import Path
 
 from dog_radar_vitals.config import load_config
 from dog_radar_vitals.train import REPO_ROOT
+from dog_radar_vitals.training.beatgraph_gan_trainer import evaluate_beatgraph_gan
+from dog_radar_vitals.training.beatgraph_trainer import evaluate_beatgraph
 from dog_radar_vitals.training.classical_trainer import evaluate_classical
 from dog_radar_vitals.training.deep_trainer import evaluate_deep
 from dog_radar_vitals.training.ecg_trainer import evaluate_ecg
+from dog_radar_vitals.training.heatmap_gan_trainer import evaluate_heatmap_gan
+from dog_radar_vitals.training.mmecg_classical_trainer import evaluate_mmecg_classical
+from dog_radar_vitals.training.mmecg_rpeak_trainer import evaluate_mmecg_rpeak
+from dog_radar_vitals.training.mmecg_trainer import evaluate_mmecg
 from dog_radar_vitals.training.rpeak_trainer import evaluate_rpeak
+from dog_radar_vitals.training.spatial_fusion_trainer import evaluate_spatial_fusion
+from dog_radar_vitals.training.spatial_heatmap_gan_trainer import evaluate_spatial_heatmap_gan
 
 _EVAL_FNS = {
     "deep": evaluate_deep,
     "classical": evaluate_classical,
     "ecg_seq2seq": evaluate_ecg,
     "rpeak_seq2seq": evaluate_rpeak,
+    "mmecg_seq2seq": evaluate_mmecg,
+    "mmecg_rpeak_seq2seq": evaluate_mmecg_rpeak,
+    "mmecg_classical_rr": evaluate_mmecg_classical,
+    "mmecg_beatgraph": evaluate_beatgraph,
+    "mmecg_beatgraph_gan": evaluate_beatgraph_gan,
+    "mmecg_heatmap_gan": evaluate_heatmap_gan,
+    "mmecg_spatial_seq2seq": evaluate_spatial_fusion,
+    "mmecg_spatial_heatmap_gan": evaluate_spatial_heatmap_gan,
 }
 
 

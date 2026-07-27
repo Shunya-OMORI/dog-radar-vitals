@@ -72,6 +72,10 @@
 ## configの番号帯
 
 - `001`〜: 犬HR/BR予測（deep/classical）
-- `101`〜: ヒトデータでの手法検証（ecg_seq2seq, rpeak_seq2seq等）
+- `101`〜: ヒトデータでの手法検証（Schellenberger、CW radar、ecg_seq2seq, rpeak_seq2seq等）
+- `201`〜: MMECG（mmWave radar、拍単位RR Interval・ECG波形予測、本題拡張）。
+  family: `mmecg_seq2seq`（波形回帰）/`mmecg_rpeak_seq2seq`（heatmap回帰）/
+  `mmecg_classical_rr`（古典ML、RR Interval scalar回帰）/`mmecg_beatgraph`・
+  `mmecg_beatgraph_gan`（拍単位PQRSTグラフのGNN回帰・GAN拡張）
 新しいfamilyや対象（例: 犬でのECG波形推定、複素領域モデル等）を追加する際は、
 100番台ずつ新しい帯を割り当て、このAGENTS.mdに追記する。

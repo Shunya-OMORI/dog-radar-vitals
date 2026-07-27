@@ -1,0 +1,28 @@
+# 221: RCG(mmWave, 50ch) -> R波heatmap推定。1D U-Net(220のheatmap版)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_unet1d
+  in_channels: 50
+  base_channels: 32
+  depth: 3
+  kernel_size: 9
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
