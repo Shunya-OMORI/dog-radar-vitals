@@ -1,0 +1,37 @@
+# 244: 242(SCEG)のshape_prior(McSharry型ODEデコーダ)を、ユーザ提案の
+# 「ECG基盤モデル/事前学習モデル」路線に差し替えた対照実験。
+#
+# `scripts/pretrain_ecg_beat_autoencoder.py`でSchellenberger(ヒト30名、レーダ非依存の
+# 臨床ECG)を使い教師なしで事前学習した単一拍ECGオートエンコーダのdecoderを凍結して使い、
+# SCEGは「レーダ特徴からこの学習済み形状空間への写像」だけを学習する。242との差は
+# model.shape_prior/pretrained_decoder_pathのみ（他は完全に同一設定、比較のため）。
+#
+# 事前学習手順: python scripts/pretrain_ecg_beat_autoencoder.py
+# （runs/ecg_beat_autoencoder_pretrained.pt に保存済み）
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  shape_prior: pretrained
+  pretrained_decoder_path: runs/ecg_beat_autoencoder_pretrained.pt
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 2

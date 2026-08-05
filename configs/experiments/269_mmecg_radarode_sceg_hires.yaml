@@ -1,0 +1,49 @@
+# 269: 267/268の結論(τ・公式パラメータ化・Anchor補助タスクのいずれでも改善しなかったのは、
+# backbone/encoderが1心拍タイトクロップ窓から抽出できる時間分解能自体の不足が原因ではないか)
+# を検証する。ユーザ指示「その問題を解決してください」を受けた対応。
+#
+# 実測(trial 1、203拍): タイトクロップの生SSTフレーム長は平均87・中央値89フレーム
+# (T_FIXED_SST=64はこれをやや下回るのみで、ほぼ生の時間分解能を保っている)。一方
+# backboneは3段downsampling(各stride2)で64→32→16→8まで時間軸を潰しており、encoder出力は
+# 1拍あたりわずか8フレーム(1フレームあたり約87ms相当)しか残らない。これがR波位置を
+# ms単位で区別できない主因と考えられる。
+#
+# 対策として、T_FIXED_SSTを上げる(64→128)のではなく——生クロップが平均87フレームしか
+# ないため128への線形補間リサイズは実質的に新しい情報を増やさない(補間による見かけ上の
+# 解像度に過ぎない)——`backbone_channels`を3段から2段([128,256,512]→[128,256])に
+# 減らし、downsampling段数そのものを1段減らすことで、生の64フレーム分解能をより多く
+# encoder出力側に残す(64→32→16、1フレームあたり約43ms相当に改善)。こちらは補間ではなく
+# 実際の情報量を保持する変更。
+#
+# 268(3段downsampling・encoder_out_time=8・Anchor補助タスクあり)との比較で、時間分解能を
+# 上げるだけでtau/anchorの学習可能性・波形回帰精度が改善するかを見る。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256]
+  encoder_out_channels: 128
+  encoder_out_time: 16
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+  use_tau: false
+  use_anchor_head: true
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4
+  anchor_weight: 1.0

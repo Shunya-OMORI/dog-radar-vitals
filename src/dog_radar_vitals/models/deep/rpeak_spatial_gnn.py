@@ -12,9 +12,17 @@ from dog_radar_vitals.models.deep.spatial_graph import batched_knn_edge_index
 
 
 class RPeakSpatialGNN(nn.Module):
-    def __init__(self, n_points: int = 50, embed_dim: int = 32, k_neighbors: int = 6, n_gat_layers: int = 2) -> None:
+    def __init__(self, n_points: int = 50, embed_dim: int = 32, k_neighbors: int = 6, n_gat_layers: int = 2,
+                 n_downsample: int = 3) -> None:
+        """n_downsample (2026-08-05, default 3 = unchanged/8x): F1 for this
+        model (best RR-interval accuracy this session, 9.67ms) has stayed
+        moderate (0.383); PerPointTemporalEncoder's 8x downsampling is the
+        same class of temporal-resolution bottleneck already diagnosed as
+        the root cause of the Anchor task's earlier localization/recall
+        problems. Exposed here to test whether less downsampling (e.g. 1 =
+        2x) improves F1 without hurting RR-MAE."""
         super().__init__()
-        self.point_encoder = PerPointTemporalEncoder(embed_dim)
+        self.point_encoder = PerPointTemporalEncoder(embed_dim, n_downsample=n_downsample)
         self.pos_embed = nn.Linear(3, embed_dim)
         self.k_neighbors = k_neighbors
 

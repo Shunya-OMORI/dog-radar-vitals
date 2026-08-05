@@ -1,0 +1,35 @@
+# 240: 201(ecg_cnn1d, z-score正規化)の正規化方式のみをmin-max([-1,1])に変えた対照実験。
+#
+# 背景: ユーザ経験則（IMU/レーダ入力・ECG出力ともmin-max[0,1]または[-1,1]正規化が良い）と、
+# Radar2ECG(bottleneck fusion論文, docs/Radar2ECG_*.pdf)の前処理方針を踏まえ、原著Chen et al.
+# (2022)が達成した波形相関0.90の再現に向けた最初の一手として検証する。モデル構造・split・
+# window設定は201から一切変更しない（正規化方式だけを分離して効果を見るため）。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  normalization: minmax
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_seq2seq
+  name: ecg_cnn1d
+  in_channels: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

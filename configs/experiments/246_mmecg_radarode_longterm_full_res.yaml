@@ -1,0 +1,31 @@
+# 246: radarODEの長期ECG再構成ネットワーク、245(T_FIXED_SST=64+Deformable Conv版SCEG)を使用。
+#
+# 243は242(T_FIXED_SST=16、通常Conv2d)の重みを凍結して使っていた。245でSCEGの単一拍相関が
+# 0.147→0.209(test)に改善したため、その重みを使ってmorphological referenceの質がどう
+# 窓内相関に伝播するかを確認する。243と設定は同一、model.sceg_run_dirのみ245へ差し替え。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_longterm
+  name: radarode_longterm
+  sceg_run_dir: runs/20260728-213900_ecg_radarode_sceg
+  n_points: 50
+  channels: [128, 256, 512]
+  tcn_hidden: 16
+
+train:
+  batch_size: 16
+  epochs: 30
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 0

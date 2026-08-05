@@ -23,18 +23,29 @@ from dog_radar_vitals.training.ecg_trainer import _pearson_corr
 from dog_radar_vitals.training.schedulers import build_scheduler
 
 
-def _run_epoch(model: nn.Module, loader: DataLoader, device: torch.device, optimizer=None) -> dict[str, float]:
+def _run_epoch(model: nn.Module, loader: DataLoader, device: torch.device, optimizer=None,
+               amplitude_weight_beta: float = 0.0) -> dict[str, float]:
+    """amplitude_weight_beta=0.0 (default): unweighted MSE, unchanged behavior.
+    >0: per-timestep weight = 1 + beta*|y| (y is z-scored ECG), so QRS-region
+    timesteps (large |y|) get more weight than the mostly-flat baseline that
+    otherwise dominates plain per-timestep MSE over an 800-sample window
+    (2026-08-05, testing whether loss design -- not just regularization
+    strength -- explains the train/val corr gap seen in every prior MMECG
+    ecg_cnn1d/ecg_conv_ncp run)."""
     is_train = optimizer is not None
     model.train(is_train)
 
     total_loss, total_corr, n_batches = 0.0, 0.0, 0
-    loss_fn = nn.MSELoss()
 
     with torch.set_grad_enabled(is_train):
         for x, y in loader:
             x, y = x.to(device), y.to(device)
             pred = model(x)
-            loss = loss_fn(pred, y)
+            if amplitude_weight_beta > 0:
+                weight = 1.0 + amplitude_weight_beta * y.abs()
+                loss = (weight * (pred - y) ** 2).mean()
+            else:
+                loss = nn.functional.mse_loss(pred, y)
 
             if is_train:
                 optimizer.zero_grad()
@@ -56,6 +67,7 @@ def _build_dataset(data_cfg: dict, raw_root: Path, split: str) -> MMECGWindowDat
         data_cfg["window_sec"],
         data_cfg["stride_sec"],
         complex_input=data_cfg.get("complex_input", False),
+        normalization=data_cfg.get("normalization", "zscore"),
     )
 
 
@@ -84,13 +96,15 @@ def train_mmecg(config: dict, run_dir: Path, repo_root: Path) -> None:
     optimizer = torch.optim.Adam(model.parameters(), lr=train_cfg["lr"], weight_decay=train_cfg["weight_decay"])
     scheduler = build_scheduler(optimizer, train_cfg, total_epochs=train_cfg["epochs"])
 
+    amplitude_weight_beta = float(train_cfg.get("amplitude_weight_beta", 0.0))
+
     history = []
     best_val_corr = -float("inf")
     for epoch in range(train_cfg["epochs"]):
         if scheduler is not None:
             scheduler.step()
-        train_metrics = _run_epoch(model, train_loader, device, optimizer)
-        val_metrics = _run_epoch(model, val_loader, device)
+        train_metrics = _run_epoch(model, train_loader, device, optimizer, amplitude_weight_beta)
+        val_metrics = _run_epoch(model, val_loader, device, amplitude_weight_beta=amplitude_weight_beta)
         history.append({"epoch": epoch, "lr": optimizer.param_groups[0]["lr"], "train": train_metrics, "val": val_metrics})
         print(
             f"[epoch {epoch}] lr={optimizer.param_groups[0]['lr']:.2e} train_loss={train_metrics['loss']:.4f} "

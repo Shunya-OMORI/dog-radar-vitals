@@ -1,0 +1,36 @@
+# 248: 245(T_FIXED_SST=64+Deformable Conv2d)に、タスク設計の改善(拍境界のコンセンサス検出、
+# `mmecg_singlecycle_dataset.py`のデータセット側で共通適用済み)と学習設計の改善
+# (dropout=0.2で過学習対策)を重ねた版。
+#
+# 245/246は強い過学習(train_corrは0.7近くまで到達するがval/testは0.2台で頭打ち)を示した。
+# 過学習対策(dropout)と拍境界推定の改善(位相ドリフト解消)を同時に適用し、両方の効果を
+# 245との比較で確認する。詳細は
+# `reports/mmecg_comparison/prior_work_accuracy_comparison.md`「タスク設計・前処理・
+# 学習設計の改善」節参照。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+
+train:
+  batch_size: 32
+  epochs: 80
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4

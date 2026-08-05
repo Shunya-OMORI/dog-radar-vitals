@@ -1,0 +1,41 @@
+# 259: 257(対照、25epoch、シフト無し)に、shift-invariant training(学習時のみoracle shift
+# を適用してから損失計算)を追加した実験。
+#
+# 257の予測にoracle shift(正解とのラグ探索、±30サンプル)を適用すると相関0.203→0.586まで
+# 跳ね上がることを確認済み(詳細は`reports/mmecg_comparison/prior_work_accuracy_comparison.md`
+# 参照)。学習可能なτ補正(256/258)は入力のみからは有用なシフト量を学習できずほぼ定数に
+# 収束したため、まずは「学習時だけoracleでアライメントしてから損失を取る」ことで、MSE損失が
+# タイミング不確実性を理由に予測を鈍らせるインセンティブを除去できるか検証する。
+# 評価は常に生の予測に対して行う(推論時にoracleは使えないため)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: false
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_singlecycle_cnn
+  name: singlecycle_cnn
+  n_points: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+  out_len: 200
+  use_temporal_shift: false
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4
+  oracle_shift_train: true
+  oracle_max_shift: 30

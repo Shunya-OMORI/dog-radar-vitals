@@ -1,0 +1,31 @@
+# 265: 264(τ追加)との公平な比較用control。248と同じアーキテクチャ(τなし)を
+# 264と同じepoch数(25)で学習する。264の改善がτそのものによるものか、単に
+# epoch数の違いによるものかを切り分ける。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+  use_tau: false
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4

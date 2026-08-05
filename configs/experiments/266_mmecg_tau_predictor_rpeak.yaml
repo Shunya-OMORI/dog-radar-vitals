@@ -1,0 +1,36 @@
+# 266: 263と同じTauOnlyCNNアーキテクチャだが、疑似ラベルを257基準のoracle shiftではなく
+# model-independentな`rpeak_position`(拍境界内でのR波位置、tau_pseudo_labels.py参照)にする。
+#
+# 目的: 「τの予測がmmWaveから難しいのは、257という特定モデルの癖に依存した疑似ラベルの
+# 質が悪いせいではないか」という仮説を検証する。263(oracle_shift)と本質的に同一設定
+# (アーキテクチャ・データ・epoch数)で、ラベル生成方式だけを変えた対照実験。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: false
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_tau_predictor
+  name: tau_only_cnn
+  in_channels: 50
+  channels: [64, 128, 256]
+  hidden: 64
+  dropout: 0.1
+  max_shift_frac: 0.15
+
+train:
+  batch_size: 32
+  epochs: 30
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4
+  tau_labels:
+    method: rpeak_position

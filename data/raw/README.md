@@ -136,3 +136,38 @@ data/raw/mmecg/
 現行の実装（`configs/experiments/201_*.yaml`〜、`EXPERIMENTS.md`参照）は、11被験者を
 `train: [1,2,5,9,10,13,14]` / `val: [16]` / `test: [17,29,30]` に分割した単一splitから開始し、
 後段でLeave-Subjects-Out cross-validationに拡張する方針（101/102と同じ育て方）。
+
+### `MMECG202211.rar`は原著者配布物の「全体」であり、取得漏れではない（2026-07-28確認）
+
+ユーザから「rarの中身は本当に原著より少ないのか」との確認依頼を受け、`unrar lb`（一覧表示）で
+アーカイブ全体を再確認した。**アーカイブには`finalPartialPublicData20221108/1.mat`〜`91.mat`
+の91ファイルのみが含まれ、それ以外の隠れたファイル・追加ドキュメントは一切無い。** つまり
+`data/raw/mmecg/`に展開済みの内容が、このrarの全内容と完全に一致することを確認した
+（取得や展開の手違いでデータが欠落しているわけではない）。
+
+さらに、原著者の配布リポジトリ[jinbochen0823/RCG2ECG](https://github.com/jinbochen0823/RCG2ECG)
+を確認したところ、次の記載がある:
+
+> "RightNow, we only release 4.55 hours of data. The rest of the data are still under the
+> authorizing process with privacy concern."
+
+実測した本アーカイブの総録音時間は**269.2分(4.49時間)**であり、上記の「4.55時間」とほぼ一致する。
+つまり**この91トライアル・11被験者は、原著論文の全データ（35被験者・約10時間）のうち
+現時点で一般公開されている全量そのものであり、我々が追加で抽出・入手できる余地は無い。**
+
+**残りのデータ（約5.5時間・24被験者相当）を入手する経路は存在する**: 同リポジトリには
+「機関印付きの同意書をPDFで`jinbochen@mail.ustc.edu.cn`宛に送付すれば、7日以内に
+ダウンロードリンクが記載された通知メールが届く」という案内がある。本データセット自体も
+当初この経路（ユーザによる同意書送付）で入手した経緯があり、**同じ手続きを踏めば
+残りのデータの入手を試みることができる**（ただし人間側の申請作業が必要であり、
+本セッションでは実行していない）。
+
+### 11被験者という規模は、実は「相関0.90の再現を妨げる根本原因ではない」ことが判明
+
+同じ研究室（Chen et al.とは無関係、Xi'an Jiaotong-Liverpool University / HKUST(GZ)）による
+追試研究**radarODE**（Zhang et al. 2024/2025, arXiv:2408.01672, IEEE TMC掲載）が、
+**この全く同じ91トライアル・11被験者データを使い、11-fold leave-one-subject-out CVで
+評価している。** 詳細は`reports/mmecg_comparison/prior_work_accuracy_comparison.md`
+「データ規模の再検証」節を参照。要点: 同論文が再現したChen et al.のアーキテクチャは
+このデータだけでPCC(相関)87.9%を達成しており、11被験者という規模自体が0.90再現の
+障害ではないことが独立した論文により示されている。

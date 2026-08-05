@@ -1,0 +1,35 @@
+# 242: 241(正則化強化)はtrain/val corrギャップを実質的に縮められなかった(2026-08-05)。
+# ユーザ指摘: 損失設計(plain MSE、800サンプル全体を均等に重み付け)自体が問題では
+# ないか。ECG窓はほとんどがフラットなベースラインでQRSはごく一部 -- Anchorタスクの
+# 崩壊をweighted BCEで直したのと同じ構造の問題(疎な情報がplain lossに埋もれる)。
+# ここでは正則化は元に戻し(dropout 0.1, weight_decay 1e-4)、損失だけを
+# amplitude_weight_beta>0 の重み付きMSE(weight=1+beta*|y|)に変更した一点検証。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  complex_input: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_seq2seq
+  name: ecg_cnn1d
+  in_channels: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4
+  amplitude_weight_beta: 5.0

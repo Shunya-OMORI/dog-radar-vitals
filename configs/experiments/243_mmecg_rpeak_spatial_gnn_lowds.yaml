@@ -1,0 +1,32 @@
+# 243: 236(空間GNN、本セッション最良RR-MAE=9.67ms、パラメータ34Kと極小)のF1が
+# 0.383と低めな弱点の原因調査。PerPointTemporalEncoderのn_downsample=3(8x)は、
+# Anchorタスクの再現率低下を招いていたのと同じ時間分解能ボトルネックの可能性がある。
+# n_downsample=1(2x)に減らした一点検証。まず少エポックで効果があるか probe する
+# (フル50エポックの前に、ユーザ指示により部分学習で見込みを確認)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+  n_downsample: 1
+
+train:
+  batch_size: 32
+  epochs: 8
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

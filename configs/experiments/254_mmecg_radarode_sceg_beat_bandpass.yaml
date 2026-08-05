@@ -1,0 +1,37 @@
+# 254: 253と同一だが、正規化スコープを拍セグメント自身(norm_scope="beat")に変更した版。
+#
+# SST自体は計算コスト上の制約からトライアル全体で計算(バンドパス込み)するが、拍に
+# クロップした後、そのセグメント自身の統計量で再正規化する(SST: スケールのみ、
+# ECG: mean+stdの標準化)。253(トライアル全体スコープ)との対照実験。詳細は
+# `mmecg_singlecycle_dataset.py`のdocstring・`reports/mmecg_comparison/prior_work_accuracy_comparison.md`
+# 参照。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: beat
+  apply_bandpass: true
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+
+train:
+  batch_size: 32
+  epochs: 80
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4

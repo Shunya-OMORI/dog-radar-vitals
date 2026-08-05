@@ -1,0 +1,40 @@
+# 255: 248(タイトクロップ+dropout+consensus PPI、単一拍相関0.258、MSE損失)のMSE損失を
+# 微分可能なPearson相関損失(1-corr)に置き換えた対照実験。
+#
+# 248の予測を診断したところ、±20サンプル(200サンプル中)のシフト探索を許すと相関が
+# 0.36→0.54まで跳ね上がることを確認した(シフト方向は左右対称)。これはMSE損失が
+# QRSのような鋭いピークに対して「タイミング不確実性をヘッジするため予測を鈍らせる」
+# 構造的な問題を引き起こしている可能性を示唆する。評価指標(相関)と学習目的を直接
+# 一致させることで、この鈍化インセンティブを取り除けるか検証する。詳細は
+# `reports/mmecg_comparison/prior_work_accuracy_comparison.md`参照。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: false
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+
+train:
+  batch_size: 32
+  epochs: 80
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4
+  loss_type: corr

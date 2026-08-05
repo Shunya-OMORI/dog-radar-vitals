@@ -1,0 +1,43 @@
+# 268: 265(τなしcontrol)に、radarODE公式実装の"Anchor"補助タスク(R波位置ヒートマップ回帰、
+# AnchorHead)を追加する。ユーザとの相談の結果採用した中間案:
+# 「4秒複数拍窓+PPI/Anchor+LibMTL EGA」というフル再現ではなく、既存の1心拍タイトクロップ
+# パイプラインに、公式のAnchor補助タスクだけを軽量な形で追加する(詳細は
+# reports/mmecg_comparison/prior_work_accuracy_comparison.md参照)。
+#
+# Anchorラベルは`tau_pseudo_labels.compute_rpeak_heatmap_labels`(拍境界内で検出した
+# R波位置にガウシアンheatmapを立てる、model-independent)で生成する。266で試した
+# rpeak_positionラベルと同じ考え方だが、スカラー回帰ではなくheatmap回帰にすることで
+# 位置の不確実性を表現する(公式のAnchorタスクと同じ表現形式)。
+#
+# 265(τなし、Anchorなし)との比較で、Anchor補助タスクを追加するだけで波形回帰精度が
+# 改善するかを見る。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+  use_tau: false
+  use_anchor_head: true
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4
+  anchor_weight: 1.0

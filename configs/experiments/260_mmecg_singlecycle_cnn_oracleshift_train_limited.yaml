@@ -1,0 +1,37 @@
+# 260: 259(shift-invariant training, oracle_max_shift=30)は無制約すぎて生出力の位置合わせ
+# 動機を失い、test_corrが0.084まで悪化した(257の0.203を大きく下回る)。ここではシフト幅を
+# ±5サンプル(200サンプル中、257オラクル分布の平均絶対値13.0よりかなり小さい)に制限し、
+# 「学習時のタイミング不確実性の免除」と「生出力の位置合わせ動機の保持」のトレードオフを
+# 探る。259が完全な失敗、257(シフト無し)が基準(0.203)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: false
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_singlecycle_cnn
+  name: singlecycle_cnn
+  n_points: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+  out_len: 200
+  use_temporal_shift: false
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4
+  oracle_shift_train: true
+  oracle_max_shift: 5

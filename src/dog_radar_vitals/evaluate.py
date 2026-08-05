@@ -12,7 +12,12 @@ from dog_radar_vitals.config import load_config
 from dog_radar_vitals.train import REPO_ROOT
 from dog_radar_vitals.training.beatgraph_gan_trainer import evaluate_beatgraph_gan
 from dog_radar_vitals.training.beatgraph_trainer import evaluate_beatgraph
+from dog_radar_vitals.training.chen2022_trainer import evaluate_chen2022
 from dog_radar_vitals.training.classical_trainer import evaluate_classical
+from dog_radar_vitals.training.radarode_longterm_trainer import evaluate_radarode_longterm
+from dog_radar_vitals.training.radarode_sceg_trainer import evaluate_radarode_sceg
+from dog_radar_vitals.training.singlecycle_cnn_trainer import evaluate_singlecycle_cnn
+from dog_radar_vitals.training.tau_predictor_trainer import evaluate_tau_predictor
 from dog_radar_vitals.training.deep_trainer import evaluate_deep
 from dog_radar_vitals.training.ecg_trainer import evaluate_ecg
 from dog_radar_vitals.training.heatmap_gan_trainer import evaluate_heatmap_gan
@@ -36,6 +41,11 @@ _EVAL_FNS = {
     "mmecg_heatmap_gan": evaluate_heatmap_gan,
     "mmecg_spatial_seq2seq": evaluate_spatial_fusion,
     "mmecg_spatial_heatmap_gan": evaluate_spatial_heatmap_gan,
+    "mmecg_chen2022": evaluate_chen2022,
+    "mmecg_radarode_sceg": evaluate_radarode_sceg,
+    "mmecg_singlecycle_cnn": evaluate_singlecycle_cnn,
+    "mmecg_tau_predictor": evaluate_tau_predictor,
+    "mmecg_radarode_longterm": evaluate_radarode_longterm,
 }
 
 

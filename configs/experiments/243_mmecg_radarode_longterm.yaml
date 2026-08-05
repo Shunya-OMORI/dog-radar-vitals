@@ -1,0 +1,34 @@
+# 243: radarODEの長期ECG再構成ネットワーク(Table III・非自己回帰TCN融合)。
+#
+# 242(SCEG、単一拍再構成)で学習した重みを凍結して使い、生RCG窓+SCEG由来の
+# morphological referenceから最終的な4秒窓のECGを再構成する。201/240/241と同じ
+# window_sec/stride_sec/subjectsを使い、窓内Pearson相関で直接比較できるようにする。
+#
+# model.sceg_run_dir は242を学習した後、実際のrun_dirパス(runs/{timestamp}_ecg_radarode_sceg)に
+# 書き換えること。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_longterm
+  name: radarode_longterm
+  sceg_run_dir: runs/20260728-044928_ecg_radarode_sceg
+  n_points: 50
+  channels: [128, 256, 512]
+  tcn_hidden: 16
+
+train:
+  batch_size: 16
+  epochs: 30
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 0

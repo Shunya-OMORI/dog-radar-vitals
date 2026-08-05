@@ -1,0 +1,39 @@
+# 263: τのみを予測する専用モデル(TauOnlyCNN)を、τ疑似ラベルへの回帰損失のみで学習する。
+#
+# 261/262(波形回帰モデルにτ教師あり補助損失を追加)は、weightを50倍にしてもτ予測が
+# oracle疑似ラベルτとほぼ無相関のままだった(相関-0.0001, -0.0208)。これが「波形回帰用
+# アーキテクチャ(周波数軸を早々に平均poolingで潰す設計)がτ推定に向いていない」せいか、
+# 「τというタスク自体が(疑似ラベルのノイズ込みで)そもそも予測困難」なのかを切り分ける。
+# TauOnlyCNNはSST(50,F,T)を周波数軸を潰さず2D Conv2dで処理する専用設計。波形は一切
+# 予測せず、oracle疑似ラベルτ(257基準)へのMSE回帰のみを損失とする。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: false
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_tau_predictor
+  name: tau_only_cnn
+  in_channels: 50
+  channels: [64, 128, 256]
+  hidden: 64
+  dropout: 0.1
+  max_shift_frac: 0.15
+
+train:
+  batch_size: 32
+  epochs: 30
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4
+  tau_labels:
+    source_run_dir: runs/20260730-113005_ecg_singlecycle_cnn
+    max_shift: 30

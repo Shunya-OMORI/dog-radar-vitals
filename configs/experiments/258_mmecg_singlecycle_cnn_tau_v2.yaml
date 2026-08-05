@@ -1,0 +1,35 @@
+# 258: 256(TemporalShiftHead v1)の再設計版。v1はAdaptiveAvgPool1d(1)で時間軸を1点に
+# 潰していたため位置情報が失われ、τがほぼ0(平均-0.45/200サンプル)に留まっていた。
+# v2はAdaptiveAvgPool1d(8)で時間軸を粗く残し、大まかな位置情報を保ったままτを予測する
+# (`models/deep/temporal_alignment.py`参照)。257(対照、25epoch)と比較する。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: false
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_singlecycle_cnn
+  name: singlecycle_cnn
+  n_points: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+  out_len: 200
+  use_temporal_shift: true
+  max_shift_frac: 0.15
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4

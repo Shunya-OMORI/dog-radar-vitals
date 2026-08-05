@@ -24,11 +24,14 @@ class MMECGWindowDataset(Dataset):
         window_sec: float,
         stride_sec: float,
         complex_input: bool = False,
+        normalization: str = "zscore",
     ) -> None:
         self._samples: list[tuple[np.ndarray, np.ndarray]] = []
         for trial_id in trial_ids:
             rec = load_trial(raw_root, trial_id)
-            self._samples.extend(iter_windows(rec, window_sec, stride_sec, complex_input=complex_input))
+            self._samples.extend(
+                iter_windows(rec, window_sec, stride_sec, complex_input=complex_input, normalization=normalization)
+            )
 
     def __len__(self) -> int:
         return len(self._samples)

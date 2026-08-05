@@ -1,0 +1,41 @@
+# 261: τの教師あり補助損失(tau supervision)。TemporalShiftHead(256/258で入力のみからは
+# 有用なシフト量を学習できずほぼ定数に収束)に対し、固定した257(シフト無しコントロール)の
+# 予測に対するoracle探索τを疑似ラベルとして直接回帰させる補助損失を追加する
+# (singlecycle_cnn_trainer.py `_compute_oracle_tau_labels`参照)。257オラクル分布の
+# 平均絶対値は13.0/200=0.065程度。257のtest_corr=0.203、オラクル上限=0.586が比較対象。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: false
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_singlecycle_cnn
+  name: singlecycle_cnn
+  n_points: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+  out_len: 200
+  use_temporal_shift: true
+  max_shift_frac: 0.15
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4
+  tau_supervision:
+    enabled: true
+    source_run_dir: runs/20260730-113005_ecg_singlecycle_cnn
+    max_shift: 30
+    weight: 1.0

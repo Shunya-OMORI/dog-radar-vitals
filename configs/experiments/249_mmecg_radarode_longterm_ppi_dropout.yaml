@@ -1,0 +1,31 @@
+# 249: radarODEの長期ECG再構成ネットワーク、248(拍境界コンセンサス検出+dropout版SCEG)を使用。
+#
+# 246は245(拍境界は旧PPIウォーク方式)の重みを使っていた。248でSCEGの単一拍相関が
+# 0.209→0.258(test)に改善したため、その重みを使ってmorphological referenceの質が
+# 窓内相関にどう伝播するかを確認する。246と設定は同一、model.sceg_run_dirのみ248へ差し替え。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_longterm
+  name: radarode_longterm
+  sceg_run_dir: runs/20260729-134315_ecg_radarode_sceg
+  n_points: 50
+  channels: [128, 256, 512]
+  tcn_hidden: 16
+
+train:
+  batch_size: 16
+  epochs: 30
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 0

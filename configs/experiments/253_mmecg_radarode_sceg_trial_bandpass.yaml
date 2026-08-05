@@ -1,0 +1,39 @@
+# 253: 248(タイトクロップ+dropout+consensus PPI、単一拍相関0.258)に、RCG正規化前の
+# [1,25]Hzバンドパスフィルタを追加した版。正規化スコープはトライアル全体(従来通り)。
+#
+# 2026-07-29の検証で、RCG正規化(z-score)の分散計算が体動由来と推測される25Hz超の
+# 高周波ノイズに支配されていることが判明した(trial 1 ch0で、10秒窓ごとのstdが
+# 生広帯域では最大9.3倍ばらつくのに対し、[1,25]Hzバンドパス後は3.4倍まで縮小)。
+# 4秒文脈窓(250/251)は悪化したため既定offに戻し、この実験ではバンドパスフィルタの
+# 効果だけを248に対して単独で検証する。詳細は
+# `reports/mmecg_comparison/prior_work_accuracy_comparison.md`参照。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: true
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+
+train:
+  batch_size: 32
+  epochs: 80
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4

@@ -1,0 +1,41 @@
+# 272: 269(タイトクロップ、backbone 2段対称downsampling、encoder_out_time=16)から、
+# 窓の種類は変えずに時間分解能だけをさらに上げるとどうなるかを単体で見る(269との比較で
+# 「時間分解能」という変数だけを分離する)。
+#
+# 269と同じ2段構成のまま、2段目のstrideを(周波数2, 時間1)の非対称にする
+# (`backbone_strides: [[2,2],[2,1]]`、公式DCNResNetの後段と同じ発想: 周波数軸は
+# 引き続き潰すが時間軸はこれ以上潰さない)。これによりネイティブ時間分解能が
+# 64→32→32(時間軸は1段目でのみ半減)となり、encoder_out_time=32(269の16の2倍、
+# 1フレームあたり約22ms)にできる。周波数軸は64→32→16のまま従来通り潰されるため、
+# チャネル方向の表現力は269とほぼ同等。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256]
+  backbone_strides: [[2, 2], [2, 1]]
+  encoder_out_channels: 128
+  encoder_out_time: 32
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+  use_tau: false
+  use_anchor_head: true
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4
+  anchor_weight: 1.0

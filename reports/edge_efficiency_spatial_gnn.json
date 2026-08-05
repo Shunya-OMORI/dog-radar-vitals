@@ -1,0 +1,80 @@
+{
+  "device": "NVIDIA GeForce RTX 3060 Ti",
+  "torch": "2.13.0+cu130",
+  "cpu_threads": 4,
+  "models": [
+    {
+      "name": "spatial_gnn_posxyz",
+      "note": "点ごと時間conv(8倍縮約)→posXYZのk近傍(k=6)グラフ上でGATConv×2→転置convで800点に復元",
+      "params": 33985,
+      "params_M": 0.033985,
+      "model_size_MB_fp32": 0.12964248657226562,
+      "input_shapes": [
+        [
+          1,
+          800,
+          50
+        ],
+        [
+          1,
+          50,
+          3
+        ]
+      ],
+      "flops_per_window": 314275200,
+      "gflops_per_window": 0.3142752,
+      "cpu": {
+        "latency_ms_mean": 11.460360099972604,
+        "latency_ms_std": 1.3618370336459609,
+        "latency_ms_p50": 11.24674499988032,
+        "latency_ms_p95": 13.603760899695768,
+        "realtime_factor_4s_window": 0.002865090024993151,
+        "n_threads": 4
+      },
+      "gpu": {
+        "latency_ms_mean": 4.093671739992715,
+        "latency_ms_std": 0.6154232588360733,
+        "latency_ms_p50": 3.919952500382351,
+        "latency_ms_p95": 5.495750599766324,
+        "realtime_factor_4s_window": 0.0010234179349981787,
+        "peak_gpu_mem_MB": 28.939453125,
+        "gpu_power_W_mean": 23.310000000000002,
+        "gpu_power_W_max": 25.58
+      }
+    },
+    {
+      "name": "rpeak_cnn1d_64ch_crosscheck",
+      "note": "クロスチェック用(radarODE-MTL側 raw_anchor_cnn_64ch と同一構成)",
+      "params": 356417,
+      "params_M": 0.356417,
+      "model_size_MB_fp32": 1.3596229553222656,
+      "input_shapes": [
+        [
+          1,
+          800,
+          50
+        ]
+      ],
+      "flops_per_window": 568422400,
+      "gflops_per_window": 0.5684224,
+      "cpu": {
+        "latency_ms_mean": 2.460439260084968,
+        "latency_ms_std": 0.9486720509264372,
+        "latency_ms_p50": 2.1315860003596754,
+        "latency_ms_p95": 3.5503760999745277,
+        "realtime_factor_4s_window": 0.000615109815021242,
+        "n_threads": 4
+      },
+      "gpu": {
+        "latency_ms_mean": 0.7306357600646152,
+        "latency_ms_std": 0.1224680155530105,
+        "latency_ms_p50": 0.7074290001582995,
+        "latency_ms_p95": 0.8098057999177399,
+        "realtime_factor_4s_window": 0.0001826589400161538,
+        "peak_gpu_mem_MB": 10.66748046875,
+        "gpu_power_W_mean": 44.29,
+        "gpu_power_W_max": 44.29
+      }
+    }
+  ]
+}

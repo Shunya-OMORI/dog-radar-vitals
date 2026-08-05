@@ -35,9 +35,15 @@ class ECGWaveformCNN1D(nn.Module):
         self.conv = nn.Sequential(*layers)
         self.head = nn.Conv1d(channels, 1, kernel_size=1)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """x: (batch, seq_len, 2) -> (batch, seq_len)"""
+    def forward(self, x: torch.Tensor, return_features: bool = False):
+        """x: (batch, seq_len, 2) -> (batch, seq_len)。
+
+        `return_features=True`で、headに入れる前の中間特徴(batch, channels, seq_len)も
+        併せて返す(`TemporalShiftHead`のlocalization networkの入力に使う)。
+        """
         h = x.transpose(1, 2)  # (batch, 2, seq_len)
         h = self.conv(h)
-        out = self.head(h)  # (batch, 1, seq_len)
-        return out.squeeze(1)
+        out = self.head(h).squeeze(1)  # (batch, seq_len)
+        if return_features:
+            return out, h
+        return out

@@ -1,0 +1,44 @@
+# 271: 269/270(backbone 2段downsampling+Anchor補助タスク)に、4秒複数拍窓
+# (use_context_window: true、T_FIXED_SST_CONTEXT=128)を組み合わせる。
+#
+# ユーザとの相談で見送っていた「フル再現」方向(公式実装は50x71x120の4秒複数拍窓を使う)を、
+# 解像度改善後の構成で改めて試す。250/251(旧3段downsampling・Anchor無し構成)では4秒窓は
+# 悪化したが、当時と違い今は(a)backboneのdownsampling段数を減らして時間分解能を確保でき、
+# (b)Anchor補助タスクでR波位置を明示的に教師あり学習できる。4秒窓は複数拍を含むため、
+# 拍境界推定ノイズへの依存を減らせ、Anchorタスクのダイナミックレンジも広がる(タイトクロップ
+# では境界推定ノイズ由来の数十ms程度のばらつきしか無かった)ことが期待される。
+#
+# 入力SST長128に対しbackbone 2段(各stride2)で128→64→32、encoder_out_time=32
+# (269のタイトクロップ64→32→16、encoder_out_time=16と比べて絶対時間分解能は4秒/32=125ms/
+# フレームで269の43ms/フレームより粗いが、複数拍の文脈情報が使える点がタイトクロップと違う)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+  use_context_window: true
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256]
+  encoder_out_channels: 128
+  encoder_out_time: 32
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+  use_tau: false
+  use_anchor_head: true
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4
+  anchor_weight: 1.0

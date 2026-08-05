@@ -1,0 +1,41 @@
+# 262: 261(tau_supervision weight=1.0)はτが定数に収束し(std=0.0000)、oracleτとの相関が
+# ほぼ0だった。再構成損失(~0.6-0.9)に対しτ損失(~0.0037)のスケールが2桁小さく、勾配の
+# ほとんどが再構成損失側に流れて τ の補助損失が実効的に無視されていた可能性を検証するため、
+# weightを50倍(1.0→50.0)に引き上げる。これでτ損失の勾配寄与が再構成損失と同程度の
+# オーダーになるはず(0.0037*50=0.185、再構成損失0.6-0.9と近いオーダー)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: false
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_singlecycle_cnn
+  name: singlecycle_cnn
+  n_points: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+  out_len: 200
+  use_temporal_shift: true
+  max_shift_frac: 0.15
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4
+  tau_supervision:
+    enabled: true
+    source_run_dir: runs/20260730-113005_ecg_singlecycle_cnn
+    max_shift: 30
+    weight: 50.0

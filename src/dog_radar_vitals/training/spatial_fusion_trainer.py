@@ -57,7 +57,14 @@ _build_model = build_spatial_model
 
 def _build_dataset(data_cfg: dict, raw_root: Path, split: str, heatmap: bool) -> MMECGSpatialWindowDataset:
     trial_ids = trial_ids_for_subjects(raw_root, data_cfg["subjects"][split])
-    return MMECGSpatialWindowDataset(raw_root, trial_ids, data_cfg["window_sec"], data_cfg["stride_sec"], heatmap=heatmap)
+    return MMECGSpatialWindowDataset(
+        raw_root,
+        trial_ids,
+        data_cfg["window_sec"],
+        data_cfg["stride_sec"],
+        heatmap=heatmap,
+        normalization=data_cfg.get("normalization", "zscore"),
+    )
 
 
 def _run_epoch(model: nn.Module, loader: DataLoader, device: torch.device, loss_fn, optimizer=None) -> dict[str, float]:

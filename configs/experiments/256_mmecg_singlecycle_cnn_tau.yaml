@@ -1,0 +1,42 @@
+# 256: 247(タイトクロップ+凡庸CNN、単一拍相関0.218)に、学習可能な時間遅延τ補正
+# (TemporalShiftHead)を追加した高速反復用config。
+#
+# 診断実験で、248の予測に±20サンプル(200サンプル中)のシフト探索を許すと相関が
+# 0.36→0.54まで跳ね上がることを確認した(詳細は
+# `reports/mmecg_comparison/prior_work_accuracy_comparison.md`参照)。radarODE論文の
+# ODEデコーダが実装する「学習可能な時間遅延τでシフト」という補正を、Temporal Transformer
+# layer(Spatial Transformer Networksの1次元版)に着想した軽量なヘッドとして実装した
+# (`models/deep/temporal_alignment.py`)。まずは凡庸なCNN(247相当)+epoch数を減らした
+# 高速設定でτ補正の設計自体が機能するか検証する。良ければ248(SCEG)にも移植しフル学習で
+# 検証する。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  norm_scope: trial
+  apply_bandpass: false
+  use_context_window: false
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_singlecycle_cnn
+  name: singlecycle_cnn
+  n_points: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+  out_len: 200
+  use_temporal_shift: true
+  max_shift_frac: 0.15
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4

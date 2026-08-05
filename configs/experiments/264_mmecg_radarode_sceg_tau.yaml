@@ -1,0 +1,40 @@
+# 264: 248(現状最良、test_corr=0.258)のODEデコーダに、原著radarODEのτ(時間遅延)を
+# 追加した版。過去の実装(245-248)はODEの位相グリッドθ(t)を`linspace(0,2π,T)`で固定的に
+# 与えており、原著が明記する「the solution of the ODEs will be shifted to the left with
+# time τ」を完全に省略していた(`radarode_sceg.py` ODEDecoder docstring参照)。
+#
+# 256/258/261/262/263(波形回帰用CNNへの後付けτ、または教師ありオラクル回帰)はいずれも
+# 疑似ラベルτとほぼ無相関、あるいはMAEでゼロ予測にすら負けるという結果に終わった。
+# 本config は原著の設計をそのまま再現する: τをODEの形状パラメータη(a,b,theta)と
+# 同じ潜在特徴から予測し、疑似ラベルは一切使わず、最終的な再構成損失のみで
+# end-to-endに学習する。ODEの5ピーク・パラメトリックな形状制約下では、CNNのように
+# 「振幅やピーク幅で誤魔化す」余地が少なく、τに正しい勾配が伝わりやすいという仮説を検証する。
+# 高速反復のためepochsを80→25に短縮(248本体の80epoch検証は、この設定で改善が
+# 確認できてから行う)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4

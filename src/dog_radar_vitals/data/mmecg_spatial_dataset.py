@@ -21,13 +21,20 @@ from dog_radar_vitals.data.mmecg_windowing import iter_windows
 
 class MMECGSpatialWindowDataset(Dataset):
     def __init__(
-        self, raw_root: Path, trial_ids: list[int], window_sec: float, stride_sec: float, heatmap: bool = False
+        self,
+        raw_root: Path,
+        trial_ids: list[int],
+        window_sec: float,
+        stride_sec: float,
+        heatmap: bool = False,
+        normalization: str = "zscore",
     ) -> None:
         self._samples: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []
         window_fn = iter_peak_windows if heatmap else iter_windows
+        window_kwargs = {} if heatmap else {"normalization": normalization}
         for trial_id in trial_ids:
             rec = load_trial(raw_root, trial_id)
-            for rcg_win, target_win in window_fn(rec, window_sec, stride_sec, complex_input=False):
+            for rcg_win, target_win in window_fn(rec, window_sec, stride_sec, complex_input=False, **window_kwargs):
                 self._samples.append((rcg_win, rec.posxyz, target_win))
 
     def __len__(self) -> int:

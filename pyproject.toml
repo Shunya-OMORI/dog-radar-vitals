@@ -16,6 +16,8 @@ dependencies = [
     "torch_geometric>=2.5",
     "neurokit2>=0.2.7",
     "ptflops>=0.7",
+    "ssqueezepy>=0.6.6",
+    "torchvision>=0.28.0",
 ]
 
 [project.optional-dependencies]

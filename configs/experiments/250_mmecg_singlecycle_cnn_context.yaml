@@ -1,0 +1,38 @@
+# 250: 247(単一拍タスク+凡庸CNN)に、原著本文(radarODE p.6)で確認した「4秒文脈窓」入力と
+# 固定スケールECG正規化を追加した版。
+#
+# 原著は出力(ターゲット)こそ単一拍(200サンプル)だが、モデルへの入力は推定拍境界にタイトに
+# 切り詰めず、その拍を中心とした4秒間(複数拍分の文脈)を丸ごと与えている
+# ("the actual SST segment is centered at the current cardiac cycle and expands to 4 seconds")。
+# 247はタイトなクロップを使っており、拍境界推定の誤差に対して脆弱だった。また、ECGの
+# per-trial z-score正規化がトライアル間で振幅スケールを不整合にしていた問題も固定スケールへの
+# 変更で解消した(`mmecg_singlecycle_dataset.py`のdocstring参照)。
+#
+# データパイプラインは`mmecg_singlecycle_dataset.py`の更新を通じて自動的にこの2点を反映する
+# (T_FIXED_SST=128、CONTEXT_SEC=4.0、ECG_FIXED_SCALE=0.15)。split・被験者は247と同一。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_singlecycle_cnn
+  name: singlecycle_cnn
+  n_points: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+  out_len: 200
+
+train:
+  batch_size: 32
+  epochs: 80
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4

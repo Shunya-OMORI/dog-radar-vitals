@@ -1,0 +1,45 @@
+# 241: Chen et al. (2022, RCG2ECG、同一データセットの原著論文)アーキテクチャの忠実な再現。
+#
+# 原著が達成した波形相関中央値0.90の再現に向けた本実装。原著の(a) 空間時間エンコーダ
+# (CNN時間エンコーダ+posXYZ埋め込み+Transformer空間融合、231/232のecg_spatial_fusionと
+# 同じ発想をベースに拡張)、(b) TCN自己回帰デコーダ(式13, 9層dilation2^i)、(c) μ-law
+# companding+256値カテゴリカル損失(式14)、をmodels/deep/chen2022_reconstructor.pyで実装した。
+#
+# window_sec=3.2 (640サンプル@200Hz)は原著4.2.3節と同一。stride_secは原著の0.15s(30サンプル)
+# だと訓練窓が約47,000枚に膨れ上がり(40トライアル×約1,178窓)、自己回帰デコーダの学習・評価が
+# 現実的な時間で終わらないため、201/240と同じstride_sec=2に緩和する（学習窓は約1/13に減るが、
+# 3分トライアルなら1トライアルあたり十分な窓数が残る）。normalization: minmaxはμ-law companding
+# 前提の[-1,1]正規化（原著「xtは-1<xt<1に正規化」、式14直前の記述）。
+#
+# 注意: 原著は全35被験者・35-fold leave-one-subject-out CVで学習しているが、本実験は
+# 既存configと同じ11被験者・単一split(train7/val1/test3)のまま。訓練データ量の差
+# （34人 vs 7人）は本実験では埋められない未解決の変数として残る
+# （`reports/mmecg_comparison/prior_work_accuracy_comparison.md`参照）。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 3.2 # 640サンプル@200Hz。原著4.2.3節と同一
+  stride_sec: 2 # 原著は0.15s(30サンプル)だが計算量の都合で201/240と揃える（上記コメント参照）
+  normalization: minmax # μ-law companding前提（原著: ECGを-1<xt<1に正規化してから companding）
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_chen2022
+  name: chen2022_reconstructor
+  n_points: 50
+  embed_dim: 32
+  cond_channels: 8
+  decoder_hidden: 32
+  n_tcn_layers: 9 # 原著: 受容野512（dilation 2^0..2^8）
+
+train:
+  batch_size: 32
+  epochs: 30
+  lr: 0.001 # 原著: lr=0.001, Adam(β=0.9, 0.999)
+  weight_decay: 0.0
+  num_workers: 2

@@ -1,0 +1,37 @@
+# 247: 単一拍SST->ECG回帰を、201と全く同じ凡庸なCNN(ECGWaveformCNN1Dそのもの)で解く。
+#
+# 目的: 「タスク設計(単一拍再定式化)・前処理(SST変換)・拍境界推定(コンセンサス検出)」を
+# 201(window regression、raw RCG入力)と同じ凡庸なCNNに適用したとき、SCEGのような凝った
+# アーキテクチャ(245: 単一拍相関0.209)にどれだけ迫れるかを検証する。差が小さければ
+# アーキテクチャは支配的要因ではなく、差が大きければアーキテクチャにも実質的な価値がある。
+# 詳細は`reports/mmecg_comparison/prior_work_accuracy_comparison.md`
+# 「タスク設計・前処理・学習設計の改善」節参照。
+#
+# データは245と同じ`MMECGSingleCycleDataset`(拍境界推定を2026-07-29にコンセンサス検出方式へ
+# 更新済み、位相ドリフト問題を解消)をそのまま使う。split・被験者は201/245と同一。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_singlecycle_cnn
+  name: singlecycle_cnn
+  n_points: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+  out_len: 200
+
+train:
+  batch_size: 32
+  epochs: 80
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 4

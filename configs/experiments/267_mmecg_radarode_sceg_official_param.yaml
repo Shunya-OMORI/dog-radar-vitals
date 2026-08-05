@@ -1,0 +1,37 @@
+# 267: τ専用ヘッドを廃止し、公式実装(GitHub `ZYY0844/radarODE-MTL`のECGParameterEstimator)の
+# パラメータ推定ブランチを忠実に再現した`OfficialODEDecoder`(shape_prior: ode_official)を使う。
+#
+# 公式コードには独立した「τ」というスカラー変数は存在せず、P/Q/R/S/T各波の(a,b,theta)×5=15個
+# のみが出力される。theta_Rのデフォルト値が0度でなく40度であるため、乗算スケーリング
+# ((1+1*pred)*default)でもR波の位相を±40度の範囲で動かせる(=論文が"τ"と呼ぶ効果の実体)。
+# 265(τなし、独自の0.3スケール限定パラメータ化)との比較で、公式のパラメータ化・デフォルト値
+# ・スケーリング方式に変えるだけでどれだけ精度が変わるかを見る。248/264/265と同じ25epoch・
+# 同じデータ分割で高速比較する。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+  shape_prior: ode_official
+
+train:
+  batch_size: 32
+  epochs: 25
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4

@@ -1,0 +1,40 @@
+# 245: radarODE SCEG(単一拍ECG再構成)、T_FIXED_SST復元+Deformable Conv2d版。
+#
+# 242(SCEG)はT_FIXED_SST=16(メモリ制約による縮小、原著Table Iは64)・通常Conv2d
+# (Deformable Conv2dの代用)という2点で原著から乖離しており、単一拍相関0.147と
+# 目標(87.9〜92.6%)に遠く届かなかった(`reports/mmecg_comparison/prior_work_accuracy_comparison.md`
+# 「radarODEの実装・再現結果」節)。本configは以下2点を実装した上での再学習:
+#
+# 1. `mmecg_singlecycle_dataset.py`を遅延ロード+トライアル単位LRUキャッシュ方式に書き換え、
+#    T_FIXED_SST=64(原著と同じ)へ復元してもシステムRAM(15GB)を超えないようにした
+#    (実測: train+val全trial読み込みのピークRSSは約900MB)。
+# 2. torchvisionを導入し、backboneのDeformable Conv2dを本来設計通り使えるようにした
+#    (`use_deformable: true`、既定)。
+#
+# split・被験者は242と同一(単一split、201/240/241と揃える)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+
+train:
+  batch_size: 32
+  epochs: 80
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4

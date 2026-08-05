@@ -1,0 +1,33 @@
+# 251: 248(拍境界コンセンサス検出+dropout版SCEG)に、4秒文脈窓入力+固定スケールECG正規化を
+# 追加した版。250と対になるアーキテクチャ側(Deformable Conv2d+ODE形状事前分布)の実験。
+#
+# データパイプラインの変更は`mmecg_singlecycle_dataset.py`を通じて自動反映される
+# (T_FIXED_SST=128、CONTEXT_SEC=4.0秒、ECG_FIXED_SCALE=0.15)。詳細は
+# `reports/mmecg_comparison/prior_work_accuracy_comparison.md`参照。split・被験者は248と同一。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_radarode_sceg
+  name: radarode_sceg
+  n_points: 50
+  backbone_channels: [128, 256, 512]
+  encoder_out_channels: 128
+  encoder_out_time: 8
+  out_len: 200
+  use_deformable: true
+  dropout: 0.2
+
+train:
+  batch_size: 32
+  epochs: 80
+  lr: 0.001
+  weight_decay: 0.0001
+  num_workers: 4
