@@ -82,6 +82,7 @@ def _build_dataset(data_cfg: dict, raw_root: Path, split: str, heatmap: bool) ->
         heatmap=heatmap,
         normalization=data_cfg.get("normalization", "zscore"),
         rpeak_detector=data_cfg.get("rpeak_detector", "legacy"),
+        apply_bandpass=data_cfg.get("apply_bandpass", False),
     )
 
 

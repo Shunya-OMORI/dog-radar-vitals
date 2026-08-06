@@ -5,6 +5,7 @@ from collections.abc import Iterator
 
 import numpy as np
 
+from dog_radar_vitals.data.bandpass import bandpass_filter
 from dog_radar_vitals.data.mmecg import MMECGRecording
 from dog_radar_vitals.data.mmecg_windowing import analytic_signal_channels, zscore_channels
 from dog_radar_vitals.data.rpeaks import (
@@ -21,6 +22,7 @@ def iter_peak_windows(
     stride_sec: float,
     complex_input: bool = False,
     detector: str = "legacy",
+    apply_bandpass: bool = False,
 ) -> Iterator[tuple[np.ndarray, np.ndarray]]:
     """(RCG窓 [T,50](real or complex64), R波heatmap窓 [T]) を順に返す。
 
@@ -31,12 +33,25 @@ def iter_peak_windows(
         与え続けるのをやめ、R/Tどちらを検出したかの選別は後処理に任せる。
         評価時の正解はdetect_r_peaks_neurokit(R波のみ)を使うため、この
         モードの効果は学習後の後処理付き評価で確認する)。
+    apply_bandpass: 2026-08-07、z-score正規化の前にRCGへ[1,25]Hzバンドパスフィルタ
+        (`bandpass.py`)をかけるかどうか。SST/波形回帰パイプラインでは既に試されて
+        悪化した記録がある(config253/254)が、別パイプライン・旧ラベルでの結果で
+        あり、本パイプライン(生信号heatmap, 新ラベル)での単一変数プローブとして
+        別途検証する。既定False(過去との再現性のため)。
     """
     nan_mask = None
     if np.isnan(rec.rcg).any() or np.isnan(rec.ecg).any():
         nan_mask = np.isnan(rec.rcg).any(axis=1) | np.isnan(rec.ecg)
 
-    rcg_z = zscore_channels(rec.rcg)
+    rcg_for_norm = rec.rcg
+    if apply_bandpass:
+        # sosfiltfiltはNaNが1つでもあると出力全体をNaN汚染するため、フィルタ前だけ
+        # チャネル平均で一時的に埋める（該当窓はnan_maskで別途スキップされるので
+        # ここでの埋め方自体は結果に影響しない）。
+        rcg_filled = np.where(np.isnan(rec.rcg), np.nanmean(rec.rcg, axis=0, keepdims=True), rec.rcg)
+        rcg_for_norm = np.stack(
+            [bandpass_filter(rcg_filled[:, ch], rec.fs) for ch in range(rcg_filled.shape[1])], axis=-1)
+    rcg_z = zscore_channels(rcg_for_norm)
     rcg_input = analytic_signal_channels(rcg_z) if complex_input else rcg_z
 
     ecg_filled = np.nan_to_num(rec.ecg, nan=float(np.nanmean(rec.ecg)))
