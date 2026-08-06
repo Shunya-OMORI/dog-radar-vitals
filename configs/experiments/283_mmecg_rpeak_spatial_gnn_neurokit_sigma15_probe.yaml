@@ -1,0 +1,33 @@
+# 283: 282(sigma=20ms)の8epochプローブはF1=0.76台まで改善したがRR-MAE/RMSSD-MAEは
+# 274(sigma=10)より悪化した(20〜28ms vs 16.27ms)。検出率(F1)と位置推定精度
+# (RR-MAE/RMSSD-MAE)のトレードオフと解釈できるため、10msと20msの中間である15msで
+# 折衷点を探る単一変数プローブ(CLAUDE.md R4)。RMSSD-MAEが274並みに保たれつつF1が
+# 改善するなら採用、そうでなければ10ms(274)を維持する。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 8
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
