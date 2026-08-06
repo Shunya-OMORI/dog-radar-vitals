@@ -1,0 +1,40 @@
+# 284: 283(sigma=15ms, 8epochプローブ)で有望な結果が出たため本番50epochに進める。
+# 274(sigma=10、比較対象、F1=0.687/RR-MAE=10.69ms/RMSSD-MAE=16.27ms)との比較:
+# 283のepoch4(4epoch目、adaptive_searchback後処理)でF1=0.722・RR-MAE=11.56ms・
+# RMSSD-MAE=19.15ms・SDNN-MAE=6.03ms、oldしきい値法でもF1=0.712・RMSSD-MAE=17.30ms
+# (274にほぼ匹敵)・SDNN-MAE=5.22ms(274より良好)。
+# 282(sigma=20)はF1が0.76台まで上がったがRMSSD-MAEが20〜28msまで悪化する
+# 検出/位置精度トレードオフを示したのに対し、283(sigma=15)はRMSSD-MAEの悪化が
+# 軽微(+1〜3ms程度)でF1改善のメリットの方が大きい、中間的な折衷点に見える。
+# 単一変数の原則(CLAUDE.md R4、変更点はdata.heatmap_sigma_msのみ)を保ったまま
+# 本番epoch数で確定させる(R2)。周期チェックポイント(5epoch毎)を使い、
+# post-hocに下流タスク(F1/RR-MAE/RMSSD-MAE)で最良epochを選び直す
+# (config281の教訓: val_corrだけでは下流精度を予測できない)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
