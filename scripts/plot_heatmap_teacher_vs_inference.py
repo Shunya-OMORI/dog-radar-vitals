@@ -44,7 +44,10 @@ CONFIG_PATH = REPO_ROOT / "configs/experiments/102_rpeak_cnn1d_resting.yaml"
 RUN_DIR = REPO_ROOT / "runs/20260723-003215_ecg_rpeak_cnn1d"
 TEST_SUBJECT = "GDN0009"
 WINDOW_SEC = 4
-PLOT_START_SEC = 30.0  # トライアル冒頭は不安定なことが多いので少し進んだ位置から切り出す
+# 「概念を伝える」ための図であることを踏まえ、正解4個・検出4個が全一致(誤差最大6ms)する
+# 窓を全走査で見つけて採用(ユーザ指示: 今回はイメージ優先で良い窓を選んでよい)。
+# モデルの実力(F1 0.32〜0.57)そのものはこの図の主題ではなく、他の節の数値表で報告済み。
+PLOT_START_SEC = 111.0
 
 
 def main() -> None:
