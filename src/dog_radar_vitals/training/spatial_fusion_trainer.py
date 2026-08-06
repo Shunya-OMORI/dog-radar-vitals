@@ -149,6 +149,14 @@ def train_spatial_fusion(config: dict, run_dir: Path, repo_root: Path) -> None:
             f"train_corr={train_metrics['corr']:.3f} val_loss={val_metrics['loss']:.4f} val_corr={val_metrics['corr']:.3f}"
         )
 
+        # 2026-08-07: チェックポイント選択基準(val_corr、heatmap全体のPearson相関)が
+        # 実際の下流タスク(ピーク検出のF1・RR/RMSSD精度)と乖離する場合がある実例を確認した
+        # (R+T統合教師モデルで、corrが同水準でも下流精度が大きく異なった)。best_model.pt
+        # だけでは事後的に「本当に良かったepoch」を再評価できないため、一定間隔でも
+        # チェックポイントを残し、post-hocに下流タスクで選び直せるようにする。
+        if (epoch + 1) % 5 == 0 or epoch == train_cfg["epochs"] - 1:
+            torch.save(model.state_dict(), run_dir / f"epoch_{epoch:03d}.pt")
+
         if val_metrics["corr"] > best_val_corr:
             best_val_corr = val_metrics["corr"]
             torch.save(model.state_dict(), run_dir / "best_model.pt")
