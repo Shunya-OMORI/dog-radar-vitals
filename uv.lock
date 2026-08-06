@@ -749,6 +749,7 @@ dependencies = [
     { name = "torch-geometric" },
     { name = "torchvision" },
     { name = "transformers" },
+    { name = "vmdpy" },
 ]
 
 [package.optional-dependencies]
@@ -779,6 +780,7 @@ requires-dist = [
     { name = "torch-geometric", specifier = ">=2.5" },
     { name = "torchvision", specifier = ">=0.28.0" },
     { name = "transformers", specifier = ">=5.14.1" },
+    { name = "vmdpy", specifier = ">=0.2" },
 ]
 provides-extras = ["dev"]
 
@@ -3707,6 +3709,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/c2/51/32da03cf19d17d46cce5c731967bf58de9bd71db3a379932f53b094deda4/urllib3-1.26.13.tar.gz", hash = "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8", size = 300476 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/65/0c/cc6644eaa594585e5875f46f3c83ee8762b647b51fc5b0fb253a242df2dc/urllib3-1.26.13-py2.py3-none-any.whl", hash = "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc", size = 140572 },
+]
+
+[[package]]
+name = "vmdpy"
+version = "0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0a/96/23fdc1b42a835e3c64bae636bd1b2249680c4c70bbb416f09e8a29a1d8d8/vmdpy-0.2-py2.py3-none-any.whl", hash = "sha256:331e3013dbc95beb564fe7ce70a0f95a09efb44d0ec56a28f61e9ab40fe16c1b", size = 6547 },
 ]
 
 [[package]]
