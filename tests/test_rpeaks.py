@@ -4,6 +4,7 @@ import pytest
 from dog_radar_vitals.data.rpeaks import (
     build_peak_heatmap,
     detect_r_peaks,
+    extract_peaks_adaptive_searchback,
     extract_peaks_from_heatmap,
     extract_peaks_paired_dedup,
     extract_peaks_rhythmic,
@@ -158,6 +159,39 @@ def test_extract_peaks_rhythmic_prefers_higher_amplitude_regular_chain_over_rt_l
     extracted = extract_peaks_rhythmic(heatmap, fs=fs, candidate_height=0.05, min_rr_sec=0.2, max_rr_sec=1.5)
     assert len(extracted) == len(r_idx)
     assert np.abs(np.sort(extracted) - np.array(r_idx)).max() < 5
+
+
+def test_extract_peaks_adaptive_searchback_recovers_regular_beats_with_noise():
+    fs = 2000
+    length = 6000
+    heatmap = np.zeros(length, dtype=np.float32)
+    regular_idx = [500, 1100, 1700, 2300, 2900, 3500, 4100, 4700, 5300]
+    for idx in regular_idx:
+        _bump(heatmap, idx, amplitude=1.0)
+    noise_idx = [850, 2050, 3950]
+    for idx in noise_idx:
+        _bump(heatmap, idx, amplitude=0.2)  # 十分弱いノイズ = ノイズしきい値を超えない想定
+
+    extracted = extract_peaks_adaptive_searchback(heatmap, fs=fs, candidate_height=0.05, init_rr_sec=0.3)
+    assert len(extracted) == len(regular_idx)
+    assert np.abs(np.sort(extracted) - np.array(regular_idx)).max() < 5
+
+
+def test_extract_peaks_adaptive_searchback_recovers_missed_beat_via_searchback():
+    # 1周期分(idx=1700相当)だけ振幅が弱く、通常しきい値では見逃されるが、
+    # searchbackの緩和しきい値では拾えるケース。
+    fs = 2000
+    length = 6000
+    heatmap = np.zeros(length, dtype=np.float32)
+    strong_idx = [500, 1100, 2300, 2900, 3500]
+    weak_idx = 1700  # 見逃されそうな弱いR波
+    for idx in strong_idx:
+        _bump(heatmap, idx, amplitude=1.0)
+    _bump(heatmap, weak_idx, amplitude=0.35)
+
+    extracted = extract_peaks_adaptive_searchback(heatmap, fs=fs, candidate_height=0.05, init_rr_sec=0.3)
+    assert len(extracted) == len(strong_idx) + 1
+    assert np.any(np.abs(np.sort(extracted) - weak_idx) < 5)
 
 
 def test_rpeak_cnn1d_forward_shape_and_range():

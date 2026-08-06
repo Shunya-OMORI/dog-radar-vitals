@@ -207,6 +207,80 @@ def extract_peaks_rhythmic(
     return candidates[np.array(chain, dtype=np.int64)]
 
 
+def extract_peaks_adaptive_searchback(
+    heatmap: np.ndarray,
+    fs: int,
+    candidate_height: float = 0.05,
+    refractory_sec: float = 0.15,
+    init_rr_sec: float = 0.8,
+    missed_limit_frac: float = 1.66,
+    searchback_threshold_frac: float = 0.5,
+) -> np.ndarray:
+    """Pan-Tompkinsの二重しきい値(signal/noise)+searchback方式をheatmap出力に適用した後処理。
+
+    背景（2026-08-06、ユーザ指摘）: 固定しきい値による極大点選択は「時間成分を持たない
+    線形な決定境界」に過ぎず、心拍のような周期信号の検出には本質的に不利。ECGのQRS検出
+    分野では40年以上前から、直近の心拍間隔（RR間隔）の履歴に応じてしきい値を動的に
+    調整し、さらに「予想される次拍のタイミングを大きく過ぎても検出できていない」場合は
+    一度下げたしきい値で過去に遡って候補を探し直す（searchback）方式が標準になっている。
+
+    対応する先行研究: Pan, J. and Tompkins, W. J., "A Real-Time QRS Detection Algorithm,"
+    IEEE Transactions on Biomedical Engineering, 1985（Pan-Tompkinsアルゴリズム）。
+
+    Parameters
+    ----------
+    candidate_height: 候補ピーク自体の下限（ノイズ除去のためこの値未満は最初から捨てる）。
+    missed_limit_frac: 直近のRR間隔平均のこの倍率を超えて次のRが見つからない場合、
+        見逃しとみなしてsearchbackを行う（原著は1.66）。
+    searchback_threshold_frac: searchback時に使う、通常しきい値に対する緩和後の
+        しきい値の比率（原著は0.5）。
+    """
+    candidates, props = find_peaks(heatmap, height=candidate_height, distance=int(refractory_sec * fs))
+    heights = props["peak_heights"]
+    n = len(candidates)
+    if n < 2:
+        return candidates
+
+    init_n = min(8, n)
+    spki = float(np.mean(heights[:init_n]))
+    npki = float(np.min(heights[:init_n])) * 0.5
+    rr_buffer: list[float] = [init_rr_sec * fs]
+
+    accepted: list[int] = []
+    last_r_idx = None
+
+    for i in range(n):
+        idx, h = int(candidates[i]), float(heights[i])
+        thr1 = npki + 0.25 * (spki - npki)
+
+        if last_r_idx is not None and rr_buffer:
+            rr_avg = float(np.mean(rr_buffer))
+            if idx - last_r_idx > missed_limit_frac * rr_avg:
+                thr2 = searchback_threshold_frac * thr1
+                window = [j for j in range(n) if last_r_idx < candidates[j] < idx and heights[j] > thr2]
+                if window:
+                    best_j = max(window, key=lambda j: heights[j])
+                    accepted.append(int(candidates[best_j]))
+                    spki = 0.25 * heights[best_j] + 0.75 * spki
+                    rr_buffer.append(candidates[best_j] - last_r_idx)
+                    if len(rr_buffer) > 8:
+                        rr_buffer.pop(0)
+                    last_r_idx = int(candidates[best_j])
+
+        if h > thr1:
+            accepted.append(idx)
+            spki = 0.125 * h + 0.875 * spki
+            if last_r_idx is not None:
+                rr_buffer.append(idx - last_r_idx)
+                if len(rr_buffer) > 8:
+                    rr_buffer.pop(0)
+            last_r_idx = idx
+        else:
+            npki = 0.125 * h + 0.875 * npki
+
+    return np.array(sorted(set(accepted)), dtype=candidates.dtype)
+
+
 def match_peaks(true_peaks: np.ndarray, pred_peaks: np.ndarray, fs: int, tolerance_ms: float = 50.0) -> dict:
     """真のR波と予測R波を、許容誤差内で1対1に対応付ける（貪欲法、時刻順）。
 
