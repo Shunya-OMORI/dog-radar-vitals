@@ -1,0 +1,50 @@
+=== チャネル重み付けプローブ(8epoch) vs neurokit GT ===
+trial 48: precision=0.689 recall=0.682 f1=0.686 rr_mae_ms=11.461538461538462
+trial 49: precision=0.647 recall=0.220 f1=0.328 rr_mae_ms=4.651162790697675
+trial 50: precision=0.923 recall=0.508 f1=0.655 rr_mae_ms=11.368421052631577
+trial 51: precision=0.956 recall=0.609 f1=0.744 rr_mae_ms=17.361111111111114
+trial 52: precision=0.989 recall=0.508 f1=0.672 rr_mae_ms=12.13483146067415
+trial 53: precision=0.949 recall=0.547 f1=0.694 rr_mae_ms=7.365591397849461
+trial 54: precision=0.951 recall=0.440 f1=0.602 rr_mae_ms=8.421052631578942
+trial 55: precision=0.946 recall=0.819 f1=0.878 rr_mae_ms=11.258992805755392
+trial 56: precision=0.569 recall=0.264 f1=0.361 rr_mae_ms=8.623188405797094
+trial 57: precision=0.026 recall=0.005 f1=0.008 rr_mae_ms=None
+trial 58: precision=0.548 recall=0.076 f1=0.133 rr_mae_ms=9.375
+trial 59: precision=0.928 recall=0.391 f1=0.550 rr_mae_ms=5.898876404494382
+trial 60: precision=0.846 recall=0.363 f1=0.508 rr_mae_ms=7.434210526315789
+trial 61: precision=0.000 recall=0.000 f1=0.000 rr_mae_ms=None
+trial 62: precision=0.969 recall=0.856 f1=0.909 rr_mae_ms=21.41304347826087
+trial 63: precision=0.028 recall=0.018 f1=0.022 rr_mae_ms=16.666666666666668
+trial 64: precision=0.963 recall=0.553 f1=0.703 rr_mae_ms=11.89922480620155
+trial 65: precision=0.922 recall=0.250 f1=0.393 rr_mae_ms=7.826086956521739
+trial 66: precision=0.868 recall=0.853 f1=0.861 rr_mae_ms=6.2944162436548226
+trial 67: precision=0.326 recall=0.198 f1=0.246 rr_mae_ms=8.690476190476213
+trial 68: precision=0.597 recall=0.711 f1=0.649 rr_mae_ms=8.2183908045977
+trial 69: precision=0.749 recall=0.689 f1=0.718 rr_mae_ms=9.846625766871165
+trial 70: precision=0.680 recall=0.280 f1=0.396 rr_mae_ms=8.461538461538462
+trial 71: precision=0.883 recall=0.297 f1=0.444 rr_mae_ms=16.044776119402986
+trial 72: precision=0.667 recall=0.365 f1=0.472 rr_mae_ms=6.746987951807229
+trial 73: precision=0.906 recall=0.207 f1=0.337 rr_mae_ms=10.638297872340425
+trial 74: precision=0.919 recall=0.498 f1=0.646 rr_mae_ms=16.026785714285715
+trial 75: precision=0.541 recall=0.400 f1=0.460 rr_mae_ms=5.604395604395604
+trial 76: precision=0.846 recall=0.636 f1=0.726 rr_mae_ms=8.838028169014084
+trial 77: precision=0.964 recall=0.700 f1=0.811 rr_mae_ms=10.537974683544304
+trial 78: precision=0.946 recall=0.311 f1=0.468 rr_mae_ms=10.0
+trial 79: precision=0.945 recall=0.191 f1=0.318 rr_mae_ms=5.490196078431346
+trial 80: precision=0.915 recall=0.906 f1=0.911 rr_mae_ms=8.168604651162791
+trial 81: precision=0.918 recall=0.822 f1=0.867 rr_mae_ms=8.910256410256407
+trial 82: precision=0.972 recall=0.879 f1=0.923 rr_mae_ms=6.300578034682081
+trial 83: precision=0.243 recall=0.151 f1=0.186 rr_mae_ms=9.696969696969697
+trial 84: precision=0.571 recall=0.881 f1=0.693 rr_mae_ms=6.358695652173913
+trial 85: precision=0.969 recall=0.641 f1=0.772 rr_mae_ms=9.475806451612904
+trial 86: precision=0.959 recall=0.882 f1=0.919 rr_mae_ms=6.901840490797543
+trial 87: precision=0.006 recall=0.005 f1=0.005 rr_mae_ms=None
+trial 88: precision=0.968 recall=0.136 f1=0.239 rr_mae_ms=8.620689655172415
+trial 89: precision=0.026 recall=0.017 f1=0.021 rr_mae_ms=20.0
+trial 90: precision=0.917 recall=0.242 f1=0.383 rr_mae_ms=25.53846153846154
+trial 91: precision=0.973 recall=0.603 f1=0.745 rr_mae_ms=8.38888888888889
+======================================================================
+mean F1: 0.524
+RR-interval MAE (mean over 41 trials): 10.32 ms
+HRV usable: 44/44, RMSSD MAE: 17.39 ms, SDNN MAE: 7.79 ms
+DONE

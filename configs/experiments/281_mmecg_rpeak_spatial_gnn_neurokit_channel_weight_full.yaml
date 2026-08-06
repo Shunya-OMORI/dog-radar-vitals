@@ -1,0 +1,34 @@
+# 281: 280(チャネル重み付け前処理, 8epochプローブ)で有望な結果が出たため本番50epochに
+# 進める。274(前処理なし, 本番)との比較: 8epochプローブ段階でRR-MAE 10.32ms(274本番の
+# 10.69msに迫る)、RMSSD-MAE 17.39ms(274本番の16.27msに迫る)、SDNN-MAE 7.79ms。
+# F1はやや低い(0.524 vs 8epoch基準0.549)が、HRV精度で本日試した全プローブ中最良。
+# 単一変数の原則(CLAUDE.md R4、変更点はdata.preprocessのみ)を保ったまま本番epoch数で
+# 確定させる(R2)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  preprocess: channel_weight
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
