@@ -1,0 +1,35 @@
+# 275: 274(neurokitラベルで学習した本番GNN, F1 0.549/RR-MAE 10.91ms)と同一構成だが、
+# heatmap損失をBCEからfocal loss(CornerNet/CenterNet由来、losses.py参照)に変える。
+# ユーザ指摘(2026-08-06): 後処理は生成済みheatmapの中から極大点を選ぶことしかできず、
+# 真のR波位置でheatmap値が十分上がっていない(見逃し)場合は取り返せない。BCEは
+# 適合率・再現率を対称に扱うため、見逃し防止側に非対称な重みを持つfocal lossを試す。
+# 単一変数の原則(CLAUDE.md R4)により、変更点はtrain.lossのみ。まず8epochプローブで
+# recall/F1/RR-MAEの見込みを確認してから本番epoch数に進む(R2)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 8
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  loss: focal

@@ -6,6 +6,7 @@ from dog_radar_vitals.data.rpeaks import (
     detect_r_peaks,
     extract_peaks_from_heatmap,
     extract_peaks_paired_dedup,
+    extract_peaks_rhythmic,
     match_peaks,
     matched_rr_interval_mae_ms,
     rr_intervals_ms,
@@ -116,6 +117,47 @@ def test_extract_peaks_paired_dedup_keeps_genuinely_spaced_beats():
 
     new = extract_peaks_paired_dedup(heatmap, fs=fs, height=0.10, pair_merge_sec=0.45)
     assert len(new) == 2
+
+
+def _bump(heatmap: np.ndarray, idx: int, amplitude: float, width: int = 40, sigma: float = 10.0) -> None:
+    t_axis = np.arange(-width, width)
+    lo, hi = max(0, idx - width), min(len(heatmap), idx + width)
+    heatmap[lo:hi] += amplitude * np.exp(-0.5 * (t_axis[: hi - lo] / sigma) ** 2)
+
+
+def test_extract_peaks_rhythmic_rejects_irregular_noise_spikes():
+    # 一定間隔(600サンプル=300ms@2000Hz)の規則的な系列に、間隔が不規則な雑音ピークを混ぜる。
+    fs = 2000
+    length = 6000
+    heatmap = np.zeros(length, dtype=np.float32)
+    regular_idx = [500, 1100, 1700, 2300, 2900, 3500, 4100, 4700, 5300]
+    for idx in regular_idx:
+        _bump(heatmap, idx, amplitude=1.0)
+    noise_idx = [850, 2050, 3950]  # 規則的な系列とは無関係な位置
+    for idx in noise_idx:
+        _bump(heatmap, idx, amplitude=0.6)
+
+    extracted = extract_peaks_rhythmic(heatmap, fs=fs, candidate_height=0.05, min_rr_sec=0.2, max_rr_sec=0.5)
+    assert len(extracted) == len(regular_idx)
+    assert np.abs(np.sort(extracted) - np.array(regular_idx)).max() < 5
+
+
+def test_extract_peaks_rhythmic_prefers_higher_amplitude_regular_chain_over_rt_like_pair():
+    # 各周期でR相当(高振幅)とT相当(低振幅・R波の370ms後)の2つの規則的な系列が並走する場合、
+    # 高振幅側(R)の系列が選ばれることを確認する。
+    fs = 2000
+    length = 6000
+    heatmap = np.zeros(length, dtype=np.float32)
+    r_idx = [500, 1500, 2500, 3500, 4500]
+    t_idx = [i + 740 for i in r_idx]  # 370ms後
+    for idx in r_idx:
+        _bump(heatmap, idx, amplitude=1.0)
+    for idx in t_idx:
+        _bump(heatmap, idx, amplitude=0.5)
+
+    extracted = extract_peaks_rhythmic(heatmap, fs=fs, candidate_height=0.05, min_rr_sec=0.2, max_rr_sec=1.5)
+    assert len(extracted) == len(r_idx)
+    assert np.abs(np.sort(extracted) - np.array(r_idx)).max() < 5
 
 
 def test_rpeak_cnn1d_forward_shape_and_range():

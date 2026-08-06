@@ -23,6 +23,7 @@ from dog_radar_vitals.models.deep.rpeak_spatial_fusion import RPeakSpatialFusion
 from dog_radar_vitals.models.deep.rpeak_spatial_gnn import RPeakSpatialGNN
 from dog_radar_vitals.seeding import make_generator, set_all_seeds
 from dog_radar_vitals.training.ecg_trainer import _pearson_corr
+from dog_radar_vitals.training.losses import heatmap_focal_loss
 from dog_radar_vitals.training.schedulers import build_scheduler
 
 _SPATIAL_MODEL_REGISTRY = {
@@ -50,6 +51,22 @@ def build_spatial_model(model_cfg: dict) -> nn.Module:
 
 def is_heatmap_model(name: str) -> bool:
     return _IS_HEATMAP[name]
+
+
+def _build_loss_fn(model_name: str, train_cfg: dict):
+    """`train.loss`（既定"bce"）でheatmapモデルの損失を切り替える。波形モデルは常にMSE。
+
+    2026-08-06追記: 後処理（極大点の選択）は生成済みheatmapの中から選ぶことしかできず、
+    真のR波位置でheatmap値が十分上がっていない（見逃し）場合は取り返せない。BCEは
+    適合率・再現率を対称に扱うため、"focal"（`losses.heatmap_focal_loss`、CornerNet/
+    CenterNet由来）で見逃し防止側に非対称な重み付けを試せるようにする。
+    """
+    if not _IS_HEATMAP[model_name]:
+        return nn.MSELoss()
+    loss_name = train_cfg.get("loss", "bce")
+    if loss_name == "focal":
+        return heatmap_focal_loss
+    return nn.BCELoss()
 
 
 _build_model = build_spatial_model
@@ -113,7 +130,7 @@ def train_spatial_fusion(config: dict, run_dir: Path, repo_root: Path) -> None:
     val_loader = DataLoader(val_ds, batch_size=train_cfg["batch_size"], shuffle=False, num_workers=train_cfg["num_workers"])
 
     model = _build_model(config["model"]).to(device)
-    loss_fn = nn.BCELoss() if _IS_HEATMAP[config["model"]["name"]] else nn.MSELoss()
+    loss_fn = _build_loss_fn(config["model"]["name"], train_cfg)
     optimizer = torch.optim.Adam(model.parameters(), lr=train_cfg["lr"], weight_decay=train_cfg["weight_decay"])
     scheduler = build_scheduler(optimizer, train_cfg, total_epochs=train_cfg["epochs"])
 
@@ -148,7 +165,7 @@ def evaluate_spatial_fusion(run_dir: Path, config: dict, repo_root: Path) -> dic
 
     model = _build_model(config["model"]).to(device)
     model.load_state_dict(torch.load(run_dir / "best_model.pt", map_location=device))
-    loss_fn = nn.BCELoss() if is_heatmap else nn.MSELoss()
+    loss_fn = _build_loss_fn(config["model"]["name"], config["train"])
 
     metrics = _run_epoch(model, test_loader, device, loss_fn)
     return {"corr": metrics["corr"], "loss": metrics["loss"]}

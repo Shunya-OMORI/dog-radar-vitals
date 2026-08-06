@@ -10,6 +10,8 @@ RR Interval予測は、密な波形再構成（`ecg_cnn1d.py`）とは異なる�
 """
 from __future__ import annotations
 
+import bisect
+
 import numpy as np
 from scipy.signal import find_peaks
 
@@ -124,6 +126,85 @@ def extract_peaks_paired_dedup(
             continue  # 直前に残した候補とのペア(R-T等)とみなし、後発は採用しない
         kept.append(c)
     return np.array(kept, dtype=candidates.dtype)
+
+
+def extract_peaks_rhythmic(
+    heatmap: np.ndarray,
+    fs: int,
+    candidate_height: float = 0.05,
+    refractory_sec: float = 0.15,
+    min_rr_sec: float = 0.3,
+    max_rr_sec: float = 2.0,
+    interval_tolerance_frac: float = 0.25,
+    interval_tolerance_floor_sec: float = 0.05,
+) -> np.ndarray:
+    """予測heatmapの極大点から、間隔の規則性を根拠にR波の系列を選ぶ後処理（2026-08-06）。
+
+    背景: `extract_peaks_paired_dedup`はR-T混同の応急対応として有効だが、モデル自体は
+    T波以外にもさまざまな理由でノイズ状の疑似極大点を出しうる。ユーザ指摘: 学習の質では
+    なく、heatmapから「どの極大点を採用するか」を選ぶアルゴリズムの質で検出率・RR
+    Interval精度が改善するはず。特に、連続する極大点を2つずつのペアと見て、間隔が
+    ほぼ一定で連続するペアの並びを採用すれば、(1) 近くに単発で出る雑音状の極大点は
+    「一定間隔の並び」を構成できないため自然に棄却でき、(2) どのペアの並びも一定間隔に
+    ならない区間があれば、真のR波の見逃し（or 閾値が低すぎる）を示唆する診断にもなる。
+
+    アルゴリズム: 心拍のリズム（RR間隔がすぐ前の拍と近い値であること）を根拠にした、
+    動的計画法によるビート系列選択（音楽情報処理のビートトラッキング手法、
+    Ellis, 2007, "Beat Tracking by Dynamic Programming"と同型の定式化）。
+    低いしきい値で拾った極大点候補それぞれについて、「直前の候補との間隔が、その候補が
+    連なる系列の直前区間の間隔とどれだけ近いか」に応じたスコアを累積し、最終的に
+    スコア最大の系列を1本だけ選ぶ。RR間隔が急に半分・倍になるような無関係な極大点
+    （T波・体動由来のノイズ等）は、系列を継続する動機（スコア）がないため自然に外れる。
+    HRの緩やかなドリフト（安静→運動等）は「直前区間との差」だけを見ているため許容される。
+
+    Parameters
+    ----------
+    candidate_height: 極大点候補のしきい値。ノイズも含めて広く拾ってよい
+        （どれを採用するかは間隔の規則性で選別するため、閾値自体は低くてよい）。
+    min_rr_sec, max_rr_sec: 許容するRR間隔の範囲（デフォルトは生理的に妥当な
+        30〜200bpm相当）。
+    interval_tolerance_frac, interval_tolerance_floor_sec: 「一定間隔」とみなす許容誤差
+        （直前区間の何割まで揺れを許すか、その下限[秒]）。この範囲を外れる遷移は
+        系列として認めない（＝規則的な並びを構成できない候補は自然に脱落する）。
+    """
+    candidates, props = find_peaks(heatmap, height=candidate_height, distance=int(refractory_sec * fs))
+    heights = props["peak_heights"]
+    n = len(candidates)
+    if n < 2:
+        return candidates
+
+    min_rr = min_rr_sec * fs
+    max_rr = max_rr_sec * fs
+
+    score = heights.astype(np.float64).copy()
+    prev = np.full(n, -1, dtype=np.int64)
+    prev_interval = np.full(n, -1.0)
+
+    for i in range(n):
+        lo = bisect.bisect_left(candidates, candidates[i] - max_rr)
+        hi = bisect.bisect_right(candidates, candidates[i] - min_rr)
+        for j in range(lo, hi):
+            gap = candidates[i] - candidates[j]
+            if prev_interval[j] < 0:
+                consistency = 0.0
+            else:
+                tol = max(interval_tolerance_frac * prev_interval[j], interval_tolerance_floor_sec * fs)
+                if abs(gap - prev_interval[j]) > tol:
+                    continue  # 直前区間と間隔が違いすぎる = 規則的な並びとして認めない
+                consistency = -abs(gap - prev_interval[j]) / fs
+            cand_score = score[j] + heights[i] + consistency
+            if cand_score > score[i]:
+                score[i] = cand_score
+                prev[i] = j
+                prev_interval[i] = gap
+
+    chain = []
+    cur = int(np.argmax(score))
+    while cur != -1:
+        chain.append(cur)
+        cur = int(prev[cur])
+    chain.reverse()
+    return candidates[np.array(chain, dtype=np.int64)]
 
 
 def match_peaks(true_peaks: np.ndarray, pred_peaks: np.ndarray, fs: int, tolerance_ms: float = 50.0) -> dict:
