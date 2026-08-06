@@ -215,6 +215,7 @@ def extract_peaks_adaptive_searchback(
     init_rr_sec: float = 0.8,
     missed_limit_frac: float = 1.66,
     searchback_threshold_frac: float = 0.5,
+    threshold_frac: float = 0.25,
 ) -> np.ndarray:
     """Pan-Tompkinsの二重しきい値(signal/noise)+searchback方式をheatmap出力に適用した後処理。
 
@@ -234,6 +235,9 @@ def extract_peaks_adaptive_searchback(
         見逃しとみなしてsearchbackを行う（原著は1.66）。
     searchback_threshold_frac: searchback時に使う、通常しきい値に対する緩和後の
         しきい値の比率（原著は0.5）。
+    threshold_frac: 通常時の受理しきい値 thr1 = NPKI + threshold_frac*(SPKI-NPKI) の
+        係数（原著は0.25）。原著はQRS前処理後の信号でSN比が非常に高いことを前提にした
+        値であり、SN分離が乏しい入力（heatmap出力等）では大きめの値が必要になりうる。
     """
     candidates, props = find_peaks(heatmap, height=candidate_height, distance=int(refractory_sec * fs))
     heights = props["peak_heights"]
@@ -251,7 +255,7 @@ def extract_peaks_adaptive_searchback(
 
     for i in range(n):
         idx, h = int(candidates[i]), float(heights[i])
-        thr1 = npki + 0.25 * (spki - npki)
+        thr1 = npki + threshold_frac * (spki - npki)
 
         if last_r_idx is not None and rr_buffer:
             rr_avg = float(np.mean(rr_buffer))
