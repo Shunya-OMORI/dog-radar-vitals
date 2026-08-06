@@ -6,6 +6,7 @@ from collections.abc import Iterator
 import numpy as np
 
 from dog_radar_vitals.data.bandpass import bandpass_filter, ema_clutter_removal
+from dog_radar_vitals.data.channel_weighting import apply_channel_weights, compute_channel_weights
 from dog_radar_vitals.data.mmecg import MMECGRecording
 from dog_radar_vitals.data.mmecg_windowing import analytic_signal_channels, zscore_channels
 from dog_radar_vitals.data.rpeaks import (
@@ -42,19 +43,25 @@ def iter_peak_windows(
     preprocess: "none"(既定)、"ema_clutter"(2026-08-07、`bandpass.ema_clutter_removal`。
         指数移動平均基線を引く適応的クラッタ除去。FMCWレーダのバイタルサイン計測分野で
         使われる、固定次数Butterworthとは異なる高域通過特性を持つ手法。apply_bandpassとは
-        併用しない想定)。
+        併用しない想定)、"channel_weight"(2026-08-07、`channel_weighting.py`。50点のうち
+        心拍帯パワー比が高い点を重視するSNRベースの重み付け。"Cardio-Focusing"型の発想)。
     """
     nan_mask = None
     if np.isnan(rec.rcg).any() or np.isnan(rec.ecg).any():
         nan_mask = np.isnan(rec.rcg).any(axis=1) | np.isnan(rec.ecg)
 
+    # 各前処理は排他的に適用する(優先順位: channel_weight > ema_clutter > apply_bandpass > none)。
+    # 複数同時に有効化した場合は単一変数プローブの前提が崩れるため、意図的に併用しない。
     rcg_for_norm = rec.rcg
-    if apply_bandpass or preprocess == "ema_clutter":
-        # sosfiltfilt/emaはNaNが1つでもあると出力全体を汚染しうるため、フィルタ前だけ
+    if preprocess in ("channel_weight", "ema_clutter") or apply_bandpass:
+        # sosfiltfilt/ema/welchはNaNが1つでもあると出力全体を汚染しうるため、フィルタ前だけ
         # チャネル平均で一時的に埋める（該当窓はnan_maskで別途スキップされるので
         # ここでの埋め方自体は結果に影響しない）。
         rcg_filled = np.where(np.isnan(rec.rcg), np.nanmean(rec.rcg, axis=0, keepdims=True), rec.rcg)
-        if preprocess == "ema_clutter":
+        if preprocess == "channel_weight":
+            weights = compute_channel_weights(rcg_filled, rec.fs)
+            rcg_for_norm = apply_channel_weights(rcg_filled, weights)
+        elif preprocess == "ema_clutter":
             rcg_for_norm = np.stack(
                 [ema_clutter_removal(rcg_filled[:, ch]) for ch in range(rcg_filled.shape[1])], axis=-1)
         else:
