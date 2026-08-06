@@ -396,12 +396,45 @@ RMSSD-MAE=17.30〜19.15msという274に迫る値が出ていたが、本番50ep
 config274(sigma=10、前処理なし)+ adaptive_searchbackとする**。
 heatmap sigma幅のチューニングはこれで一旦打ち切り、優先度を下げる。
 
+## ecgshape neurokit本番30epoch: モード崩壊を確認、trivial baselineを上回れず (2026-08-07)
+
+014の8epochプローブ(test_Corr 0.799〜0.857、trivial baseline 0.883未達)を受け、
+本番epoch数(既定30)で再学習した(キュー023)。`evaluate_ecgshape_raw_cnn.py`の
+崩壊診断(matched vs mismatched pairwise correlation)を使って評価した:
+
+```
+PRED-vs-PRED pairwise corr: mean=0.9172   (モデル出力同士の類似度、高いほど「いつも同じ形」)
+TRUE-vs-TRUE pairwise corr: mean=0.7886   (正解同士の類似度、拍間の本来の多様性)
+matched (pred_i vs true_i):    mean=0.8516
+mismatched (pred_i vs random true_j): mean=0.8201
+VERDICT: COLLAPSED
+shapeMetric Corr=0.8487
+```
+
+**モード崩壊を確認した**: モデル出力同士の相関(0.917)が正解同士の相関(0.789)より
+明確に高く、`matched`(正しいペア)と`mismatched`(ランダムなペア)の差がわずか
+0.0315(診断スクリプトの崩壊判定しきい値0.05を下回る)しかない。**つまりこのモデルは
+レーダ入力ごとに拍の形を作り分けられておらず、ほぼ「平均的な拍の形」を出力する
+だけになっている**。全体のshapeMetric Corr(0.8487)も、progress_report内で
+確立済みのtrivial baseline(「レーダ入力を一切見ずに学習データの平均的な拍の形を
+出力するだけ」のモデルの相関0.883、III-8参照)を**依然として下回っている**。
+本番epoch数に伸ばしても(8epochプローブの0.80台→30epochの0.85台への改善はあった
+ものの)モード崩壊自体は解消しておらず、根本的な問題(単一拍の切り出し窓が短い・
+入力SNRが低い・アーキテクチャの表現力不足など)が残っていると考えられる。
+CLAUDE.md R5(モデルより先に入力と評価を疑う)の観点では、この崩壊は既にIII-8で
+指摘されていた「相関という指標自体が平均形状で高く出てしまう」問題の具体的な
+再確認であり、**単一のcorr値だけを見て精度向上と判断してはいけない**という
+教訓を改めて裏付けた。この経路(単一拍波形回帰、`ecgshape`系列)は現状のアーキ
+テクチャ・データ量では trivial baseline を安定して超えられておらず、優先度を
+下げる。
+
 ## 未解決・今後の課題
 
 - Anchor CNNのneurokitラベルでの悪化は未解決(weight_decayでは改善せず)。
   優先度を下げて保留。空間GNN(274)を当面の主力モデルとする。
 - R+T統合教師の本番評価待ち(既に277で棄却済み、再検証の予定なし)。
-- `ecgshape`(波形回帰)モデルのneurokit2ベース再学習(案2の前提)。
+- `ecgshape`(波形回帰)モデルはneurokit本番30epochでもモード崩壊が続きtrivial
+  baselineを超えられず(上記参照)。優先度を下げる。
 - バンドパスフィルタのheatmapパイプラインでの単一変数プローブ(既に278で棄却済み)。
 - heatmap sigma幅チューニング(10/15/20ms)は一旦打ち切り。10ms(274)を維持。
 - 方法論上の教訓: 8epochプローブ結果が本番50epochの同epoch時点で再現しない
@@ -409,3 +442,7 @@ heatmap sigma幅のチューニングはこれで一旦打ち切り、優先度�
   「見込みあり」と即断せず、複数seedまたは本番run側での早期評価で再確認する
   運用を検討する余地がある。
 - F1だけでなくRR-MAE/RMSSD-MAEを常に併記する運用は今後も徹底する。
+- 現時点での確定構成: R波検出=空間GNN(config274, sigma=10, 前処理なし)+
+  adaptive_searchback後処理(F1=0.687, RR-MAE=10.69ms, RMSSD-MAE=16.27ms)。
+  ecgshape(波形形状)・Anchor CNNはいずれも未解決課題を抱えたまま優先度を下げて
+  保留し、本セッションのR波heatmap関連調査はここで一区切りとする。
