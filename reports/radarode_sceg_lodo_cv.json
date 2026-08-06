@@ -1,97 +1,216 @@
-[
-  {
-    "fold": 0,
-    "test_subject": 1,
-    "val_subject": 2,
-    "train_subjects": [
-      5,
-      9,
-      10,
-      13,
-      14,
-      16,
-      17,
-      29,
-      30
-    ],
-    "test_corr": 0.4691958106481112,
-    "test_loss": 0.8264107566613418,
-    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-020702_ecg_radarode_sceg_lodo269_fold0_test1"
-  },
-  {
-    "fold": 1,
-    "test_subject": 2,
-    "val_subject": 5,
-    "train_subjects": [
-      1,
-      9,
-      10,
-      13,
-      14,
-      16,
-      17,
-      29,
-      30
-    ],
-    "test_corr": -0.042515138164162636,
-    "test_loss": 1.199513630433516,
-    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-035007_ecg_radarode_sceg_lodo269_fold1_test2"
-  },
-  {
-    "fold": 2,
-    "test_subject": 5,
-    "val_subject": 9,
-    "train_subjects": [
-      1,
-      2,
-      10,
-      13,
-      14,
-      16,
-      17,
-      29,
-      30
-    ],
-    "test_corr": 0.11706209015222145,
-    "test_loss": 1.1227525898388453,
-    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-052650_ecg_radarode_sceg_lodo269_fold2_test5"
-  },
-  {
-    "fold": 3,
-    "test_subject": 9,
-    "val_subject": 10,
-    "train_subjects": [
-      1,
-      2,
-      5,
-      13,
-      14,
-      16,
-      17,
-      29,
-      30
-    ],
-    "test_corr": 0.29553364341457683,
-    "test_loss": 0.9773053606351216,
-    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-065506_ecg_radarode_sceg_lodo269_fold3_test9"
-  },
-  {
-    "fold": 4,
-    "test_subject": 10,
-    "val_subject": 13,
-    "train_subjects": [
-      1,
-      2,
-      5,
-      9,
-      14,
-      16,
-      17,
-      29,
-      30
-    ],
-    "test_corr": 0.35434758521261667,
-    "test_loss": 0.9380933784303211,
-    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-083159_ecg_radarode_sceg_lodo269_fold4_test10"
-  }
-]
+{
+  "n_folds": 11,
+  "mean_test_corr": 0.25608303508577734,
+  "std_test_corr": 0.13254282632088088,
+  "folds": [
+    {
+      "fold": 0,
+      "test_subject": 1,
+      "val_subject": 2,
+      "train_subjects": [
+        5,
+        9,
+        10,
+        13,
+        14,
+        16,
+        17,
+        29,
+        30
+      ],
+      "test_corr": 0.4691958106481112,
+      "test_loss": 0.8264107566613418,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-020702_ecg_radarode_sceg_lodo269_fold0_test1"
+    },
+    {
+      "fold": 1,
+      "test_subject": 2,
+      "val_subject": 5,
+      "train_subjects": [
+        1,
+        9,
+        10,
+        13,
+        14,
+        16,
+        17,
+        29,
+        30
+      ],
+      "test_corr": -0.042515138164162636,
+      "test_loss": 1.199513630433516,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-035007_ecg_radarode_sceg_lodo269_fold1_test2"
+    },
+    {
+      "fold": 2,
+      "test_subject": 5,
+      "val_subject": 9,
+      "train_subjects": [
+        1,
+        2,
+        10,
+        13,
+        14,
+        16,
+        17,
+        29,
+        30
+      ],
+      "test_corr": 0.11706209015222145,
+      "test_loss": 1.1227525898388453,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-052650_ecg_radarode_sceg_lodo269_fold2_test5"
+    },
+    {
+      "fold": 3,
+      "test_subject": 9,
+      "val_subject": 10,
+      "train_subjects": [
+        1,
+        2,
+        5,
+        13,
+        14,
+        16,
+        17,
+        29,
+        30
+      ],
+      "test_corr": 0.29553364341457683,
+      "test_loss": 0.9773053606351216,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-065506_ecg_radarode_sceg_lodo269_fold3_test9"
+    },
+    {
+      "fold": 4,
+      "test_subject": 10,
+      "val_subject": 13,
+      "train_subjects": [
+        1,
+        2,
+        5,
+        9,
+        14,
+        16,
+        17,
+        29,
+        30
+      ],
+      "test_corr": 0.35434758521261667,
+      "test_loss": 0.9380933784303211,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-083159_ecg_radarode_sceg_lodo269_fold4_test10"
+    },
+    {
+      "fold": 5,
+      "test_subject": 13,
+      "val_subject": 14,
+      "train_subjects": [
+        1,
+        2,
+        5,
+        9,
+        10,
+        16,
+        17,
+        29,
+        30
+      ],
+      "test_corr": 0.33691448037113464,
+      "test_loss": 0.9128278519426073,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-100943_ecg_radarode_sceg_lodo269_fold5_test13"
+    },
+    {
+      "fold": 6,
+      "test_subject": 14,
+      "val_subject": 16,
+      "train_subjects": [
+        1,
+        2,
+        5,
+        9,
+        10,
+        13,
+        17,
+        29,
+        30
+      ],
+      "test_corr": 0.3309244299392131,
+      "test_loss": 0.9050857814875516,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-114328_ecg_radarode_sceg_lodo269_fold6_test14"
+    },
+    {
+      "fold": 7,
+      "test_subject": 16,
+      "val_subject": 17,
+      "train_subjects": [
+        1,
+        2,
+        5,
+        9,
+        10,
+        13,
+        14,
+        29,
+        30
+      ],
+      "test_corr": 0.19576535644659468,
+      "test_loss": 1.0127877620763557,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-131445_ecg_radarode_sceg_lodo269_fold7_test16"
+    },
+    {
+      "fold": 8,
+      "test_subject": 17,
+      "val_subject": 29,
+      "train_subjects": [
+        1,
+        2,
+        5,
+        9,
+        10,
+        13,
+        14,
+        16,
+        30
+      ],
+      "test_corr": 0.3233627116379256,
+      "test_loss": 0.9267906156870035,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-144702_ecg_radarode_sceg_lodo269_fold8_test17"
+    },
+    {
+      "fold": 9,
+      "test_subject": 29,
+      "val_subject": 30,
+      "train_subjects": [
+        1,
+        2,
+        5,
+        9,
+        10,
+        13,
+        14,
+        16,
+        17
+      ],
+      "test_corr": 0.2679142241499254,
+      "test_loss": 1.1392238070438434,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-160855_ecg_radarode_sceg_lodo269_fold9_test29"
+    },
+    {
+      "fold": 10,
+      "test_subject": 30,
+      "val_subject": 1,
+      "train_subjects": [
+        2,
+        5,
+        9,
+        10,
+        13,
+        14,
+        16,
+        17,
+        29
+      ],
+      "test_corr": 0.16840819213539363,
+      "test_loss": 1.0906709162394206,
+      "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260806-172119_ecg_radarode_sceg_lodo269_fold10_test30"
+    }
+  ]
+}

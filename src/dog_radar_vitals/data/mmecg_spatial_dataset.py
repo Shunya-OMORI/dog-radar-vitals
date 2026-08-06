@@ -28,10 +28,11 @@ class MMECGSpatialWindowDataset(Dataset):
         stride_sec: float,
         heatmap: bool = False,
         normalization: str = "zscore",
+        rpeak_detector: str = "legacy",
     ) -> None:
         self._samples: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []
         window_fn = iter_peak_windows if heatmap else iter_windows
-        window_kwargs = {} if heatmap else {"normalization": normalization}
+        window_kwargs = {"detector": rpeak_detector} if heatmap else {"normalization": normalization}
         for trial_id in trial_ids:
             rec = load_trial(raw_root, trial_id)
             for rcg_win, target_win in window_fn(rec, window_sec, stride_sec, complex_input=False, **window_kwargs):

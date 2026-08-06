@@ -64,6 +64,7 @@ def _build_dataset(data_cfg: dict, raw_root: Path, split: str, heatmap: bool) ->
         data_cfg["stride_sec"],
         heatmap=heatmap,
         normalization=data_cfg.get("normalization", "zscore"),
+        rpeak_detector=data_cfg.get("rpeak_detector", "legacy"),
     )
 
 

@@ -5,6 +5,7 @@ from dog_radar_vitals.data.rpeaks import (
     build_peak_heatmap,
     detect_r_peaks,
     extract_peaks_from_heatmap,
+    extract_peaks_paired_dedup,
     match_peaks,
     matched_rr_interval_mae_ms,
     rr_intervals_ms,
@@ -80,6 +81,41 @@ def test_matched_rr_interval_mae_ms():
     assert mae is not None
     # true_rr=[1000,1000,1000]ms, pred_rr=[1050,900,1050]ms -> |diff|=[50,100,50] -> mean=200/3
     assert mae == pytest.approx(200 / 3, abs=1e-6)
+
+
+def test_extract_peaks_paired_dedup_merges_close_rt_like_pair():
+    # R(idx=1000)の370ms後(fs=2000なので740サンプル後)にT波相当の小さい山がある
+    # ケースを合成する。pair_merge_sec=0.45秒(900サンプル)より近いので後者は除外される。
+    fs = 2000
+    length = 4000
+    heatmap = np.zeros(length, dtype=np.float32)
+    r_idx, t_idx = 1000, 1740
+    width = 40
+    t_axis = np.arange(-width, width)
+    heatmap[r_idx - width : r_idx + width] += np.exp(-0.5 * (t_axis / 10.0) ** 2)
+    heatmap[t_idx - width : t_idx + width] += 0.5 * np.exp(-0.5 * (t_axis / 10.0) ** 2)
+
+    old = extract_peaks_from_heatmap(heatmap, fs=fs, height=0.10)
+    assert len(old) == 2  # 旧方式(不応期0.3秒)ではR/Tとも検出されてしまう
+
+    new = extract_peaks_paired_dedup(heatmap, fs=fs, height=0.10, pair_merge_sec=0.45)
+    assert len(new) == 1
+    assert abs(int(new[0]) - r_idx) < 5
+
+
+def test_extract_peaks_paired_dedup_keeps_genuinely_spaced_beats():
+    # 900ms間隔(pair_merge_secの0.45秒より十分長い)の通常のRR間隔は統合されない
+    fs = 2000
+    length = 4000
+    heatmap = np.zeros(length, dtype=np.float32)
+    peak_indices = [500, 2300]  # 900ms間隔
+    width = 40
+    t_axis = np.arange(-width, width)
+    for idx in peak_indices:
+        heatmap[idx - width : idx + width] += np.exp(-0.5 * (t_axis / 10.0) ** 2)
+
+    new = extract_peaks_paired_dedup(heatmap, fs=fs, height=0.10, pair_merge_sec=0.45)
+    assert len(new) == 2
 
 
 def test_rpeak_cnn1d_forward_shape_and_range():

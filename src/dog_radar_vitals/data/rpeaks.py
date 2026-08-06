@@ -18,10 +18,35 @@ PEAK_HEIGHT_ZSCORE = 2.0
 
 
 def detect_r_peaks(ecg: np.ndarray, fs: int) -> np.ndarray:
-    """ECG波形（生値）からR波のサンプルインデックスを検出する。"""
+    """ECG波形（生値）からR波のサンプルインデックスを検出する。
+
+    2026-08-06追記: この方式はT波を第二のR波候補として検出したり、逆に真のR波を
+    見逃したりすることがユーザ指摘・実データ(MMECGデータセット)で確認された
+    (`dog-radar-vitals/reports/progress_report_2026-08-05_presentation.md`付録参照)。
+    恒久対応としては`detect_r_peaks_neurokit`を使うこと。この関数は過去の
+    再現性のために残す。
+    """
     z = (ecg - np.nanmean(ecg)) / (np.nanstd(ecg) + 1e-8)
     peaks, _ = find_peaks(z, height=PEAK_HEIGHT_ZSCORE, distance=int(MIN_RR_SEC * fs))
     return peaks
+
+
+def detect_r_peaks_neurokit(ecg: np.ndarray, fs: int) -> np.ndarray:
+    """外部の検証済みQRS検出アルゴリズム(NeuroKit2)によるR波検出(恒久対応)。
+
+    detect_r_peaksとの違い・採用理由は`radarODE-MTL/scripts/prepare_mmecg_dataset.py`の
+    同名関数のdocstringに詳しい(このリポジトリとradarODE-MTL双方で同じ問題が
+    確認されたため、同じ対応を独立に用意している)。MMECG全91ファイルでの検証では
+    R-T混同を疑わせる短い(<350ms)拍間隔が0/19583件だった。
+
+    対応する先行研究: Makowski et al., 2021, "NeuroKit2: A Python toolbox for
+    neurophysiological signal processing," Behavior Research Methods。
+    """
+    import neurokit2 as nk
+
+    cleaned = nk.ecg_clean(ecg, sampling_rate=fs)
+    _, info = nk.ecg_peaks(cleaned, sampling_rate=fs)
+    return np.asarray(info["ECG_R_Peaks"], dtype=np.int64)
 
 
 def rr_intervals_ms(peak_indices: np.ndarray, fs: int) -> np.ndarray:
@@ -57,10 +82,54 @@ def extract_peaks_from_heatmap(heatmap: np.ndarray, fs: int, height: float = 0.3
     return peaks
 
 
+def extract_peaks_paired_dedup(
+    heatmap: np.ndarray,
+    fs: int,
+    height: float = 0.10,
+    pair_merge_sec: float = 0.45,
+    refractory_sec: float = 0.15,
+) -> np.ndarray:
+    """R波とT波の混同（隣接する二山）を緩和した、応急対応版のピーク抽出。
+
+    背景（2026-08-06、ユーザ指摘・実データで確認済み）: このプロジェクトのR波検出
+    （`detect_r_peaks`、z-score閾値+find_peaks）は、教師heatmap自体にT波を第二の
+    R波候補として含めてしまうことがある。学習済みモデルの予測heatmapにも、真のR波
+    検出直後に振幅の小さい第二の山が一貫して現れる（進捗報告書付録の図で確認）。
+    恒久対応（外部の検証済みR波検出器で正解をつけ直し、再学習する）とは別に、
+    「既に学習済みのモデルの後処理だけ」でこの症状を緩和する応急対応として、
+    (1) 閾値を大きく下げて微弱な検出も候補に含め、(2) 真のRR間隔より明らかに短い
+    間隔で隣接する候補どうしは前者（時間的に早い方=R波である可能性が高い方）だけを
+    残す、という2段の後処理を行う。
+
+    Parameters
+    ----------
+    height: 候補ピークの検出しきい値。extract_peaks_from_heatmapの0.3から大きく
+        下げる（ユーザ指示: heatmap値で0.10かそれより低いくらい）。
+    pair_merge_sec: これより短い間隔で隣接する2候補はR-T等のペアとみなし、前者を
+        残す。真のRR間隔の生理的な下限（高強度運動後でも概ね300ms=200bpm相当）より
+        明確に短くする必要はない（ユーザ指示: 「正確なRR間隔の最小値より短ければ
+        何でもよい」）が、典型的なR-T間隔（QT間隔、概ね250〜450ms）は覆う必要がある
+        ため、既定値は0.45秒とする。
+    refractory_sec: find_peaks自体の不応期。真のQRS自体の不応期（150〜200ms程度）を
+        大きく下回らない値にする。
+    """
+    candidates, _ = find_peaks(heatmap, height=height, distance=int(refractory_sec * fs))
+    if len(candidates) < 2:
+        return candidates
+
+    kept = [candidates[0]]
+    for c in candidates[1:]:
+        gap_sec = (c - kept[-1]) / fs
+        if gap_sec < pair_merge_sec:
+            continue  # 直前に残した候補とのペア(R-T等)とみなし、後発は採用しない
+        kept.append(c)
+    return np.array(kept, dtype=candidates.dtype)
+
+
 def match_peaks(true_peaks: np.ndarray, pred_peaks: np.ndarray, fs: int, tolerance_ms: float = 50.0) -> dict:
     """真のR波と予測R波を、許容誤差内で1対1に対応付ける（貪欲法、時刻順）。
 
-    2つの波形再構成アプローチ（密な波形回帰 vs heatmap回帰）を、検出したR波の
+    2つの波形再構成アプローチ（密な波形回帰 vs heatmapキーポイント検出）を、検出したR波の
     タイミング精度・RR Intervalの精度という共通の物差しで比較するために使う。
     """
     tolerance_samples = tolerance_ms / 1000.0 * fs
