@@ -18,6 +18,12 @@ dependencies = [
     "ptflops>=0.7",
     "ssqueezepy>=0.6.6",
     "torchvision>=0.28.0",
+    "transformers>=5.14.1",
+    "accelerate>=1.14.0",
+    "pillow>=12.2.0",
+    "soundfile>=0.14.0",
+    "librosa>=0.11.0",
+    "bitsandbytes>=0.50.0",
 ]
 
 [project.optional-dependencies]

@@ -12,6 +12,12 @@ data/raw/*
 !data/raw/README.md
 data/processed/
 
+# CASEデータセット(Sharma et al. 2019, gitlab.com/karan-shr/case_dataset)。
+# git clone したリポジトリをそのまま置いているため .git を含み大容量。
+# 再取得方法は data/case/README.md を参照。
+data/case/*
+!data/case/NOTES.md
+
 # 実行結果は EXPERIMENTS.md に要約を残し、生データ（チェックポイント等）は追跡しない。
 runs/*
 !runs/README.md
