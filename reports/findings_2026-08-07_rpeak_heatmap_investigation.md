@@ -312,6 +312,43 @@ RR-MAE=10.69ms, RMSSD-MAE=16.27ms。**
 274を下回った。**短いプローブの「良さそう」は、本番の全epochを通した
 安定性まで保証しない**という教訓として記録する。
 
+## heatmap Gaussianラベル幅(sigma)プローブ: F1は大幅改善もRMSSD-MAEは悪化、棄却 (2026-08-07)
+
+`heatmap_sigma_ms`を`iter_peak_windows`/`MMECGSpatialWindowDataset`/
+`spatial_fusion_trainer`に単一変数として通し(既定10ms)、config282でsigma=20msの
+8epochプローブを実施した(`build_peak_heatmap`のGaussian幅を倍にしただけ)。
+
+| checkpoint / 後処理 | F1 | RR-MAE | RMSSD-MAE | SDNN-MAE |
+|---|---|---|---|---|
+| best_model(epoch3) / old | 0.671 | 11.56 ms | 23.17 ms | 6.71 ms |
+| best_model(epoch3) / adaptive_searchback | 0.644 | 11.47 ms | 20.07 ms | 6.94 ms |
+| epoch4 / old | **0.762** | 13.32 ms | 23.07 ms | 6.47 ms |
+| epoch4 / adaptive_searchback | **0.765** | 13.12 ms | 25.66 ms | 8.33 ms |
+| epoch7 / old | 0.731 | 12.57 ms | 24.60 ms | 7.11 ms |
+| epoch7 / adaptive_searchback | 0.725 | 12.33 ms | 27.85 ms | 8.50 ms |
+| **274(sigma=10、比較対象)** | 0.687 | **10.69 ms** | **16.27 ms** | (未計測) |
+
+**F1はわずか8epochで0.76台まで到達し274(本番50epoch)の0.687を大きく上回る**。
+これは狙い通り: Gaussianラベルを広げるとモデルの予測heatmapも真のR波周辺で
+広く高い値を保つようになり、`match_peaks`(許容誤差50ms)内に極大点が入りやすく
+なるため検出率(recall)が上がる。
+
+**しかしRR-MAE・RMSSD-MAEはいずれも274より明確に悪化している**(RMSSD-MAEは
+20〜28ms、274の16.27msを一度も下回れない)。これは検出(当たったかどうか)と
+位置推定精度(いつ当たったか)のトレードオフとして理解できる: heatmapが広く
+なるほど「50ms以内には入るが正確なピーク位置からはずれた」極大点が増え、
+連続するRR間隔の差分に敏感なRMSSDのような指標を悪化させる。**F1という指標
+単体は、sigmaを広げるだけで「見かけ上」改善できてしまう(ラベルが広いほど
+許容誤差との整合が取りやすくなるため)ことを示す一例であり、F1だけで
+後処理・前処理・ラベル設計を評価するのは危険だという教訓として重要**。
+
+**結論**: sigma=20は現行の目的(RMSSD-MAE最重視)には適さないため棄却。
+現行の生産用構成は引き続きconfig274(sigma=10、前処理なし)+
+adaptive_searchbackとする。中間的なsigma(12〜15ms程度)であれば検出率と
+位置精度の折衷点がある可能性はあるが、優先度は下げる(前処理・ラベル幅より、
+後処理アルゴリズムまたはモデル自体の位置推定精度に踏み込む方が本質的な
+改善につながる可能性が高い)。
+
 ## 未解決・今後の課題
 
 - Anchor CNNのneurokitラベルでの悪化は未解決(weight_decayでは改善せず)。
@@ -319,5 +356,6 @@ RR-MAE=10.69ms, RMSSD-MAE=16.27ms。**
 - R+T統合教師の本番評価待ち(既に277で棄却済み、再検証の予定なし)。
 - `ecgshape`(波形回帰)モデルのneurokit2ベース再学習(案2の前提)。
 - バンドパスフィルタのheatmapパイプラインでの単一変数プローブ(既に278で棄却済み)。
-- 前処理側の新規アイデア: channel_weightは棄却されたが、heatmap側の
-  Gaussianラベルのsigma(現状10ms固定)を単一変数で振る余地はまだ手つかず。
+- heatmap sigma幅は10ms(現行)と20ms(棄却)の2点しか試していない。中間値や、
+  「検出はゆるく・位置推定は別途シャープに」という2段階設計は未検証。
+- F1だけでなくRR-MAE/RMSSD-MAEを常に併記する運用は今後も徹底する(本節の教訓)。
