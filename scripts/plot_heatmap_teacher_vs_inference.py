@@ -1,11 +1,16 @@
-"""heatmap回帰(102_rpeak_cnn1d)の「教師信号」と「推論時の極大点検出」の対応を図示する。
+"""heatmapキーポイント検出(102_rpeak_cnn1d)の「教師信号」と「推論時の極大点検出」の対応を図示する。
 
-進捗報告書のheatmap回帰の説明(`build_peak_heatmap`でR波位置に立てたガウシアンを教師信号にし、
+進捗報告書の説明(`build_peak_heatmap`でR波位置に立てたガウシアンを教師信号にし、
 `extract_peaks_from_heatmap`で推論時にheatmapの極大点を拾ってR波位置に戻す、という2段構え)は
 文章だけでは伝わりにくいため、実データ・実モデルで3段構成の図にする。
 
+**用語について**: このタスクは回帰でも(単純な)分類でもなく、物体検出でいうキーポイント検出と
+同じ定式化(進捗報告書III-2節)。損失はBCEであり、連続値を当てる「回帰」ではなく、各時刻の
+「R波中心らしさ」をソフトラベル([0,1]のガウシアン)で教師する密な分類に近い。「heatmap回帰」
+という呼び方は不正確なので本スクリプトでは使わない。
+
 上段: レーダI/Q(実部)と正解R波位置(縦線)
-中段: 教師信号(build_peak_heatmapで作ったガウシアンheatmap) — 学習時にモデルはこれを回帰する
+中段: 教師信号(build_peak_heatmapで作ったガウシアンheatmap) — 学習時にモデルはこれをBCE損失で学習する
 下段: モデルの予測heatmap + extract_peaks_from_heatmapで検出した極大点(推論時の動作)
 
 使い方:
@@ -106,7 +111,7 @@ def main() -> None:
         ax.axvline(t[p], color=TRUE_PEAK_COLOR, lw=0.8, ls="--", alpha=0.5)
     ax.set_ylabel("heatmap値")
     ax.set_ylim(-0.05, 1.15)
-    ax.set_title("学習時: モデルはこの教師信号(build_peak_heatmap)を回帰するよう訓練される", fontsize=10)
+    ax.set_title("学習時: モデルはこの教師信号(build_peak_heatmap)をBCE損失で学習する", fontsize=10)
     ax.legend(loc="upper right", fontsize=9)
 
     ax = axes[2]
@@ -127,7 +132,7 @@ def main() -> None:
     ax.set_title("推論時: 予測heatmapの極大点を拾ってR波位置に戻す(build_peak_heatmapの逆操作)", fontsize=10)
     ax.legend(loc="upper right", fontsize=9)
 
-    fig.suptitle("heatmap回帰(102_rpeak_cnn1d): 教師信号と推論時の極大点検出の対応", fontsize=12)
+    fig.suptitle("heatmapキーポイント検出(102_rpeak_cnn1d): 教師信号と推論時の極大点検出の対応", fontsize=12)
     fig.tight_layout()
 
     out_path = REPO_ROOT / "reports/mmecg_comparison/heatmap_teacher_vs_inference.png"

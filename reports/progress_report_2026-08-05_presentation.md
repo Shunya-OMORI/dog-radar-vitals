@@ -167,7 +167,9 @@ for i in range(n_layers):                      # rpeak_dilated_cnn1d.py:41-49
 
 **教師信号と推論時の動作の対応**（図: `reports/mmecg_comparison/heatmap_teacher_vs_inference.png`、
 生成スクリプト: `scripts/plot_heatmap_teacher_vs_inference.py`）: 学習時は正解R波位置に
-ガウシアン(`build_peak_heatmap`)を立てたheatmapを教師信号として密なBCE回帰を行い、推論時は
+ガウシアン(`build_peak_heatmap`)を立てたheatmapを教師信号として密なBCE損失で学習する
+（137行目の通り回帰でも分類でもなくキーポイント検出の定式化であり、BCEは連続値ではなく
+各時刻の「R波中心らしさ」をソフトラベルとして扱う分類系の損失である）。推論時は
 モデルが出力したheatmapの**極大点**(`extract_peaks_from_heatmap`、しきい値0.3以上かつ近傍で
 最大)を拾ってR波位置に戻す。下図は102_rpeak_cnn1d(ヒトSchellenbergerデータ、test被験者
 GDN0009)の実際の窓での例で、教師信号(中段)・予測(下段)とも4つのR波すべてが誤差6ms以内で
