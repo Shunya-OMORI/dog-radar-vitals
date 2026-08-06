@@ -225,9 +225,48 @@ FMCWレーダのバイタルサイン計測分野の「チャンネル/アンテ
 ことが原因と考えられる**(test_BCEがepoch4を底に単調悪化)。エポック数・学習率の
 再チューニングが今後の課題。
 
+## チャネル重み付け本番50epoch(config281)の初回結果は無効、再学習中 (2026-08-07)
+
+config281(8epochプローブで前処理群のうち最良だったchannel_weight)を本番50epoch化した
+初回実行(キュー017)は、**periodic checkpoint修正(commit 5c90d86)がコミットされる
+わずか3分前にジョブが開始していた**ため、`best_model.pt`はval_corrが最高値を
+取ったepoch2(訓練のごく初期)のまま固定され、5epochごとの中間チェックポイントが
+一切残らなかった。R+T(config277)と同型の「corrベースのチェックポイント選択が
+下流タスクと乖離する」問題を、post-hocに検証する手段がない状態で評価するしかなかった。
+
+`evaluate_spatial_gnn_hrv.py`に`--preprocess`フラグを追加(学習時の
+`iter_peak_windows`と同じ「前処理->zscore」の順序を評価側でも再現しないと、
+学習・評価間で入力分布が食い違い正しく比較できないため)した上で、このepoch2
+チェックポイントを評価したところ:
+
+| 後処理 | F1 | RR-MAE | RMSSD-MAE | SDNN-MAE |
+|---|---|---|---|---|
+| old (閾値0.3) | 0.381 | 10.03 ms | 20.43 ms | 10.07 ms |
+| adaptive_searchback(re-tuned) | 0.649 | 12.59 ms | 25.01 ms | 8.47 ms |
+
+274(前処理なし、adaptive_searchback、F1=0.687/RR-MAE=10.69ms/RMSSD-MAE=16.27ms)と比べ
+明確に悪化している。しかしこの結果はepoch2という**訓練のごく初期のチェックポイント
+に基づく比較であり、「channel_weight前処理が悪い」のか「単に学習不足のチェックポイント
+しか無かった」のかを現時点では切り分けられない**。
+
+**対応**: トレーナーは既に周期チェックポイント修正を含んでいるため、config281を
+そのまま再学習した(キュー018、`281_channel_weight_full_rerun`)。完了後、
+epoch 5,10,...,50の各チェックポイントを下流F1/RR-MAE/RMSSD-MAEで評価し、
+最良epochで274と改めて公平比較する。
+
+## Anchor CNN過学習への対応: weight_decay再チューニング (2026-08-07)
+
+前節の視覚診断でラベル配置は正しいと確認済みのため、残る仮説(学習ハイパーパラメータ)
+を検証する。`train_anchor_raw_cnn.py`は元々weight_decay=1e-4に固定されていたため
+`RADARODE_WD`環境変数で外出しし、単一変数(CLAUDE.md R4)としてweight_decay=1e-3版を
+キュー登録した(019、`best_anchor_raw_cnn_neurokit_wd1e3.pt`)。過学習が緩和し
+test_BCEの底が遅く・深くなるか、下流F1が改善するかを見る。
+
 ## 未解決・今後の課題
 
+- config281再学習(キュー018)完了後、周期チェックポイントから最良epochを選んで274と再比較。
+- Anchor CNNのweight_decay=1e-3版(キュー019)の結果確認。改善しなければepoch数・
+  dropout等の追加候補を検討。
 - R+T統合教師の本番評価待ち。
 - `ecgshape`(波形回帰)モデルのneurokit2ベース再学習(案2の前提)。
 - バンドパスフィルタのheatmapパイプラインでの単一変数プローブ。
-- Anchor CNNのneurokit2本番再学習(再ラベル付け完了待ち)。
