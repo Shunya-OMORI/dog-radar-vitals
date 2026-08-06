@@ -3,6 +3,7 @@ import pytest
 
 from dog_radar_vitals.data.rpeaks import (
     build_peak_heatmap,
+    detect_r_and_t_peaks_neurokit,
     detect_r_peaks,
     extract_peaks_adaptive_searchback,
     extract_peaks_from_heatmap,
@@ -192,6 +193,23 @@ def test_extract_peaks_adaptive_searchback_recovers_missed_beat_via_searchback()
     extracted = extract_peaks_adaptive_searchback(heatmap, fs=fs, candidate_height=0.05, init_rr_sec=0.3)
     assert len(extracted) == len(strong_idx) + 1
     assert np.any(np.abs(np.sort(extracted) - weak_idx) < 5)
+
+
+def test_detect_r_and_t_peaks_neurokit_on_simulated_ecg():
+    import neurokit2 as nk
+
+    fs = 500
+    ecg = nk.ecg_simulate(duration=20, sampling_rate=fs, heart_rate=70, random_state=0)
+    r_peaks, t_peaks = detect_r_and_t_peaks_neurokit(ecg, fs)
+
+    assert len(r_peaks) > 15  # 20秒・70bpmなら20拍程度のはず
+    assert len(t_peaks) > 15
+    # T波はR波の後、QT間隔(概ね250〜450ms)の範囲内に来るはず
+    for t in t_peaks:
+        prior_r = r_peaks[r_peaks < t]
+        assert len(prior_r) > 0
+        gap_ms = (t - prior_r[-1]) / fs * 1000
+        assert 150 < gap_ms < 500
 
 
 def test_rpeak_cnn1d_forward_shape_and_range():

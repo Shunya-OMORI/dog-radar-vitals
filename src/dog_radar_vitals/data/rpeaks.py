@@ -51,6 +51,39 @@ def detect_r_peaks_neurokit(ecg: np.ndarray, fs: int) -> np.ndarray:
     return np.asarray(info["ECG_R_Peaks"], dtype=np.int64)
 
 
+def detect_r_and_t_peaks_neurokit(ecg: np.ndarray, fs: int) -> tuple[np.ndarray, np.ndarray]:
+    """NeuroKit2でR波とT波の両方を検出する（2026-08-06、ユーザ発案の派生案）。
+
+    背景: heatmapモデルはR波の教師しか与えられていないのに，予測heatmapは1心拍に
+    つき隣接する2つの山（R波＋T波）を出しがちだった．これは「T波を誤検出している」
+    というより，レーダ反射信号にはR波・T波双方に対応する物理的な変化が実際に存在し，
+    モデルがそれを拾ってしまうのが自然，という可能性を示唆する．ならば「T波を予測
+    するな」と矛盾した教師信号を与え続けるより，**R波・T波の両方を正解として与え，
+    どちらがRかの選別は後処理（既知のR→T間隔の規則性を使える）に任せる**方が，
+    モデルにとって一貫した学習課題になるのではという発想．
+
+    対応する先行研究: Makowski et al., 2021 (NeuroKit2)．`ecg_delineate`による
+    QRS/T波の同時デリニエーションは，姿勢推定分野で複数の補助的なランドマークを
+    同時に検出させてから幾何的制約で本命を絞り込む手法（例: 顔・手のランドマーク
+    検出）と同型の発想．
+
+    Returns
+    -------
+    (r_peaks, t_peaks): 両方ともサンプルインデックスのndarray．T波はR波と1対1に
+        対応するとは限らない（デリニエーションに失敗した拍はnanとして除外される）。
+    """
+    import neurokit2 as nk
+
+    cleaned = nk.ecg_clean(ecg, sampling_rate=fs)
+    _, r_info = nk.ecg_peaks(cleaned, sampling_rate=fs)
+    r_peaks = np.asarray(r_info["ECG_R_Peaks"], dtype=np.int64)
+
+    _, waves_info = nk.ecg_delineate(cleaned, rpeaks=r_info, sampling_rate=fs, method="dwt")
+    t_peaks_raw = np.asarray(waves_info["ECG_T_Peaks"], dtype=np.float64)
+    t_peaks = t_peaks_raw[~np.isnan(t_peaks_raw)].astype(np.int64)
+    return r_peaks, t_peaks
+
+
 def rr_intervals_ms(peak_indices: np.ndarray, fs: int) -> np.ndarray:
     """隣接するR波間の時間間隔[ms]を返す（長さ=len(peak_indices)-1）。"""
     return np.diff(peak_indices) / fs * 1000.0
