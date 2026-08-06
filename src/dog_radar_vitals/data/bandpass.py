@@ -28,3 +28,28 @@ def bandpass_filter(x: np.ndarray, fs: int) -> np.ndarray:
     if len(x) <= padlen or len(x) < 8:
         return x.copy()
     return sosfiltfilt(sos, x, padlen=padlen)
+
+
+EMA_CLUTTER_ALPHA = 0.01
+
+
+def ema_clutter_removal(x: np.ndarray, alpha: float = EMA_CLUTTER_ALPHA) -> np.ndarray:
+    """指数移動平均(EMA)基線を引く、適応的なクラッタ(静止反射)除去（2026-08-07）。
+
+    背景: FMCWレーダのバイタルサイン計測分野で、静止反射物由来のDC/低周波オフセットを
+    抑える定番の手法（固定次数のButterworthバンドパスとは異なり、基線が緩やかに追従する
+    一次遅れ系）。Butterworthバンドパス（config253/254、278で悪化を確認済み）とは
+    フィルタ特性が異なるため、別の単一変数プローブとして試す価値がある。
+
+    対応する先行研究: FMCWレーダ生体信号処理におけるEMAベースの静止クラッタ抑制
+    （高域通過特性を持つ一次IIRフィルタとしての利用、非同期移動平均法）。
+
+    実装: y[t] = x[t] - baseline[t]、baseline[t] = alpha*x[t] + (1-alpha)*baseline[t-1]。
+    alphaが小さいほど基線がゆっくり追従＝カットオフ周波数が低い高域通過フィルタに相当する。
+    """
+    x = np.ascontiguousarray(x, dtype=np.float64)
+    baseline = np.empty_like(x)
+    baseline[0] = x[0]
+    for t in range(1, len(x)):
+        baseline[t] = alpha * x[t] + (1 - alpha) * baseline[t - 1]
+    return x - baseline

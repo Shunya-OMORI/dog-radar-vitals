@@ -1,0 +1,33 @@
+# 279: 274(R波単独教師のneurokit2本番モデル)と同一構成だが、RCG正規化前にEMAベースの
+# クラッタ除去(preprocess: ema_clutter, bandpass.pyのema_clutter_removal)をかける。
+# FMCWレーダのバイタルサイン計測分野で使われる、固定次数Butterworthバンドパス(278で
+# 悪化を確認済み)とは異なる高域通過特性(適応的な一次IIR基線減算)を持つ手法。
+# 単一変数の原則(CLAUDE.md R4、変更点はdata.preprocessのみ)で8epochプローブ(R2)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  preprocess: ema_clutter
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 8
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
