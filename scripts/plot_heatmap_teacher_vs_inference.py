@@ -9,9 +9,10 @@
 「R波中心らしさ」をソフトラベル([0,1]のガウシアン)で教師する密な分類に近い。「heatmap回帰」
 という呼び方は不正確なので本スクリプトでは使わない。
 
-上段: レーダI/Q(実部)と正解R波位置(縦線)
-中段: 教師信号(build_peak_heatmapで作ったガウシアンheatmap) — 学習時にモデルはこれをBCE損失で学習する
-下段: モデルの予測heatmap + extract_peaks_from_heatmapで検出した極大点(推論時の動作)
+1段目: 正解ECG波形(参照信号)と正解R波位置(縦線) — モデルはこれを直接は見ない
+2段目: レーダI/Q(実部、モデルへの実際の入力)と正解R波位置(縦線)
+3段目: 教師信号(build_peak_heatmapで作ったガウシアンheatmap) — 学習時にモデルはこれをBCE損失で学習する
+4段目: モデルの予測heatmap + extract_peaks_from_heatmapで検出した極大点(推論時の動作)
 
 使い方:
     .venv/bin/python scripts/plot_heatmap_teacher_vs_inference.py
@@ -93,18 +94,28 @@ def main() -> None:
     # --- 推論時の極大点検出(build_peak_heatmapの逆操作) ---
     detected_peaks = extract_peaks_from_heatmap(pred_heatmap, fs, height=0.3)
 
+    ecg_window = ecg_filled[start:end]
+
     # --- 図 ---
-    fig, axes = plt.subplots(3, 1, figsize=(10, 7), sharex=True)
+    fig, axes = plt.subplots(4, 1, figsize=(10, 9), sharex=True)
 
     ax = axes[0]
-    ax.plot(t, radar_iq[:, 0], color=RADAR_COLOR, lw=1.0, label="レーダI/Q(実部)")
+    ax.plot(t, ecg_window, color="#000000", lw=1.0, label="正解ECG波形(参照信号)")
     for i, p in enumerate(true_peaks_in_window):
         ax.axvline(t[p], color=TRUE_PEAK_COLOR, lw=0.8, ls="--", alpha=0.7, label="正解R波位置" if i == 0 else None)
-    ax.set_ylabel("レーダ振幅")
-    ax.set_title(f"入力: レーダI/Q ({TEST_SUBJECT}, {data_cfg['scenario']}, t={PLOT_START_SEC:.0f}-{PLOT_START_SEC+WINDOW_SEC:.0f}s)")
+    ax.set_ylabel("ECG振幅")
+    ax.set_title(f"参照ECG波形 ({TEST_SUBJECT}, {data_cfg['scenario']}, t={PLOT_START_SEC:.0f}-{PLOT_START_SEC+WINDOW_SEC:.0f}s)")
     ax.legend(loc="upper right", fontsize=9)
 
     ax = axes[1]
+    ax.plot(t, radar_iq[:, 0], color=RADAR_COLOR, lw=1.0, label="レーダI/Q(実部、モデルへの入力)")
+    for i, p in enumerate(true_peaks_in_window):
+        ax.axvline(t[p], color=TRUE_PEAK_COLOR, lw=0.8, ls="--", alpha=0.7, label="正解R波位置" if i == 0 else None)
+    ax.set_ylabel("レーダ振幅")
+    ax.set_title("入力: レーダI/Q(モデルはECGではなくこちらを見る)")
+    ax.legend(loc="upper right", fontsize=9)
+
+    ax = axes[2]
     ax.fill_between(t, teacher_heatmap, color=TEACHER_COLOR, alpha=0.3)
     ax.plot(t, teacher_heatmap, color=TEACHER_COLOR, lw=1.5, label="教師信号(正解R波にガウシアンを立てたheatmap)")
     for p in true_peaks_in_window:
@@ -114,7 +125,7 @@ def main() -> None:
     ax.set_title("学習時: モデルはこの教師信号(build_peak_heatmap)をBCE損失で学習する", fontsize=10)
     ax.legend(loc="upper right", fontsize=9)
 
-    ax = axes[2]
+    ax = axes[3]
     ax.fill_between(t, pred_heatmap, color=PRED_COLOR, alpha=0.3)
     ax.plot(t, pred_heatmap, color=PRED_COLOR, lw=1.5, label="モデルの予測heatmap")
     ax.axhline(0.3, color="gray", lw=0.8, ls=":", label="検出しきい値(height=0.3)")
