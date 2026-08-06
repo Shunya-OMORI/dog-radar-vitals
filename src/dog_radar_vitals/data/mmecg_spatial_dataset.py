@@ -31,11 +31,17 @@ class MMECGSpatialWindowDataset(Dataset):
         rpeak_detector: str = "legacy",
         apply_bandpass: bool = False,
         preprocess: str = "none",
+        heatmap_sigma_ms: float = 10.0,
     ) -> None:
         self._samples: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []
         window_fn = iter_peak_windows if heatmap else iter_windows
         window_kwargs = (
-            {"detector": rpeak_detector, "apply_bandpass": apply_bandpass, "preprocess": preprocess} if heatmap
+            {
+                "detector": rpeak_detector,
+                "apply_bandpass": apply_bandpass,
+                "preprocess": preprocess,
+                "heatmap_sigma_ms": heatmap_sigma_ms,
+            } if heatmap
             else {"normalization": normalization}
         )
         for trial_id in trial_ids:

@@ -259,14 +259,65 @@ epoch 5,10,...,50の各チェックポイントを下流F1/RR-MAE/RMSSD-MAEで�
 前節の視覚診断でラベル配置は正しいと確認済みのため、残る仮説(学習ハイパーパラメータ)
 を検証する。`train_anchor_raw_cnn.py`は元々weight_decay=1e-4に固定されていたため
 `RADARODE_WD`環境変数で外出しし、単一変数(CLAUDE.md R4)としてweight_decay=1e-3版を
-キュー登録した(019、`best_anchor_raw_cnn_neurokit_wd1e3.pt`)。過学習が緩和し
-test_BCEの底が遅く・深くなるか、下流F1が改善するかを見る。
+キュー登録した(019、`best_anchor_raw_cnn_neurokit_wd1e3.pt`)。
+
+**結果**: test_BCEの底がepoch4(0.1255)からepoch17(0.1242)へ後ろ倒しになり、
+わずかにBCE自体は改善したが、下流F1=0.552は元の水準(0.554前後)から実質的に
+変化しなかった。**weight_decay強化は過学習の"底"を遅らせただけで、下流精度の
+決定的な改善にはつながらなかった**。Anchor CNNの悪化はweight_decayの単純な
+調整では解消しない別要因(モデル容量、学習率スケジュール、あるいはneurokit
+ラベル自体がAnchor CNNの帰納バイアスと相性が悪い可能性)が残っており、
+優先度を下げて保留とする(現状の生産用モデルは空間GNNの274が優勢なため)。
+
+## config281再学習(キュー018)の全チェックポイント下流評価、274との最終比較 (2026-08-07)
+
+017の無効な結果(epoch2の未成熟チェックポイントのみ)を受け、周期チェックポイント
+修正込みでconfig281を再学習(018)。全10チェックポイント(epoch4,9,...,49)+
+best_model(val_corr最高=epoch2)を、`--peak_method adaptive_searchback`
+(274で最良と確認済みの後処理、`--gt_detector neurokit --preprocess channel_weight`)
+で下流評価した:
+
+| checkpoint | F1 | RR-MAE | RMSSD-MAE | SDNN-MAE |
+|---|---|---|---|---|
+| epoch4 | **0.700** | 11.71 ms | 23.70 ms | 8.52 ms |
+| epoch9 | 0.654 | 11.15 ms | 28.12 ms | 10.57 ms |
+| epoch14 | 0.613 | 11.53 ms | 34.50 ms | 14.10 ms |
+| epoch19 | 0.566 | 11.57 ms | 32.02 ms | 13.72 ms |
+| epoch24 | 0.557 | 11.64 ms | 36.92 ms | 15.37 ms |
+| epoch29 | 0.682 | 11.26 ms | 29.66 ms | 9.87 ms |
+| epoch34 | 0.585 | 12.22 ms | 42.45 ms | 17.73 ms |
+| epoch39 | 0.603 | 12.45 ms | 41.37 ms | 15.44 ms |
+| epoch44 | 0.549 | 10.77 ms | 39.78 ms | 18.30 ms |
+| epoch49 | 0.561 | 11.20 ms | 44.98 ms | 17.38 ms |
+| best_model(epoch2,val_corr最高) | 0.674 | 12.24 ms | 21.34 ms | 7.25 ms |
+| **274(前処理なし、比較対象)** | **0.687** | **10.69 ms** | **16.27 ms** | (未計測) |
+
+**結論: channel_weight前処理は274(前処理なし)を上回らない。棄却する。**
+最良チェックポイント(epoch4)でF1こそ0.700と274の0.687をわずかに上回るが、
+RR-MAE(11.71ms vs 10.69ms)は悪化し、**RMSSD-MAE(23.70ms vs 16.27ms)は
+大幅に悪化**している。RMSSD-MAEはユーザが目的上最重要と明言した指標であり、
+全チェックポイントを通してどの epoch も274のRMSSD-MAE(16.27ms)を下回れて
+いない(最良でもbest_model/epoch2の21.34ms)。F1がわずかに高いepochでも
+RMSSD-MAEが軒並み23〜45msまで悪化する不安定さも確認された(epoch選びの
+安定性という観点でも274に劣る)。
+
+**現行の生産用構成として確定: config274(前処理なし)の空間GNN +
+`extract_peaks_adaptive_searchback`(candidate_height=0.20,
+threshold_frac=0.8, searchback_threshold_frac=0.6) = F1=0.687,
+RR-MAE=10.69ms, RMSSD-MAE=16.27ms。**
+
+この結果は同時に、R2(プローブ後の本番判断)の限界も示している: 280の
+8epochプローブではchannel_weightがRR-MAE/RMSSD-MAEで274本番に迫ると
+見えたが、本番50epochでの周期チェックポイント全数評価では一貫して
+274を下回った。**短いプローブの「良さそう」は、本番の全epochを通した
+安定性まで保証しない**という教訓として記録する。
 
 ## 未解決・今後の課題
 
-- config281再学習(キュー018)完了後、周期チェックポイントから最良epochを選んで274と再比較。
-- Anchor CNNのweight_decay=1e-3版(キュー019)の結果確認。改善しなければepoch数・
-  dropout等の追加候補を検討。
-- R+T統合教師の本番評価待ち。
+- Anchor CNNのneurokitラベルでの悪化は未解決(weight_decayでは改善せず)。
+  優先度を下げて保留。空間GNN(274)を当面の主力モデルとする。
+- R+T統合教師の本番評価待ち(既に277で棄却済み、再検証の予定なし)。
 - `ecgshape`(波形回帰)モデルのneurokit2ベース再学習(案2の前提)。
-- バンドパスフィルタのheatmapパイプラインでの単一変数プローブ。
+- バンドパスフィルタのheatmapパイプラインでの単一変数プローブ(既に278で棄却済み)。
+- 前処理側の新規アイデア: channel_weightは棄却されたが、heatmap側の
+  Gaussianラベルのsigma(現状10ms固定)を単一変数で振る余地はまだ手つかず。

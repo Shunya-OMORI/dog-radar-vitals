@@ -1,8 +1,13 @@
 # Raspberry Pi 5 実機検証 エンド2エンド・マニフェスト
 
-**状態: ドラフト（2026-08-07）。「最良の前処理・モデル・後処理」の組み合わせは
-まだ確定していない（チャネル重み付け本番50epoch(config281)の再学習・公平比較が
-進行中）。確定次第、下記「推奨構成」節を更新すること。**
+**状態: 前処理・後処理の組み合わせが確定(2026-08-07)。config281(channel_weight前処理)
+の本番50epochを周期チェックポイント込みで再学習・全epoch下流評価した結果、
+どのepochも274(前処理なし)のRMSSD-MAEを下回れず棄却
+(`reports/findings_2026-08-07_rpeak_heatmap_investigation.md`参照)。
+確定構成: **config274(前処理なし)の空間GNN + `extract_peaks_adaptive_searchback`
+後処理**(F1=0.687, RR-MAE=10.69ms, RMSSD-MAE=16.27ms)。
+モデル系統(Anchor CNN vs 空間GNN)の選択は下記のARM対応トレードオフに従い
+実機到着後に決定。**
 
 目的: レーダI/Q -> RCG(50点3D変位) -> R波heatmap -> R波位置、という推論パイプラインを
 Raspberry Pi 5（4コアCPU、GPUなし）上で動かし、消費電力・発熱・レイテンシをエッジ
@@ -32,11 +37,9 @@ GNN版のtorch_geometricビルドを別途試す、の二段構えを推奨す�
 
 ### 2. 前処理コード（責務: preprocessing）
 - `dog-radar-vitals/src/dog_radar_vitals/data/mmecg.py`（`.mat`読み込み、`MMECGRecording`）
-- `dog-radar-vitals/src/dog_radar_vitals/data/mmecg_windowing.py`（`zscore_channels`）
-- `dog-radar-vitals/src/dog_radar_vitals/data/channel_weighting.py`（採用された場合のみ:
-  `compute_channel_weights`/`apply_channel_weights`）
-- `dog-radar-vitals/src/dog_radar_vitals/data/bandpass.py`（`ema_clutter_removal`。
-  採用された場合のみ。バンドパス自体(`bandpass_filter`)は既に却下済みなので不要）
+- `dog-radar-vitals/src/dog_radar_vitals/data/mmecg_windowing.py`（`zscore_channels`のみで良い。
+  channel_weight/ema_clutter/bandpassはいずれも棄却済みのため`bandpass.py`・
+  `channel_weighting.py`は転送不要）
 
 ### 3. 後処理コード（責務: postprocessing）
 - `dog-radar-vitals/src/dog_radar_vitals/data/rpeaks.py`
@@ -88,6 +91,5 @@ torch-sparse          # 同上
 
 ## 未確定事項・要フォローアップ
 1. どちらのモデル系統を送るか（精度 vs ARM対応リスクのトレードオフ、上記参照）
-2. 前処理はchannel_weightを採用するか（config281再学習・公平比較待ち）
-3. `deploy/rpi5/run_inference.py`は未実装（骨子のみ本ファイルに記載）
-4. 電力・温度の実測手段（USB電力計の型番、`vcgencmd`等）は未確定、実機到着後に決める
+2. `deploy/rpi5/run_inference.py`は未実装（骨子のみ本ファイルに記載）
+3. 電力・温度の実測手段（USB電力計の型番、`vcgencmd`等）は未確定、実機到着後に決める

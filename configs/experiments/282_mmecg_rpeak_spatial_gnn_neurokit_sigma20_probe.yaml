@@ -1,0 +1,38 @@
+# 282: 274(R波単独教師のneurokit2本番モデル, F1=0.687/RR-MAE=10.69ms/RMSSD-MAE=16.27ms、
+# adaptive_searchback後処理込み)と同一構成だが、教師heatmapのGaussianラベル幅を
+# heatmap_sigma_ms=10(既定)->20msに広げる。
+# 背景(2026-08-07): 前処理側の変更(bandpass/ema_clutter/channel_weight)は全て274を
+# 上回れなかった(findings_2026-08-07_rpeak_heatmap_investigation.md)。CLAUDE.md R5
+# 「モデルより先に入力と評価を疑う」に従い、前処理の次はラベル設計側を疑う。heatmapの
+# 正解ラベル幅が真のR波位置に対して狭すぎると、モデルは僅かなタイミングのずれを
+# 強く罰せられ過学習しやすい・逆に広すぎると極大点のローカライズ精度が落ちるトレードオフが
+# あるはず。10ms(fs=200Hzで2サンプル相当)は狭い部類のため、まず倍の20msを単一変数で
+# 8epochプローブする(R2)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 20.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 8
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

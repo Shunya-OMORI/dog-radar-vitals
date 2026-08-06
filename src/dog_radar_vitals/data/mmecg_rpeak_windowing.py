@@ -25,6 +25,7 @@ def iter_peak_windows(
     detector: str = "legacy",
     apply_bandpass: bool = False,
     preprocess: str = "none",
+    heatmap_sigma_ms: float = 10.0,
 ) -> Iterator[tuple[np.ndarray, np.ndarray]]:
     """(RCG窓 [T,50](real or complex64), R波heatmap窓 [T]) を順に返す。
 
@@ -45,6 +46,10 @@ def iter_peak_windows(
         使われる、固定次数Butterworthとは異なる高域通過特性を持つ手法。apply_bandpassとは
         併用しない想定)、"channel_weight"(2026-08-07、`channel_weighting.py`。50点のうち
         心拍帯パワー比が高い点を重視するSNRベースの重み付け。"Cardio-Focusing"型の発想)。
+    heatmap_sigma_ms: 2026-08-07、教師heatmapのGaussianラベル幅(既定10ms、
+        `build_peak_heatmap`参照)。前処理(channel_weight/ema_clutter/bandpass)は
+        いずれも274(前処理なし)を上回れなかったため、入力側ではなくラベル側
+        (R5: モデルより先に入力と評価を疑う)の単一変数として追加した。
     """
     nan_mask = None
     if np.isnan(rec.rcg).any() or np.isnan(rec.ecg).any():
@@ -77,7 +82,7 @@ def iter_peak_windows(
     else:
         peak_fn = detect_r_peaks_neurokit if detector == "neurokit" else detect_r_peaks
         peak_indices = peak_fn(ecg_filled, rec.fs)
-    heatmap = build_peak_heatmap(peak_indices, length=len(ecg_filled), fs=rec.fs)
+    heatmap = build_peak_heatmap(peak_indices, length=len(ecg_filled), fs=rec.fs, sigma_ms=heatmap_sigma_ms)
 
     window_len = int(window_sec * rec.fs)
     stride = int(stride_sec * rec.fs)
