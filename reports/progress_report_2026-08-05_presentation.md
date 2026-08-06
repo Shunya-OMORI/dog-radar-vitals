@@ -165,6 +165,19 @@ for i in range(n_layers):                      # rpeak_dilated_cnn1d.py:41-49
                nn.BatchNorm1d(channels), nn.ReLU(), nn.Dropout(dropout)]
 ```
 
+**教師信号と推論時の動作の対応**（図: `reports/mmecg_comparison/heatmap_teacher_vs_inference.png`、
+生成スクリプト: `scripts/plot_heatmap_teacher_vs_inference.py`）: 学習時は正解R波位置に
+ガウシアン(`build_peak_heatmap`)を立てたheatmapを教師信号として密なBCE回帰を行い、推論時は
+モデルが出力したheatmapの**極大点**(`extract_peaks_from_heatmap`、しきい値0.3以上かつ近傍で
+最大)を拾ってR波位置に戻す。下図は102_rpeak_cnn1d(ヒトSchellenbergerデータ、test被験者
+GDN0009)の実際の窓での例で、教師信号(中段)がR波ごとにきれいなガウシアン4本であるのに対し、
+推論時の予測(下段)はしきい値を超える極大点が2つしか立たず、うち1つは正解位置からずれている
+——**この窓ではF1に相当する検出率は50%**であり、報告書全体で報告しているこのモデルの
+性能(F1 0.32〜0.57、被験者間で変動)をそのまま反映した典型的な例である(見栄えのため
+検出精度の良い窓を選んではいない)。
+
+![教師信号と推論時の極大点検出の対応](mmecg_comparison/heatmap_teacher_vs_inference.png)
+
 ## III-5. モデル2: 空間 GNN（0.034 M パラメータ）
 
 50 個の反射点は胸郭上のばらばらの位置から返ってきた信号だが，モデル1 はこれを単なる 50 チャネルとして扱っており，**どの点とどの点が空間的に近いかを使っていない**．原著も 3 次元位置埋め込み + Transformer で空間構造を扱っており，押さえるべき情報だと判断した．
