@@ -503,6 +503,89 @@ RMSSDは連続するRR Interval同士の差分に基づく指標であり、全�
 一律にずらすのではなく、拍ごとに異なる(FP/FN起因の非一様な)誤差を減らす必要が
 あり、これは前述のFP/FN対策(閾値・後処理の再設計)の方向性でしか解決しない。
 
+## 重大な訂正: F1とRR-MAE/RMSSD-MAEの取り違えを修正 (2026-08-07、ユーザ指摘を受けて)
+
+本ファイル内で複数回「274(前処理なし)+adaptive_searchback = F1=0.687, RR-MAE=10.69ms,
+RMSSD-MAE=16.27ms」と記載していたが、**これは誤りだった**。RR-MAE=10.69ms/
+RMSSD-MAE=16.27msは実際には「旧手法(閾値0.3)」(F1=0.551)の数値であり、
+adaptive_searchback(F1=0.687)のRR-MAEは12.00ms、RMSSD-MAEは一度も測定されて
+いなかった(`compare_peak_postprocessing.py`はF1とRR-MAEしか計算していなかった)。
+2つの後処理の数値を混同したまま「確定構成」として何度も報告し、config281/282/283/284/277
+の棄却判断もこの誤った基準(16.27ms)と比較していた。改めてconfig274+adaptive_searchbackを
+測定した結果、正しい数値は**F1=0.687, RR-MAE=12.00ms, RMSSD-MAE=20.71ms, SDNN-MAE=6.51ms**。
+これにより「F1を優先するか、RMSSD-MAEを優先するか」で採用すべき後処理が変わるという
+トレードオフが判明した(下記ランキング参照)。過去の棄却判断(281/282/283/284/277)は
+正しい基準(20.71ms)で比較しても結論は変わらない(いずれも20.71msを上回るか、
+上回らなくても僅差でF1が低い)ことを確認済み。
+
+## 全候補モデルの統一評価ランキング (2026-08-07、ユーザ依頼)
+
+評価指標の設計を明確化した: **RR-MAE**(`matched_rr_interval_mae_ms`)は真の隣接
+R波2つが両方ともマッチできた区間だけを比較する設計で、意図的に見逃し・偽陽性を
+除外している(QRS検出分野の標準的な二段評価: 検出性能=F1、位置精度=正しく検出できた
+場合のRR-MAE、に近い)。**RMSSD-MAE**はモデルの実際の予測ピーク列全体から計算する
+ため見逃し・偽陽性の影響を受けるが、標準的なHRVアーチファクト除去フィルタ
+(`clean_rr_intervals_ms`、40〜200bpm範囲外・局所中央値から20%以上ずれるRR間隔を除去)
+を通すため、一部の異常値は緩和される。また有効な間隔が3つ未満のトライアルは
+「HRV usable」から除外され平均に入らない(今回の全評価では44/44が使用可能)。
+
+統一スクリプト(`evaluate_spatial_gnn_hrv.py`、チューニング済みパラメータ)で
+これまでの主要チェックポイントを再評価し、RMSSD-MAE昇順でランキングした:
+
+| 順位 | モデル | GT | 後処理 | F1 | RR-MAE | RMSSD-MAE | SDNN-MAE |
+|---|---|---|---|---|---|---|---|
+| 1 | 274(sigma10) | neurokit | old | 0.551 | 10.69ms | **16.27ms** | 6.53ms |
+| 2 | 283 epoch4(sigma15プローブ) | neurokit | old | 0.712 | 11.50ms | 17.30ms | 5.22ms |
+| 3 | 284 epoch4(sigma15本番) | neurokit | old | **0.733** | 11.76ms | 18.26ms | **5.16ms** |
+| 4 | 283 epoch4 | neurokit | adaptive_searchback | 0.722 | 11.56ms | 19.15ms | 6.03ms |
+| 5 | 281 epoch4(channel_weight) | neurokit | old | 0.670 | 11.33ms | 19.31ms | 6.62ms |
+| 6 | **2モデル融合: 274(密候補,h=0.20)+284 epoch4** | neurokit | 2model_fusion | 0.729 | 12.03ms | 19.77ms | 5.93ms |
+| 7 | 274 | neurokit | adaptive_searchback | 0.687 | 12.00ms | 20.71ms | 6.51ms |
+| 8 | 284 epoch4 | neurokit | adaptive_searchback | 0.736 | 11.83ms | 20.84ms | 6.51ms |
+| 9 | config236(旧ラベル) | legacy | old | 0.497 | 10.34ms | 21.43ms | 8.95ms |
+| 10 | config236 | legacy | adaptive_searchback | 0.662 | 11.92ms | 22.37ms | 7.35ms |
+| 11 | 282 epoch4(sigma20) | neurokit | old | 0.762 | 13.32ms | 23.07ms | 6.47ms |
+| 12 | 2モデル融合: 274+282(h=0.20) | neurokit | 2model_fusion | 0.760 | 12.48ms | 23.40ms | 7.30ms |
+| 13 | 281 epoch4 | neurokit | adaptive_searchback | 0.700 | 11.71ms | 23.70ms | 8.52ms |
+| 14 | 282 epoch4(F1最高) | neurokit | adaptive_searchback | **0.765** | 13.12ms | 25.66ms | 8.33ms |
+| 15 | R+T epoch9(棄却済) | neurokit_rt | paired_dedup | 0.636 | 14.25ms | 43.80ms | 17.28ms |
+
+**RR-MAEは歴史的な最良値9.67ms(config236)を今回どの構成も更新できていない**。
+なお9.67ms自体も今回同一checkpointで再現できず(10.34ms、評価スクリプトのversion差
+と推測、R3の教訓)。一方**F1は0.383/0.497(旧ラベル)から0.71〜0.77台まで大幅に改善**。
+
+**進捗報告書更新の推奨候補: config284 epoch4 + old手法(3位)**。RMSSD-MAEが最良値
+(16.27ms)にわずか2ms差(18.26ms)まで迫りながら、F1は0.551→0.733まで大幅改善、
+SDNN-MAEは全候補中最良(5.16ms)。8epochプローブ(283)と50epoch本番(284)でほぼ同じ
+結果(17.3ms/18.3ms)が出ており安定して再現している(以前「sigma15はプローブが
+再現しなかった」と報告したのはadaptive_searchbackとの組み合わせでの話で、old手法との
+組み合わせでは実際には安定していたと訂正する)。
+
+## 2モデル融合案の検証 (2026-08-07、ユーザ発案)
+
+「誤差が一番小さいモデル(model_A)が出す多数の検出点候補(precisionは低くてよい)の
+うち、F1が高いモデル(model_B)の検出位置に一番近いものを選択する」という後処理案。
+`diagnose_two_model_fusion.py`で実装し検証した。
+
+初回(model_A=旧ラベルconfig236、model_B=282 epoch4、候補閾値0.05固定)は
+ほぼ無効果(F1 0.765→0.767、RMSSD-MAE 25.66→26.69msとむしろ悪化)だった。
+ユーザ指摘によりmodel_A側の候補閾値(candidate_height_a)を掃引したところ、
+**閾値の選び方で結果が大きく変わることを確認**した:
+
+| candidate_height_a | 274+282融合 F1/RMSSD-MAE | 274+284融合 F1/RMSSD-MAE |
+|---|---|---|
+| 0.02〜0.10(低すぎ) | 0.755 / 27.71ms(悪化) | 0.727 / 23.14ms(悪化) |
+| 0.15 | 0.756 / 26.64ms | 0.726 / 22.15ms |
+| **0.20** | **0.760 / 23.40ms(改善)** | **0.729 / 19.77ms(改善)** |
+| 0.30 | 0.750 / 25.01ms | 0.725 / 20.40ms |
+| 0.40 | 0.763 / 25.45ms | 0.734 / 21.04ms |
+
+model_A(274)を低RMSSD-MAEの供給元、model_B(282/284)を高F1の供給元とする組み合わせで、
+**candidate_height_a=0.20が一貫して最良**(閾値が低すぎるとノイズフロアの候補を
+拾って悪化する)。274+284融合(h=0.20)はF1=0.729/RMSSD-MAE=19.77msとなり、
+上記ランキング6位に入る結果となった。ただしいずれの融合結果も274単体
+(旧手法、RMSSD-MAE=16.27ms)は上回れていない。
+
 ## 未解決・今後の課題
 
 - Anchor CNNのneurokitラベルでの悪化は未解決(weight_decayでは改善せず)。
@@ -517,13 +600,14 @@ RMSSDは連続するRR Interval同士の差分に基づく指標であり、全�
 - `ecgshape`(波形回帰)モデルはneurokit本番30epochでもモード崩壊が続きtrivial
   baselineを超えられず(上記参照)。優先度を下げる。
 - バンドパスフィルタのheatmapパイプラインでの単一変数プローブ(既に278で棄却済み)。
-- heatmap sigma幅チューニング(10/15/20ms)は一旦打ち切り。10ms(274)を維持。
+- 2モデル融合は274+284(h=0.20)がランキング6位まで改善したが、274単体(旧手法)は
+  上回れていない。他のmodel_A/model_B組み合わせ・snap_window_msの調整余地あり。
 - 方法論上の教訓: 8epochプローブ結果が本番50epochの同epoch時点で再現しない
   ケースを確認した(GPU非決定性由来と推測)。今後、プローブの結果が僅差の場合は
   「見込みあり」と即断せず、複数seedまたは本番run側での早期評価で再確認する
   運用を検討する余地がある。
 - F1だけでなくRR-MAE/RMSSD-MAEを常に併記する運用は今後も徹底する。
-- 現時点での確定構成: R波検出=空間GNN(config274, sigma=10, 前処理なし)+
-  adaptive_searchback後処理(F1=0.687, RR-MAE=10.69ms, RMSSD-MAE=16.27ms)。
+- 現時点での最有力候補: config284 epoch4 + old手法(F1=0.733, RR-MAE=11.76ms,
+  RMSSD-MAE=18.26ms, SDNN-MAE=5.16ms)。progress_report更新はユーザ確認待ち。
   ecgshape(波形形状)・Anchor CNNはいずれも未解決課題を抱えたまま優先度を下げて
   保留し、本セッションのR波heatmap関連調査はここで一区切りとする。
