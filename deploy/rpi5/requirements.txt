@@ -1,0 +1,10 @@
+# Raspberry Pi 5 (ARM64, CPU-only) 推論の最小依存 (2026-08-07)
+# torch はCPU版で良い: pip install torch --index-url https://download.pytorch.org/whl/cpu
+# torch_geometric は pure-Python wheel。torch-scatter / torch-sparse は不要
+# (WSL側で未インストールのまま動作していることを確認済み。GATConvはpure-PyTorchフォールバックで動く)
+torch>=2.2
+torch_geometric>=2.5
+numpy>=1.24
+scipy>=1.10
+# 精度検証(--gt, 既定で有効)にのみ必要。推論だけなら省略可(--no-gt)
+neurokit2>=0.2.7

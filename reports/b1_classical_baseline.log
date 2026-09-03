@@ -1,0 +1,32 @@
+=========== 1. 既知値の再現確認 (空間GNN config284 epoch4) ===========
+期待値: F1 0.749 / RR間隔MAE 8.41ms / RMSSD MAE 10.27ms
+trial 88: precision=1.000 recall=0.805 f1=0.892 rr_mae_ms=11.063801741028557
+trial 89: precision=0.469 recall=0.280 f1=0.350 rr_mae_ms=10.685714404521393
+trial 90: precision=0.949 recall=0.619 f1=0.749 rr_mae_ms=19.6862832994426
+trial 91: precision=0.927 recall=0.763 f1=0.837 rr_mae_ms=15.262024644109816
+======================================================================
+mean F1: 0.750
+RR-interval MAE (mean over 44 trials): 8.43 ms
+HRV usable: 44/44, RMSSD MAE: 10.35 ms, SDNN MAE: 2.80 ms
+
+=========== 2. periodic (入力を見ない自明ベースライン) ===========
+train subjects mean RR interval: 841.7 ms
+[periodic] mean F1: 0.128 | RR-interval MAE (44 trials): 37.22 ms | HRV usable 44/44, RMSSD MAE: 20.98 ms, SDNN MAE: 34.42 ms
+
+=========== 3. classical: 最良チャネル + Pan-Tompkins型包絡 ===========
+[classical/best/h=0.05] mean F1: 0.121 | RR-interval MAE (32 trials): 23.72 ms | HRV usable 44/44, RMSSD MAE: 52.12 ms, SDNN MAE: 21.68 ms
+[classical/best/h=0.10] mean F1: 0.107 | RR-interval MAE (30 trials): 20.53 ms | HRV usable 41/44, RMSSD MAE: 56.07 ms, SDNN MAE: 23.87 ms
+[classical/best/h=0.15] mean F1: 0.081 | RR-interval MAE (29 trials): 19.07 ms | HRV usable 40/44, RMSSD MAE: 50.60 ms, SDNN MAE: 22.81 ms
+[classical/best/h=0.20] mean F1: 0.063 | RR-interval MAE (27 trials): 19.03 ms | HRV usable 37/44, RMSSD MAE: 51.04 ms, SDNN MAE: 20.48 ms
+[classical/best/h=0.30] mean F1: 0.043 | RR-interval MAE (24 trials): 17.89 ms | HRV usable 33/44, RMSSD MAE: 59.53 ms, SDNN MAE: 25.65 ms
+[classical/best/h=0.40] mean F1: 0.033 | RR-interval MAE (20 trials): 20.06 ms | HRV usable 24/44, RMSSD MAE: 52.00 ms, SDNN MAE: 23.64 ms
+[classical/best/h=0.50] mean F1: 0.026 | RR-interval MAE (17 trials): 21.47 ms | HRV usable 19/44, RMSSD MAE: 60.58 ms, SDNN MAE: 26.19 ms
+
+=========== 4. classical: 心拍帯パワー重み付き統合 + Pan-Tompkins型包絡 ===========
+[classical/weighted/h=0.05] mean F1: 0.049 | RR-interval MAE (36 trials): 31.39 ms | HRV usable 44/44, RMSSD MAE: 50.23 ms, SDNN MAE: 21.79 ms
+[classical/weighted/h=0.10] mean F1: 0.046 | RR-interval MAE (35 trials): 30.65 ms | HRV usable 44/44, RMSSD MAE: 51.07 ms, SDNN MAE: 22.13 ms
+[classical/weighted/h=0.15] mean F1: 0.042 | RR-interval MAE (33 trials): 32.26 ms | HRV usable 44/44, RMSSD MAE: 51.27 ms, SDNN MAE: 23.35 ms
+[classical/weighted/h=0.20] mean F1: 0.039 | RR-interval MAE (33 trials): 32.01 ms | HRV usable 44/44, RMSSD MAE: 47.51 ms, SDNN MAE: 20.08 ms
+[classical/weighted/h=0.30] mean F1: 0.029 | RR-interval MAE (31 trials): 33.03 ms | HRV usable 41/44, RMSSD MAE: 46.94 ms, SDNN MAE: 19.87 ms
+[classical/weighted/h=0.40] mean F1: 0.023 | RR-interval MAE (29 trials): 27.57 ms | HRV usable 38/44, RMSSD MAE: 49.58 ms, SDNN MAE: 21.36 ms
+[classical/weighted/h=0.50] mean F1: 0.018 | RR-interval MAE (25 trials): 29.00 ms | HRV usable 33/44, RMSSD MAE: 47.34 ms, SDNN MAE: 21.00 ms

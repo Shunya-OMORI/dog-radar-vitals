@@ -1,0 +1,45 @@
+# 299: RCG の正規化を、チャネルごとの z-score から中央値+MAD(中央絶対偏差)に変える。
+# 284 からの変更点は data.normalization のみ (R4: 単一変数)。
+#
+# 根拠 (2026-08-25 の目視診断): 検出が崩れている被験者(9, 16)のレーダ波形を描くと、
+# 分散最大チャネルに **心拍と無関係な巨大スパイク** が散発していた。被験者16では
+# ほぼ全ての正解R位置にモデル出力の小さなピークが立っている(適合率0.940)のに、
+# 高さが 0.05〜0.2 しかなくしきい値0.3を超えられない。超えるのはスパイクがあった拍だけ。
+#
+# 標準偏差は外れ値の二乗で効くので、スパイク1つでそのチャネルのスケールが膨らみ、
+# 割ったあとの心拍成分が相対的に潰れる。実測(被験者16)で
+#   z-score: |x|中央値 0.150 / 最大 103.4
+#   MAD    : |x|中央値 0.677 / 最大 10.0 (クリップ後)
+# と、心拍成分が 4.5 倍になる。MAD は順序統計量なので外れ値の大きさに引きずられない。
+# 対応する先行研究: Huber, "Robust Statistics", Wiley, 1981。
+#
+# 比較対象 (同一 split, test 17/29/30): F1@50ms 0.750 / RR間隔MAE 8.43 ms / RMSSD誤差 10.35 ms
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  normalization: robust
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 10
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

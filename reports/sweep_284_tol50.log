@@ -1,0 +1,27 @@
+subject   1: val(subj 2) で選んだ h=0.30 → test F1=0.414 R=0.413 RR=9.99 ms RMSSD誤差=8.74 (一定RR 36.90) pNN50誤差=10.98 平均IBI誤差=1.40
+subject   2: val(subj 5) で選んだ h=0.30 → test F1=0.653 R=0.639 RR=8.25 ms RMSSD誤差=11.20 (一定RR 13.71) pNN50誤差=4.01 平均IBI誤差=0.04
+subject   5: val(subj 9) で選んだ h=0.30 → test F1=0.244 R=0.213 RR=8.60 ms RMSSD誤差=9.96 (一定RR 27.41) pNN50誤差=11.51 平均IBI誤差=15.75
+subject   9: val(subj 10) で選んだ h=0.30 → test F1=0.113 R=0.063 RR=14.29 ms RMSSD誤差=64.51 (一定RR 37.53) pNN50誤差=30.73 平均IBI誤差=42.64
+subject  10: val(subj 13) で選んだ h=0.30 → test F1=0.743 R=0.637 RR=13.36 ms RMSSD誤差=6.52 (一定RR 72.31) pNN50誤差=4.09 平均IBI誤差=11.41
+subject  13: val(subj 14) で選んだ h=0.30 → test F1=0.793 R=0.728 RR=11.89 ms RMSSD誤差=9.60 (一定RR 47.70) pNN50誤差=11.66 平均IBI誤差=20.33
+subject  14: val(subj 16) で選んだ h=0.30 → test F1=0.548 R=0.461 RR=11.26 ms RMSSD誤差=12.10 (一定RR 72.77) pNN50誤差=8.08 平均IBI誤差=14.99
+subject  16: val(subj 17) で選んだ h=0.30 → test F1=0.443 R=0.375 RR=8.58 ms RMSSD誤差=19.94 (一定RR 57.29) pNN50誤差=13.94 平均IBI誤差=5.76
+subject  17: val(subj 29) で選んだ h=0.30 → test F1=0.906 R=0.877 RR=9.31 ms RMSSD誤差=4.48 (一定RR 47.57) pNN50誤差=6.66 平均IBI誤差=4.13
+subject  29: val(subj 30) で選んだ h=0.30 → test F1=0.590 R=0.532 RR=8.72 ms RMSSD誤差=9.62 (一定RR 16.81) pNN50誤差=6.31 平均IBI誤差=4.95
+subject  30: val(subj 1) で選んだ h=0.30 → test F1=0.787 R=0.775 RR=11.22 ms RMSSD誤差=13.33 (一定RR 24.13) pNN50誤差=11.97 平均IBI誤差=2.62
+  RMSSD誤差 15.45 ± 16.75 ms   (一定RRのみ: 41.29 ms)
+  pNN50誤差 10.90 ± 7.39 %   (一定RRのみ: 19.71 %)
+  平均IBI誤差 11.27 ± 12.33 ms
+
+=== val でしきい値を選んだ場合の正式値 (n=11 fold) ===
+  F1 0.567 ± 0.246   RR間隔MAE 10.50 ms
+  選ばれたしきい値: subj1:0.30, subj2:0.30, subj5:0.30, subj9:0.30, subj10:0.30, subj13:0.30, subj14:0.30, subj16:0.30, subj17:0.30, subj29:0.30, subj30:0.30
+
+=== 全被験者平均 (しきい値を全員共通にした場合) ===
+  h=0.30: F1 0.567  precision 0.712  recall 0.519  RR間隔MAE 10.50 ms  RMSSD誤差 15.45 ms  pNN50誤差 10.90 %  平均IBI誤差 11.27 ms
+  (参考) 入力を見ずに一定RRを出すだけのモデル: RMSSD誤差 41.29 ms  pNN50誤差 19.71 %
+
+=== 被験者ごとに最良しきい値を選んだ場合 (上限の目安、テストを見て選ぶので楽観的) ===
+  F1 0.567   選ばれたしきい値: subj1:0.30, subj2:0.30, subj5:0.30, subj9:0.30, subj10:0.30, subj13:0.30, subj14:0.30, subj16:0.30, subj17:0.30, subj29:0.30, subj30:0.30
+
+保存: /home/shunya/research/dog-radar-vitals/reports/height_sweep_loso.json

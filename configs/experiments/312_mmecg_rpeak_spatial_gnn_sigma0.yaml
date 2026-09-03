@@ -1,0 +1,65 @@
+# 312_s0: 301(MAD正規化 + 正例重み付きBCE) から heatmap_sigma_ms だけを 15.0 -> 0.0 に変えたプローブ (R4)。
+#
+# なぜ σ=0 を測るか (2026-08-27):
+#   radarODE 系の公式実装は anchor の生成コードを公開していないため、これまで
+#   「σ=10ms のガウシアン」と推測して再現していた。同じ著者らの CFT-RFcardi が
+#   即実行可能なデータセットを公開したので実測したところ、**公式の anchor は
+#   0/1 のスパイク列**だった (data_anchor_*.npy: 値は {0,1} のみ、4秒窓に4〜7点、
+#   正例は 800 サンプル中 5.27 点 = 0.66%)。詳細は hrv-paper/docs/08_公式anchorの仕様確認.md
+#
+#   本研究の σ=15ms ガウシアンは公式仕様と異なる。**その差が実際にどれだけ効くかを
+#   測っていない**ので、σ→0 の極限を4点目として測る。
+#
+# 何を確かめたいか:
+#   0/1 教師は「正解からの距離」の情報を持たない。正解の1サンプル隣を予測しても
+#   500サンプル離れて予測しても損失は同じで、勾配は寄せる向きを伝えない。
+#   ガウシアン教師はこの距離を符号化するので、位置推定が最適化しやすい問題に変わる——
+#   というのが我々の設計の根拠だが、**これは推測であり測定ではない**。ここで測る。
+#
+# 対応する先行研究:
+#   Tompson ら, Joint Training of a CNN and a Graphical Model for Human Pose Estimation, NIPS 2014
+#   Newell ら, Stacked Hourglass Networks, ECCV 2016
+#     → キーポイント検出でガウス heatmap が 0/1 教師より学習しやすいことを示した原型
+#   Zhang ら, DARK pose, CVPR 2020 → heatmap の幅が位置推定の量子化誤差を決める
+#
+# 注意 (交絡): σ を狭めると正例サンプル数が減り、pos_weight=10 の実効的な強さが変わる。
+#   σ=0 では正例が 0.66% まで減るので、しきい値の再選択とセットで読むこと。
+#
+# 比較対象 (すべて同一 split: test 17/29/30, 10 epoch):
+#   σ= 8ms : F1@150ms 0.868 / MDR  9.44% / RRI誤差 10.06ms / RMSSD誤差 20.72ms
+#   σ=15ms : F1@150ms 0.908 / MDR  8.70% / RRI誤差  9.33ms / RMSSD誤差 17.85ms  ← 採用中
+#   σ=25ms : F1@150ms 0.857 / MDR  7.28% / RRI誤差  9.95ms / RMSSD誤差 18.12ms
+#   (参考) 入力を見ずに一定RRを出すだけ: RMSSD誤差 41.83ms
+#
+# 301 からの変更点は heatmap_sigma_ms のみ (R4 単一変数)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  normalization: robust
+  heatmap_sigma_ms: 0.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 10
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  loss: weighted_bce
+  pos_weight: 10.0

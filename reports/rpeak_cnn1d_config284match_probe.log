@@ -1,0 +1,20 @@
+=== probe: 312_mmecg_rpeak_cnn1d_config284match_64ch ===
+[epoch 0] lr=5.00e-04 train_loss=0.3330 train_corr=0.036 val_loss=0.2094 val_corr=0.116
+[epoch 1] lr=5.00e-04 train_loss=0.1665 train_corr=0.244 val_loss=0.1547 val_corr=0.170
+[epoch 2] lr=5.00e-04 train_loss=0.1010 train_corr=0.696 val_loss=0.1435 val_corr=0.088
+[epoch 3] lr=5.00e-04 train_loss=0.0702 train_corr=0.841 val_loss=0.1409 val_corr=0.055
+[epoch 4] lr=5.00e-04 train_loss=0.0570 train_corr=0.886 val_loss=0.1411 val_corr=0.076
+[epoch 5] lr=5.00e-04 train_loss=0.0498 train_corr=0.911 val_loss=0.1391 val_corr=0.104
+[epoch 6] lr=5.00e-04 train_loss=0.0450 train_corr=0.928 val_loss=0.1440 val_corr=0.103
+[epoch 7] lr=5.00e-04 train_loss=0.0418 train_corr=0.940 val_loss=0.1479 val_corr=0.105
+run_dir /home/shunya/research/dog-radar-vitals/runs/20260827-224628_ecg_rpeak_cnn1d_312_mmecg_rpeak_cnn1d_config284match_64ch_probe8ep
+=== probe: 313_mmecg_rpeak_cnn1d_config284match_16ch ===
+[epoch 0] lr=5.00e-04 train_loss=0.5693 train_corr=0.007 val_loss=0.4792 val_corr=0.007
+[epoch 1] lr=5.00e-04 train_loss=0.4203 train_corr=0.008 val_loss=0.3705 val_corr=0.018
+[epoch 2] lr=5.00e-04 train_loss=0.3187 train_corr=0.022 val_loss=0.2651 val_corr=0.068
+[epoch 3] lr=5.00e-04 train_loss=0.2468 train_corr=0.056 val_loss=0.2090 val_corr=0.122
+[epoch 4] lr=5.00e-04 train_loss=0.1957 train_corr=0.136 val_loss=0.1687 val_corr=0.219
+[epoch 5] lr=5.00e-04 train_loss=0.1572 train_corr=0.332 val_loss=0.1517 val_corr=0.141
+[epoch 6] lr=5.00e-04 train_loss=0.1240 train_corr=0.562 val_loss=0.1440 val_corr=0.116
+[epoch 7] lr=5.00e-04 train_loss=0.0996 train_corr=0.703 val_loss=0.1420 val_corr=0.091
+run_dir /home/shunya/research/dog-radar-vitals/runs/20260827-224700_ecg_rpeak_cnn1d_313_mmecg_rpeak_cnn1d_config284match_16ch_probe8ep

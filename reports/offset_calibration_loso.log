@@ -1,0 +1,132 @@
+=========== fold 0: test subject 1 ===========
+mean F1: 0.414
+RR-interval MAE (mean over 1 trials): 9.99 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 +65.34 ms / 中央値 +65.34 ms / 標準偏差 28.97 ms  (n=2 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             59.03      10.54
+MDR [%]                      5.06       5.06
+F1 (許容0.05s)                0.443      0.970
+RR間隔MAE [ms]                 9.60      11.01
+HRV usable: 2/2, RMSSD MAE: 9.27 ms, SDNN MAE: 4.51 ms
+
+=========== fold 1: test subject 2 ===========
+mean F1: 0.653
+RR-interval MAE (mean over 2 trials): 8.25 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 +41.58 ms / 中央値 +41.58 ms / 標準偏差 3.33 ms  (n=2 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             42.15      11.30
+MDR [%]                     12.56      12.31
+F1 (許容0.05s)                0.650      0.896
+RR間隔MAE [ms]                 8.59      13.46
+HRV usable: 2/2, RMSSD MAE: 12.45 ms, SDNN MAE: 5.29 ms
+
+=========== fold 2: test subject 5 ===========
+mean F1: 0.244
+RR-interval MAE (mean over 7 trials): 8.60 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 -48.94 ms / 中央値 -52.25 ms / 標準偏差 32.36 ms  (n=10 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             65.55      17.53
+MDR [%]                     49.08      49.23
+F1 (許容0.05s)                0.282      0.575
+RR間隔MAE [ms]                 8.82      13.48
+HRV usable: 9/12, RMSSD MAE: 14.64 ms, SDNN MAE: 4.33 ms
+
+=========== fold 3: test subject 9 ===========
+mean F1: 0.113
+RR-interval MAE (mean over 6 trials): 14.29 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 -13.96 ms / 中央値 -8.79 ms / 標準偏差 17.99 ms  (n=4 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             21.57      15.75
+MDR [%]                     92.58      92.58
+F1 (許容0.05s)                0.110      0.120
+RR間隔MAE [ms]                15.08      14.51
+HRV usable: 3/6, RMSSD MAE: 59.57 ms, SDNN MAE: 37.51 ms
+
+=========== fold 4: test subject 10 ===========
+mean F1: 0.743
+RR-interval MAE (mean over 3 trials): 13.36 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 -2.77 ms / 中央値 -2.33 ms / 標準偏差 13.08 ms  (n=3 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             18.05      13.77
+MDR [%]                     33.15      33.15
+F1 (許容0.05s)                0.757      0.764
+RR間隔MAE [ms]                13.19      13.54
+HRV usable: 3/3, RMSSD MAE: 6.49 ms, SDNN MAE: 4.71 ms
+
+=========== fold 5: test subject 13 ===========
+mean F1: 0.793
+RR-interval MAE (mean over 6 trials): 11.89 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 +14.75 ms / 中央値 +11.96 ms / 標準偏差 18.78 ms  (n=6 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             17.87      11.73
+MDR [%]                     23.78      23.78
+F1 (許容0.05s)                0.807      0.830
+RR間隔MAE [ms]                11.95      12.65
+HRV usable: 6/6, RMSSD MAE: 12.69 ms, SDNN MAE: 8.99 ms
+
+=========== fold 6: test subject 14 ===========
+mean F1: 0.548
+RR-interval MAE (mean over 7 trials): 11.26 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 -22.22 ms / 中央値 -1.42 ms / 標準偏差 53.00 ms  (n=9 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             34.53      10.80
+MDR [%]                     45.12      41.74
+F1 (許容0.05s)                0.545      0.702
+RR間隔MAE [ms]                10.95      11.34
+HRV usable: 9/9, RMSSD MAE: 15.39 ms, SDNN MAE: 6.96 ms
+
+=========== fold 7: test subject 16 ===========
+mean F1: 0.443
+RR-interval MAE (mean over 5 trials): 8.58 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 -31.53 ms / 中央値 -15.45 ms / 標準偏差 62.32 ms  (n=7 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             50.97      16.04
+MDR [%]                     50.29      40.71
+F1 (許容0.05s)                0.442      0.652
+RR間隔MAE [ms]                 8.58      11.51
+HRV usable: 6/7, RMSSD MAE: 20.29 ms, SDNN MAE: 8.00 ms
+
+=========== fold 8: test subject 17 ===========
+mean F1: 0.906
+RR-interval MAE (mean over 9 trials): 9.31 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 +11.76 ms / 中央値 +21.28 ms / 標準偏差 29.71 ms  (n=9 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             27.15       8.94
+MDR [%]                      8.22       8.22
+F1 (許容0.05s)                0.907      0.946
+RR間隔MAE [ms]                 9.14       9.34
+HRV usable: 9/9, RMSSD MAE: 8.10 ms, SDNN MAE: 2.35 ms
+
+=========== fold 9: test subject 29 ===========
+mean F1: 0.590
+RR-interval MAE (mean over 22 trials): 8.72 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 +21.76 ms / 中央値 +25.43 ms / 標準偏差 34.86 ms  (n=23 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             35.04       9.75
+MDR [%]                     30.46      30.48
+F1 (許容0.05s)                0.592      0.765
+RR間隔MAE [ms]                 8.64      10.63
+HRV usable: 23/23, RMSSD MAE: 13.30 ms, SDNN MAE: 4.36 ms
+
+=========== fold 10: test subject 30 ===========
+mean F1: 0.787
+RR-interval MAE (mean over 12 trials): 11.22 ms
+--- 被験者内オフセット較正 (先頭 30 秒で推定, 評価はそれ以降) ---
+推定オフセット: 平均 +3.58 ms / 中央値 +6.14 ms / 標準偏差 32.90 ms  (n=12 トライアル)
+                             較正なし       較正あり
+R波タイミング|誤差|[ms]             30.53      12.28
+MDR [%]                      5.19       5.19
+F1 (許容0.05s)                0.782      0.951
+RR間隔MAE [ms]                10.56      11.75
+HRV usable: 12/12, RMSSD MAE: 14.19 ms, SDNN MAE: 2.58 ms
+

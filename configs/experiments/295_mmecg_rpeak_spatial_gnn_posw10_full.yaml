@@ -1,0 +1,50 @@
+# 295: 293(pos_weight=10)を本番epoch数で 11-fold LOSO に掛ける。
+# 284 からの変更点は train.loss と train.pos_weight のみ (R4: 単一変数)。
+# プローブ(034)では 3 本とも train_loss が単調減少して安定収束した。val_corr は
+# epoch 0 が最高で以降低下するが、val_corr は下流精度を予測しない(config281の教訓)ので
+# 判定は F1@150ms / RR間隔MAE / RMSSD誤差 で行う。
+# pos_weight=10 を選んだ理由: 教師 heatmap の正例実効重みは約 4.7%、その逆数は約 21。
+# 5/10/20 のうち中庸を取った。
+# 293: 損失を BCE から「正例に重みを掛けた BCE」に変える。284 からの変更点は
+# **train.loss と train.pos_weight のみ** (R4: 単一変数)。
+#
+# 根拠 (2026-08-25): 11-fold LOSO の被験者別診断で precision 0.93〜1.00 に対し
+# recall が 0.02〜0.99 と大きく落ちる被験者が複数あり、モデルは「拍でない」と
+# 答える方に偏っている。教師 heatmap は sigma=15 ms なので 4 秒窓 800 サンプルの
+# うち正例の実効重みは 5 拍 x sigma*sqrt(2pi)/dt = 約 37.6 サンプル、全体の約 4.7%。
+# その逆数が約 21 なので pos_weight は 5/10/20 の範囲を振る。
+#
+# 目的は R 波の絶対位置ではなく RR 間隔とその変動 (HRV) である。拍を 1 つ見逃すと
+# その区間の RR 間隔が倍になり RMSSD を壊すので、誤検出より見逃しの害が大きい。
+# 判定は val_loss ではなく下流指標 (F1@150ms / RR間隔MAE / RMSSD誤差) で行う
+# (284 のコメントにある config281 の教訓: val_corr は下流精度を予測しない)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  loss: weighted_bce
+  pos_weight: 10.0

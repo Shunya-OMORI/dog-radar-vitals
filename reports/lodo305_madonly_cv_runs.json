@@ -1,0 +1,211 @@
+[
+  {
+    "fold": 0,
+    "test_subject": 1,
+    "val_subject": 2,
+    "train_subjects": [
+      5,
+      9,
+      10,
+      13,
+      14,
+      16,
+      17,
+      29,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-182214_ecg_rpeak_spatial_gnn_lodo305_madonly_fold0_test1",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-182214_ecg_rpeak_spatial_gnn_lodo305_madonly_fold0_test1/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 1,
+    "test_subject": 2,
+    "val_subject": 5,
+    "train_subjects": [
+      1,
+      9,
+      10,
+      13,
+      14,
+      16,
+      17,
+      29,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-190832_ecg_rpeak_spatial_gnn_lodo305_madonly_fold1_test2",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-190832_ecg_rpeak_spatial_gnn_lodo305_madonly_fold1_test2/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 2,
+    "test_subject": 5,
+    "val_subject": 9,
+    "train_subjects": [
+      1,
+      2,
+      10,
+      13,
+      14,
+      16,
+      17,
+      29,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-192927_ecg_rpeak_spatial_gnn_lodo305_madonly_fold2_test5",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-192927_ecg_rpeak_spatial_gnn_lodo305_madonly_fold2_test5/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 3,
+    "test_subject": 9,
+    "val_subject": 10,
+    "train_subjects": [
+      1,
+      2,
+      5,
+      13,
+      14,
+      16,
+      17,
+      29,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-195708_ecg_rpeak_spatial_gnn_lodo305_madonly_fold3_test9",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-195708_ecg_rpeak_spatial_gnn_lodo305_madonly_fold3_test9/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 4,
+    "test_subject": 10,
+    "val_subject": 13,
+    "train_subjects": [
+      1,
+      2,
+      5,
+      9,
+      14,
+      16,
+      17,
+      29,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-201759_ecg_rpeak_spatial_gnn_lodo305_madonly_fold4_test10",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-201759_ecg_rpeak_spatial_gnn_lodo305_madonly_fold4_test10/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 5,
+    "test_subject": 13,
+    "val_subject": 14,
+    "train_subjects": [
+      1,
+      2,
+      5,
+      9,
+      10,
+      16,
+      17,
+      29,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-203919_ecg_rpeak_spatial_gnn_lodo305_madonly_fold5_test13",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-203919_ecg_rpeak_spatial_gnn_lodo305_madonly_fold5_test13/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 6,
+    "test_subject": 14,
+    "val_subject": 16,
+    "train_subjects": [
+      1,
+      2,
+      5,
+      9,
+      10,
+      13,
+      17,
+      29,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-205936_ecg_rpeak_spatial_gnn_lodo305_madonly_fold6_test14",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-205936_ecg_rpeak_spatial_gnn_lodo305_madonly_fold6_test14/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 7,
+    "test_subject": 16,
+    "val_subject": 17,
+    "train_subjects": [
+      1,
+      2,
+      5,
+      9,
+      10,
+      13,
+      14,
+      29,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-211914_ecg_rpeak_spatial_gnn_lodo305_madonly_fold7_test16",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-211914_ecg_rpeak_spatial_gnn_lodo305_madonly_fold7_test16/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 8,
+    "test_subject": 17,
+    "val_subject": 29,
+    "train_subjects": [
+      1,
+      2,
+      5,
+      9,
+      10,
+      13,
+      14,
+      16,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-213942_ecg_rpeak_spatial_gnn_lodo305_madonly_fold8_test17",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-213942_ecg_rpeak_spatial_gnn_lodo305_madonly_fold8_test17/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 9,
+    "test_subject": 29,
+    "val_subject": 30,
+    "train_subjects": [
+      1,
+      2,
+      5,
+      9,
+      10,
+      13,
+      14,
+      16,
+      17
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-215919_ecg_rpeak_spatial_gnn_lodo305_madonly_fold9_test29",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-215919_ecg_rpeak_spatial_gnn_lodo305_madonly_fold9_test29/epoch_004.pt",
+    "checkpoint_exists": true
+  },
+  {
+    "fold": 10,
+    "test_subject": 30,
+    "val_subject": 1,
+    "train_subjects": [
+      2,
+      5,
+      9,
+      10,
+      13,
+      14,
+      16,
+      17,
+      29
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-221519_ecg_rpeak_spatial_gnn_lodo305_madonly_fold10_test30",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-221519_ecg_rpeak_spatial_gnn_lodo305_madonly_fold10_test30/epoch_004.pt",
+    "checkpoint_exists": true
+  }
+]

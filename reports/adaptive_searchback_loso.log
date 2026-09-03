@@ -1,0 +1,333 @@
+=========== fold 0: test subject 1 ===========
+trial 1: precision=0.821 recall=0.821 f1=0.821 rr_mae_ms=9.990091169748146
+trial 2: precision=0.005 recall=0.005 f1=0.005 rr_mae_ms=None
+======================================================================
+mean F1: 0.413
+RR-interval MAE (mean over 1 trials): 9.99 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 3.10 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 60.10 ms / 中央値|誤差| 59.42 ms / 符号つき平均(bias) +59.79 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 41.20 ms
+F1 (許容0.15s): 0.979
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 6.44 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 59.42 ms / 90パーセンタイル 75.37 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]            0.60          -         3.89
+RMSSD誤差[ms]           10.18      36.90         6.43
+SDNN誤差[ms]             4.61      37.89         6.44
+pNN50誤差[%]            11.90      11.90         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 2/2, RMSSD MAE: 10.18 ms, SDNN MAE: 4.61 ms
+
+=========== fold 1: test subject 2 ===========
+trial 3: precision=0.778 recall=0.706 f1=0.740 rr_mae_ms=9.027801969528875
+trial 4: precision=0.609 recall=0.622 f1=0.615 rr_mae_ms=7.202285682980751
+======================================================================
+mean F1: 0.678
+RR-interval MAE (mean over 2 trials): 8.12 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 7.98 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 42.29 ms / 中央値|誤差| 40.46 ms / 符号つき平均(bias) +42.29 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 35.59 ms
+F1 (許容0.15s): 0.936
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 5.45 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 40.46 ms / 90パーセンタイル 60.64 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]            0.32          -         3.89
+RMSSD誤差[ms]           13.17      15.29         6.43
+SDNN誤差[ms]             5.35      18.69         6.44
+pNN50誤差[%]             5.18       0.43         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 2/2, RMSSD MAE: 13.17 ms, SDNN MAE: 5.35 ms
+
+=========== fold 2: test subject 5 ===========
+trial 5: precision=0.739 recall=0.449 f1=0.559 rr_mae_ms=9.186616255047873
+trial 6: precision=0.963 recall=0.841 f1=0.898 rr_mae_ms=13.946217730991357
+trial 7: precision=0.773 recall=0.704 f1=0.737 rr_mae_ms=7.757786833852406
+trial 8: precision=0.018 recall=0.009 f1=0.012 rr_mae_ms=17.057042957753765
+trial 9: precision=0.000 recall=0.000 f1=0.000 rr_mae_ms=None
+trial 10: precision=0.083 recall=0.024 f1=0.038 rr_mae_ms=10.063881427831074
+trial 11: precision=0.056 recall=0.009 f1=0.015 rr_mae_ms=23.322812781407265
+trial 12: precision=0.000 recall=0.000 f1=0.000 rr_mae_ms=None
+trial 13: precision=0.140 recall=0.130 f1=0.135 rr_mae_ms=8.526559110179623
+trial 14: precision=0.022 recall=0.015 f1=0.018 rr_mae_ms=23.521275767575236
+trial 15: precision=0.577 recall=0.518 f1=0.546 rr_mae_ms=9.084050791223929
+trial 16: precision=0.206 recall=0.101 f1=0.136 rr_mae_ms=7.9848041458396075
+======================================================================
+mean F1: 0.258
+RR-interval MAE (mean over 10 trials): 13.05 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 41.25 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 70.73 ms / 中央値|誤差| 69.94 ms / 符号つき平均(bias) -64.71 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 34.76 ms
+F1 (許容0.15s): 0.680
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 9.25 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 69.94 ms / 90パーセンタイル 89.88 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]           68.13          -         3.89
+RMSSD誤差[ms]           20.51      26.62         6.43
+SDNN誤差[ms]             5.85      40.65         6.44
+pNN50誤差[%]            19.33       5.24         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 12/12, RMSSD MAE: 20.51 ms, SDNN MAE: 5.85 ms
+
+=========== fold 3: test subject 9 ===========
+trial 17: precision=0.460 recall=0.267 f1=0.338 rr_mae_ms=28.46444489159783
+trial 18: precision=0.826 recall=0.353 f1=0.495 rr_mae_ms=16.41964376350199
+trial 19: precision=0.982 recall=0.287 f1=0.444 rr_mae_ms=14.92238122241534
+trial 20: precision=0.512 recall=0.106 f1=0.175 rr_mae_ms=20.50448563683919
+trial 21: precision=0.824 recall=0.129 f1=0.223 rr_mae_ms=14.065230351229518
+trial 22: precision=0.930 recall=0.595 f1=0.726 rr_mae_ms=11.734741018161076
+======================================================================
+mean F1: 0.400
+RR-interval MAE (mean over 6 trials): 17.69 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 67.57 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 25.37 ms / 中央値|誤差| 21.87 ms / 符号つき平均(bias) +1.76 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 18.04 ms
+F1 (許容0.15s): 0.458
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 2.56 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 21.87 ms / 90パーセンタイル 47.65 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]           43.49          -         3.89
+RMSSD誤差[ms]           51.44      36.99         6.43
+SDNN誤差[ms]            23.14      41.65         6.44
+pNN50誤差[%]            34.18      14.83         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 6/6, RMSSD MAE: 51.44 ms, SDNN MAE: 23.14 ms
+
+=========== fold 4: test subject 10 ===========
+trial 23: precision=0.848 recall=0.491 f1=0.622 rr_mae_ms=21.35010143318975
+trial 24: precision=0.964 recall=0.931 f1=0.947 rr_mae_ms=7.248292858741788
+trial 25: precision=0.938 recall=0.753 f1=0.835 rr_mae_ms=15.24057875752269
+======================================================================
+mean F1: 0.801
+RR-interval MAE (mean over 3 trials): 14.61 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 27.59 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 17.66 ms / 中央値|誤差| 17.39 ms / 符号つき平均(bias) -8.79 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 17.08 ms
+F1 (許容0.15s): 0.811
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 2.12 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 17.39 ms / 90パーセンタイル 30.93 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]           17.12          -         3.89
+RMSSD誤差[ms]           10.46      72.33         6.43
+SDNN誤差[ms]             4.25      73.27         6.44
+pNN50誤差[%]             5.71      45.50         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 3/3, RMSSD MAE: 10.46 ms, SDNN MAE: 4.25 ms
+
+=========== fold 5: test subject 13 ===========
+trial 26: precision=0.889 recall=0.760 f1=0.819 rr_mae_ms=15.316576396789467
+trial 27: precision=0.644 recall=0.592 f1=0.617 rr_mae_ms=19.517641961447012
+trial 28: precision=0.758 recall=0.776 f1=0.767 rr_mae_ms=12.41774543545528
+trial 29: precision=0.987 recall=0.870 f1=0.925 rr_mae_ms=6.874939001862619
+trial 30: precision=0.968 recall=0.899 f1=0.933 rr_mae_ms=10.209086228026814
+trial 31: precision=0.957 recall=0.985 f1=0.971 rr_mae_ms=9.274524082812407
+======================================================================
+mean F1: 0.839
+RR-interval MAE (mean over 6 trials): 12.27 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 15.98 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 19.07 ms / 中央値|誤差| 17.29 ms / 符号つき平均(bias) +7.43 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 17.21 ms
+F1 (許容0.15s): 0.877
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 1.75 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 17.29 ms / 90パーセンタイル 31.45 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]           10.81          -         3.89
+RMSSD誤差[ms]           14.38      47.98         6.43
+SDNN誤差[ms]             8.86      51.62         6.44
+pNN50誤差[%]            11.83      24.99         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 6/6, RMSSD MAE: 14.38 ms, SDNN MAE: 8.86 ms
+
+=========== fold 6: test subject 14 ===========
+trial 32: precision=0.888 recall=0.872 f1=0.880 rr_mae_ms=11.688325554809664
+trial 33: precision=0.984 recall=0.823 f1=0.896 rr_mae_ms=8.013242543134496
+trial 34: precision=0.994 recall=0.873 f1=0.929 rr_mae_ms=7.2492168084156745
+trial 35: precision=0.000 recall=0.000 f1=0.000 rr_mae_ms=None
+trial 36: precision=0.877 recall=0.524 f1=0.656 rr_mae_ms=13.659980490996979
+trial 37: precision=1.000 recall=0.882 f1=0.937 rr_mae_ms=11.447929345512327
+trial 38: precision=0.913 recall=0.387 f1=0.544 rr_mae_ms=16.485412745553315
+trial 39: precision=0.957 recall=0.584 f1=0.726 rr_mae_ms=9.962761624408303
+trial 40: precision=0.000 recall=0.000 f1=0.000 rr_mae_ms=None
+======================================================================
+mean F1: 0.619
+RR-interval MAE (mean over 7 trials): 11.22 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 33.50 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 34.62 ms / 中央値|誤差| 33.55 ms / 符号つき平均(bias) -24.17 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 11.90 ms
+F1 (許容0.15s): 0.754
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 4.06 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 33.55 ms / 90パーセンタイル 45.40 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]           22.90          -         3.89
+RMSSD誤差[ms]           10.90      75.94         6.43
+SDNN誤差[ms]             5.36      70.89         6.44
+pNN50誤差[%]             7.30      43.31         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 9/9, RMSSD MAE: 10.90 ms, SDNN MAE: 5.36 ms
+
+=========== fold 7: test subject 16 ===========
+trial 41: precision=0.867 recall=0.339 f1=0.487 rr_mae_ms=8.749734410034032
+trial 42: precision=0.971 recall=0.647 f1=0.777 rr_mae_ms=12.983044399526586
+trial 43: precision=0.989 recall=0.856 f1=0.918 rr_mae_ms=7.374337397311669
+trial 44: precision=0.139 recall=0.126 f1=0.132 rr_mae_ms=3.836400527435379
+trial 45: precision=0.006 recall=0.004 f1=0.005 rr_mae_ms=None
+trial 46: precision=0.045 recall=0.010 f1=0.016 rr_mae_ms=9.921304039562528
+trial 47: precision=0.993 recall=0.701 f1=0.822 rr_mae_ms=10.643507874457082
+======================================================================
+mean F1: 0.451
+RR-interval MAE (mean over 6 trials): 8.92 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 48.65 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 50.49 ms / 中央値|誤差| 51.58 ms / 符号つき平均(bias) -21.49 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 26.77 ms
+F1 (許容0.15s): 0.608
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 6.59 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 51.58 ms / 90パーセンタイル 70.80 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]            7.19          -         3.89
+RMSSD誤差[ms]           23.34      57.27         6.43
+SDNN誤差[ms]             8.95      51.93         6.44
+pNN50誤差[%]            15.83      38.55         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 6/7, RMSSD MAE: 23.34 ms, SDNN MAE: 8.95 ms
+
+=========== fold 8: test subject 17 ===========
+trial 48: precision=0.803 recall=0.807 f1=0.805 rr_mae_ms=11.708661197685647
+trial 49: precision=0.885 recall=0.885 f1=0.885 rr_mae_ms=5.302528964763828
+trial 50: precision=0.983 recall=0.931 f1=0.957 rr_mae_ms=6.938466459419687
+trial 51: precision=0.994 recall=0.994 f1=0.994 rr_mae_ms=8.449781031198562
+trial 52: precision=1.000 recall=0.989 f1=0.994 rr_mae_ms=8.450250763479865
+trial 53: precision=0.971 recall=0.959 f1=0.965 rr_mae_ms=9.243278664338973
+trial 54: precision=0.931 recall=0.771 f1=0.844 rr_mae_ms=9.994777245883876
+trial 55: precision=0.994 recall=0.994 f1=0.994 rr_mae_ms=7.72913677412587
+trial 56: precision=0.895 recall=0.740 f1=0.810 rr_mae_ms=15.83860688126298
+======================================================================
+mean F1: 0.916
+RR-interval MAE (mean over 9 trials): 9.30 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 5.98 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 27.92 ms / 中央値|誤差| 27.46 ms / 符号つき平均(bias) +8.74 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 26.76 ms
+F1 (許容0.15s): 0.964
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 2.97 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 27.46 ms / 90パーセンタイル 38.56 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]            3.72          -         3.89
+RMSSD誤差[ms]            8.08      47.88         6.43
+SDNN誤差[ms]             2.13      52.63         6.44
+pNN50誤差[%]             7.95      25.98         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 9/9, RMSSD MAE: 8.08 ms, SDNN MAE: 2.13 ms
+
+=========== fold 9: test subject 29 ===========
+trial 57: precision=0.005 recall=0.005 f1=0.005 rr_mae_ms=None
+trial 58: precision=0.466 recall=0.360 f1=0.406 rr_mae_ms=10.544652124056634
+trial 59: precision=0.903 recall=0.609 f1=0.727 rr_mae_ms=8.702226256895203
+trial 60: precision=0.983 recall=0.811 f1=0.889 rr_mae_ms=9.02306645859926
+trial 61: precision=0.000 recall=0.000 f1=0.000 rr_mae_ms=None
+trial 62: precision=0.995 recall=1.000 f1=0.998 rr_mae_ms=5.819279393164036
+trial 63: precision=0.790 recall=0.794 f1=0.792 rr_mae_ms=9.02539368079428
+trial 64: precision=0.995 recall=0.915 f1=0.953 rr_mae_ms=7.8335842450801145
+trial 65: precision=0.488 recall=0.441 f1=0.464 rr_mae_ms=6.921241496622437
+trial 66: precision=0.878 recall=0.591 f1=0.706 rr_mae_ms=12.340379463985911
+trial 67: precision=0.723 recall=0.710 f1=0.716 rr_mae_ms=7.620720966904191
+trial 68: precision=0.534 recall=0.679 f1=0.597 rr_mae_ms=9.009701224133936
+trial 69: precision=0.747 recall=0.819 f1=0.782 rr_mae_ms=9.386831616972565
+trial 70: precision=0.327 recall=0.271 f1=0.296 rr_mae_ms=6.460295482295993
+trial 71: precision=0.925 recall=0.699 f1=0.796 rr_mae_ms=11.986843216073428
+trial 72: precision=0.506 recall=0.509 f1=0.508 rr_mae_ms=8.731998863624314
+trial 73: precision=0.620 recall=0.401 f1=0.487 rr_mae_ms=8.798044210819368
+trial 74: precision=0.847 recall=0.709 f1=0.772 rr_mae_ms=9.395908443578604
+trial 75: precision=0.547 recall=0.535 f1=0.541 rr_mae_ms=6.648332423233108
+trial 76: precision=0.912 recall=0.827 f1=0.867 rr_mae_ms=11.114441882669897
+trial 77: precision=0.825 recall=0.850 f1=0.837 rr_mae_ms=10.36026673651176
+trial 78: precision=0.814 recall=0.720 f1=0.764 rr_mae_ms=13.281294476298482
+trial 79: precision=0.617 recall=0.397 f1=0.483 rr_mae_ms=23.39069358268798
+======================================================================
+mean F1: 0.626
+RR-interval MAE (mean over 21 trials): 9.83 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 26.60 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 35.03 ms / 中央値|誤差| 34.19 ms / 符号つき平均(bias) +18.58 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 28.59 ms
+F1 (許容0.15s): 0.811
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 4.36 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 34.19 ms / 90パーセンタイル 48.30 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]            4.60          -         3.89
+RMSSD誤差[ms]           17.44      16.81         6.43
+SDNN誤差[ms]             5.47      27.69         6.44
+pNN50誤差[%]            11.63       0.42         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 23/23, RMSSD MAE: 17.44 ms, SDNN MAE: 5.47 ms
+
+=========== fold 10: test subject 30 ===========
+trial 80: precision=0.995 recall=0.995 f1=0.995 rr_mae_ms=10.640621761129037
+trial 81: precision=0.990 recall=1.000 f1=0.995 rr_mae_ms=10.526840983437165
+trial 82: precision=0.960 recall=0.970 f1=0.965 rr_mae_ms=8.637685330300148
+trial 83: precision=0.335 recall=0.338 f1=0.336 rr_mae_ms=7.00293345921943
+trial 84: precision=0.981 recall=0.990 f1=0.986 rr_mae_ms=10.96448213699819
+trial 85: precision=0.995 recall=0.990 f1=0.992 rr_mae_ms=8.599454002728537
+trial 86: precision=0.952 recall=0.952 f1=0.952 rr_mae_ms=6.425897858369217
+trial 87: precision=0.461 recall=0.461 f1=0.461 rr_mae_ms=6.589629203235041
+trial 88: precision=1.000 recall=0.850 f1=0.919 rr_mae_ms=13.993608365247974
+trial 89: precision=0.283 recall=0.287 f1=0.285 rr_mae_ms=8.72213648237381
+trial 90: precision=0.758 recall=0.791 f1=0.774 rr_mae_ms=24.177288020664406
+trial 91: precision=0.930 recall=0.937 f1=0.934 rr_mae_ms=18.082472854591646
+======================================================================
+mean F1: 0.799
+RR-interval MAE (mean over 12 trials): 11.20 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 3.77 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 30.36 ms / 中央値|誤差| 30.04 ms / 符号つき平均(bias) -2.28 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 26.65 ms
+F1 (許容0.15s): 0.976
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 3.83 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 30.04 ms / 90パーセンタイル 42.95 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]            3.26          -         3.89
+RMSSD誤差[ms]           13.65      24.12         6.43
+SDNN誤差[ms]             2.35      42.39         6.44
+pNN50誤差[%]            11.78       4.42         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 12/12, RMSSD MAE: 13.65 ms, SDNN MAE: 2.35 ms
+

@@ -1,0 +1,222 @@
+############ lodo290_none ############
+=== fold 0: test subject 1 ===
+mean F1: 0.430
+RR-interval MAE (mean over 2 trials): 6.71 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 9.48 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 56.02 ms / 中央値|誤差| 55.01 ms / 符号つき平均(bias) +55.97 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 37.97 ms
+F1 (許容0.15s): 0.947
+HRV usable: 2/2, RMSSD MAE: 7.89 ms, SDNN MAE: 2.37 ms
+
+=== fold 1: test subject 2 ===
+mean F1: 0.277
+RR-interval MAE (mean over 2 trials): 9.98 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 46.43 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 54.01 ms / 中央値|誤差| 57.64 ms / 符号つき平均(bias) +54.01 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 32.52 ms
+F1 (許容0.15s): 0.688
+HRV usable: 2/2, RMSSD MAE: 27.91 ms, SDNN MAE: 12.10 ms
+
+=== fold 2: test subject 5 ===
+mean F1: 0.187
+RR-interval MAE (mean over 6 trials): 9.90 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 52.50 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 66.67 ms / 中央値|誤差| 66.27 ms / 符号つき平均(bias) -63.77 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 35.83 ms
+F1 (許容0.15s): 0.558
+HRV usable: 9/12, RMSSD MAE: 11.12 ms, SDNN MAE: 4.20 ms
+
+=== fold 3: test subject 9 ===
+mean F1: 0.496
+RR-interval MAE (mean over 6 trials): 15.79 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 60.97 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 27.53 ms / 中央値|誤差| 24.61 ms / 符号つき平均(bias) -12.70 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 23.06 ms
+F1 (許容0.15s): 0.530
+HRV usable: 6/6, RMSSD MAE: 21.57 ms, SDNN MAE: 11.16 ms
+
+=== fold 4: test subject 10 ===
+mean F1: 0.768
+RR-interval MAE (mean over 3 trials): 15.80 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 29.69 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 18.41 ms / 中央値|誤差| 18.04 ms / 符号つき平均(bias) -7.83 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 16.81 ms
+F1 (許容0.15s): 0.800
+HRV usable: 3/3, RMSSD MAE: 5.92 ms, SDNN MAE: 4.54 ms
+
+=== fold 5: test subject 13 ===
+mean F1: 0.779
+RR-interval MAE (mean over 6 trials): 12.72 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 29.31 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 15.80 ms / 中央値|誤差| 13.68 ms / 符号つき平均(bias) -0.14 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 14.74 ms
+F1 (許容0.15s): 0.789
+HRV usable: 6/6, RMSSD MAE: 17.90 ms, SDNN MAE: 7.49 ms
+
+=== fold 6: test subject 14 ===
+mean F1: 0.510
+RR-interval MAE (mean over 7 trials): 11.74 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 50.13 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 37.34 ms / 中央値|誤差| 36.63 ms / 符号つき平均(bias) -25.72 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 13.89 ms
+F1 (許容0.15s): 0.616
+HRV usable: 9/9, RMSSD MAE: 14.96 ms, SDNN MAE: 10.31 ms
+
+=== fold 7: test subject 16 ===
+mean F1: 0.419
+RR-interval MAE (mean over 5 trials): 8.87 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 56.83 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 52.74 ms / 中央値|誤差| 54.66 ms / 符号つき平均(bias) -18.65 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 21.16 ms
+F1 (許容0.15s): 0.542
+HRV usable: 7/7, RMSSD MAE: 19.90 ms, SDNN MAE: 9.15 ms
+
+=== fold 8: test subject 17 ===
+mean F1: 0.849
+RR-interval MAE (mean over 9 trials): 9.21 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 4.17 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 27.19 ms / 中央値|誤差| 26.25 ms / 符号つき平均(bias) +1.39 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 24.56 ms
+F1 (許容0.15s): 0.968
+HRV usable: 9/9, RMSSD MAE: 11.73 ms, SDNN MAE: 2.32 ms
+
+=== fold 9: test subject 29 ===
+mean F1: 0.745
+RR-interval MAE (mean over 22 trials): 8.40 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 12.57 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 31.92 ms / 中央値|誤差| 31.48 ms / 符号つき平均(bias) +15.19 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 27.97 ms
+F1 (許容0.15s): 0.894
+HRV usable: 23/23, RMSSD MAE: 14.35 ms, SDNN MAE: 4.01 ms
+
+=== fold 10: test subject 30 ===
+mean F1: 0.786
+RR-interval MAE (mean over 12 trials): 13.04 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 7.82 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 30.76 ms / 中央値|誤差| 29.98 ms / 符号つき平均(bias) +2.97 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 27.15 ms
+F1 (許容0.15s): 0.950
+HRV usable: 12/12, RMSSD MAE: 20.21 ms, SDNN MAE: 4.46 ms
+
+############ lodo291_fullattn ############
+=== fold 0: test subject 1 ===
+mean F1: 0.458
+RR-interval MAE (mean over 2 trials): 6.19 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 7.53 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 54.58 ms / 中央値|誤差| 53.91 ms / 符号つき平均(bias) +54.58 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 37.89 ms
+F1 (許容0.15s): 0.959
+HRV usable: 2/2, RMSSD MAE: 7.40 ms, SDNN MAE: 2.89 ms
+
+=== fold 1: test subject 2 ===
+mean F1: 0.735
+RR-interval MAE (mean over 2 trials): 10.57 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 19.54 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 35.50 ms / 中央値|誤差| 31.92 ms / 符号つき平均(bias) +35.50 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 30.09 ms
+F1 (許容0.15s): 0.886
+HRV usable: 2/2, RMSSD MAE: 17.24 ms, SDNN MAE: 7.05 ms
+
+=== fold 2: test subject 5 ===
+mean F1: 0.147
+RR-interval MAE (mean over 8 trials): 16.26 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 50.36 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 72.64 ms / 中央値|誤差| 72.36 ms / 符号つき平均(bias) -68.64 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 37.91 ms
+F1 (許容0.15s): 0.586
+HRV usable: 10/12, RMSSD MAE: 11.85 ms, SDNN MAE: 4.48 ms
+
+=== fold 3: test subject 9 ===
+mean F1: 0.621
+RR-interval MAE (mean over 6 trials): 15.10 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 44.15 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 29.38 ms / 中央値|誤差| 26.57 ms / 符号つき平均(bias) -11.63 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 24.14 ms
+F1 (許容0.15s): 0.685
+HRV usable: 6/6, RMSSD MAE: 26.02 ms, SDNN MAE: 17.06 ms
+
+=== fold 4: test subject 10 ===
+mean F1: 0.850
+RR-interval MAE (mean over 3 trials): 17.20 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 14.90 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 17.28 ms / 中央値|誤差| 16.21 ms / 符号つき平均(bias) -0.79 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 16.72 ms
+F1 (許容0.15s): 0.862
+HRV usable: 3/3, RMSSD MAE: 14.33 ms, SDNN MAE: 3.48 ms
+
+=== fold 5: test subject 13 ===
+mean F1: 0.711
+RR-interval MAE (mean over 6 trials): 13.55 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 38.88 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 17.15 ms / 中央値|誤差| 15.48 ms / 符号つき平均(bias) -3.57 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 15.85 ms
+F1 (許容0.15s): 0.723
+HRV usable: 6/6, RMSSD MAE: 17.53 ms, SDNN MAE: 7.19 ms
+
+=== fold 6: test subject 14 ===
+mean F1: 0.238
+RR-interval MAE (mean over 6 trials): 15.65 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 81.42 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 40.04 ms / 中央値|誤差| 37.91 ms / 符号つき平均(bias) -25.62 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 16.80 ms
+F1 (許容0.15s): 0.287
+HRV usable: 8/9, RMSSD MAE: 20.97 ms, SDNN MAE: 16.76 ms
+
+=== fold 7: test subject 16 ===
+mean F1: 0.214
+RR-interval MAE (mean over 5 trials): 8.75 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 80.99 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 51.31 ms / 中央値|誤差| 52.17 ms / 符号つき平均(bias) -25.93 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 24.87 ms
+F1 (許容0.15s): 0.278
+HRV usable: 5/7, RMSSD MAE: 23.93 ms, SDNN MAE: 13.16 ms
+
+=== fold 8: test subject 17 ===
+mean F1: 0.857
+RR-interval MAE (mean over 9 trials): 9.80 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 15.59 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 28.35 ms / 中央値|誤差| 27.82 ms / 符号つき平均(bias) +10.07 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 26.76 ms
+F1 (許容0.15s): 0.902
+HRV usable: 9/9, RMSSD MAE: 9.37 ms, SDNN MAE: 2.74 ms
+
+=== fold 9: test subject 29 ===
+mean F1: 0.689
+RR-interval MAE (mean over 22 trials): 9.17 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 24.07 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 32.69 ms / 中央値|誤差| 32.13 ms / 符号つき平均(bias) +17.57 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 28.33 ms
+F1 (許容0.15s): 0.842
+HRV usable: 23/23, RMSSD MAE: 13.51 ms, SDNN MAE: 4.49 ms
+
+=== fold 10: test subject 30 ===
+mean F1: 0.778
+RR-interval MAE (mean over 12 trials): 9.65 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 10.46 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 29.21 ms / 中央値|誤差| 28.40 ms / 符号つき平均(bias) +0.64 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 25.76 ms
+F1 (許容0.15s): 0.936
+HRV usable: 12/12, RMSSD MAE: 11.51 ms, SDNN MAE: 3.23 ms
+

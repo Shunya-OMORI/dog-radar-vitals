@@ -20,6 +20,49 @@ def zscore_channels(rcg: np.ndarray) -> np.ndarray:
     return np.stack([zscore_with_nan_gap(rcg[:, ch]) for ch in range(rcg.shape[1])], axis=-1)
 
 
+def robust_scale_channels(rcg: np.ndarray, eps: float = 1e-8, clip: float = 10.0) -> np.ndarray:
+    """RCG(T, 50)を、チャネルごとに中央値と中央絶対偏差(MAD)で正規化する (2026-08-25 追加)。
+
+    背景（目視診断から）: 検出が崩れている被験者(9, 16)のレーダ波形を描いてみると、
+    分散が最大のチャネルに **心拍と無関係な巨大スパイク** が散発していた。
+    被験者16では、ほぼ全ての正解R位置にモデル出力の小さなピークが立っている
+    (適合率0.940 = しきい値を超えた分は正しい)のに、高さが 0.05〜0.2 しかなく
+    しきい値0.3を超えられない。超えているのは巨大スパイクがあった拍だけだった。
+
+    `zscore_channels` はチャネルごとの標準偏差で割る。標準偏差は外れ値の二乗で効くので、
+    **散発する巨大スパイクが1つあるだけでそのチャネルのスケールが膨らみ、
+    割ったあとの心拍成分が相対的に潰される。**
+    中央絶対偏差は順序統計量なので、外れ値の大きさに引きずられない
+    (breakdown point 50%)。正規分布なら MAD x 1.4826 が標準偏差に一致するので、
+    その係数を掛けて z-score とスケールを揃える。
+
+    対応する先行研究: Huber, "Robust Statistics," Wiley, 1981（頑健統計の標準）。
+    レーダのバイタルサイン計測でも、静止反射体や体動由来の外れ値を除いてから
+    正規化するのは定石で、Wang ら (Sensors 25(17):5607, 2025) は MTI フィルタで
+    静止クラッタを落としてから位相を取り出している。
+    """
+    out = np.empty_like(rcg, dtype=float)
+    for ch in range(rcg.shape[1]):
+        x = rcg[:, ch].astype(float)
+        med = np.nanmedian(x)
+        mad = np.nanmedian(np.abs(x - med))
+        scale = 1.4826 * mad
+        if not np.isfinite(scale) or scale < eps:
+            # MAD が潰れる(ほぼ定数のチャネル)場合だけ標準偏差に落とす
+            scale = np.nanstd(x)
+            if not np.isfinite(scale) or scale < eps:
+                scale = 1.0
+        out[:, ch] = (x - med) / scale
+    out = np.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0)
+    if clip is not None and clip > 0:
+        # MAD 正規化はスパイクを「潰さずに残す」ので、そのままだと被験者16の実データで
+        # 最大 487 に達し勾配を壊す。心拍成分は |x| の中央値で 0.68 程度なので、
+        # 生理的にありえない振幅はここで切る。切る操作自体が頑健化の一部なので、
+        # MAD 正規化とクリップはセットで 1 つの前処理として扱う。
+        out = np.clip(out, -clip, clip)
+    return out
+
+
 def minmax_with_nan_gap(x: np.ndarray) -> np.ndarray:
     """1次元信号を[-1, 1]にmin-max正規化する（NaNは統計量計算からnanmin/nanmaxで除外）。
 

@@ -1,0 +1,1 @@
+284_sigma15_epoch004.pt  config=configs/experiments/284_mmecg_rpeak_spatial_gnn_neurokit_sigma15_full.yaml  epoch=4  run=runs/20260807-062112_ecg_rpeak_spatial_gnn_284_sigma15_full  copied=2026-08-07  性能(test 44 trials, old0.3+centroid85x2): F1=0.749 RR-MAE=8.41ms RMSSD-MAE=10.27ms SDNN-MAE=2.85ms

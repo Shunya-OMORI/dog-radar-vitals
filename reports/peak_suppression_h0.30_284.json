@@ -1,0 +1,90 @@
+[
+  {
+    "subject": 1,
+    "n_true": 391,
+    "n_miss": 23,
+    "suppressed": 0,
+    "low": 23,
+    "other": 0
+  },
+  {
+    "subject": 2,
+    "n_true": 476,
+    "n_miss": 54,
+    "suppressed": 1,
+    "low": 53,
+    "other": 0
+  },
+  {
+    "subject": 5,
+    "n_true": 2874,
+    "n_miss": 1665,
+    "suppressed": 4,
+    "low": 1661,
+    "other": 0
+  },
+  {
+    "subject": 9,
+    "n_true": 1216,
+    "n_miss": 1128,
+    "suppressed": 0,
+    "low": 1128,
+    "other": 0
+  },
+  {
+    "subject": 10,
+    "n_true": 657,
+    "n_miss": 239,
+    "suppressed": 1,
+    "low": 238,
+    "other": 0
+  },
+  {
+    "subject": 13,
+    "n_true": 1098,
+    "n_miss": 267,
+    "suppressed": 2,
+    "low": 265,
+    "other": 0
+  },
+  {
+    "subject": 14,
+    "n_true": 1832,
+    "n_miss": 833,
+    "suppressed": 6,
+    "low": 827,
+    "other": 0
+  },
+  {
+    "subject": 16,
+    "n_true": 1514,
+    "n_miss": 773,
+    "suppressed": 13,
+    "low": 760,
+    "other": 0
+  },
+  {
+    "subject": 17,
+    "n_true": 1720,
+    "n_miss": 151,
+    "suppressed": 2,
+    "low": 149,
+    "other": 0
+  },
+  {
+    "subject": 29,
+    "n_true": 5221,
+    "n_miss": 1622,
+    "suppressed": 80,
+    "low": 1542,
+    "other": 0
+  },
+  {
+    "subject": 30,
+    "n_true": 2675,
+    "n_miss": 148,
+    "suppressed": 12,
+    "low": 136,
+    "other": 0
+  }
+]

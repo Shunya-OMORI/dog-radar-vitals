@@ -1,0 +1,43 @@
+# 309: 入力窓長を 4 秒から 2 秒に変える。301(MAD正規化+正例重み付きBCE)からの変更点は
+# data.window_sec のみ (R4: 単一変数)。10 epoch のプローブ。
+#
+# 根拠: RR 間隔誤差の分解 (2026-08-24) で、RR間隔MAE は E|e[i+1]-e[i]| に一致し、
+# 誤差 e の標準偏差は 24.03 ms、**lag-1 自己相関は 0.759** だった。
+# つまり位置誤差は独立ではなく **ゆっくりドリフトしている**。窓を伸ばして文脈を増やせば
+# ドリフトを補正できる可能性がある。逆に窓を縮めると悪化するはずで、両側を振って確かめる。
+# 今夜 σ・損失・正規化・時間分解能・空間集約・後段処理5種を試し切ったが、
+# **窓長だけは振っていない**。
+#
+# 比較 (301, 10epoch, 同一split, h=0.5): F1@150ms 0.908 / MDR 8.70% / RR間隔MAE 9.33ms / RMSSD誤差 17.85ms
+# 一定RRのみ: RMSSD誤差 41.83ms
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 2
+  stride_sec: 2
+  rpeak_detector: neurokit
+  normalization: robust
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 10
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  loss: weighted_bce
+  pos_weight: 10.0

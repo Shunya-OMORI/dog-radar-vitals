@@ -1,0 +1,33 @@
+# 313: 312と同じ(config284と教師・前処理・学習設定を揃えたプレーンCNN)だが、
+# channels=16にしてパラメータ数を0.0315Mまで落とし、config284のGNN(0.0340M)・
+# 「混ぜない」構成(0.0317M、Appendix A8)とサイズを揃えた直接比較にする。
+# 単一変数(R4): 312からの変更点はmodel.channelsのみ(64→16)。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_cnn1d
+  in_channels: 50
+  channels: 16
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

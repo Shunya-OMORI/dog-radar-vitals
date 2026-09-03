@@ -1,0 +1,39 @@
+# 298: 295(pos_weight=10) から pos_weight のみ 5 に下げる (R4: 単一変数)。
+# 根拠: 295 は検出を大きく改善した (F1@150ms 0.729 -> 0.847, MDR 33.4% -> 12.1%) が、
+# RMSSD 誤差は改善しなかった (16.94 -> 17.99 ms、しきい値を選び直しても 13.87 ms 止まり、
+# 284 の h=0.40 固定 12.51 ms に届かない)。単一 split のプローブ(035, 10 epoch)では
+# pos_weight=5 の方が RMSSD 誤差が小さかった (23.08 vs 26.88 ms) ので、
+# 重みを下げれば検出の改善を保ったまま HRV も戻るかを 11-fold LOSO で確かめる。
+# 比較対象: 284 (重みなし) F1@150ms 0.729 / RMSSD誤差 16.94 ms
+#           295 (重み10)   F1@150ms 0.847 / RMSSD誤差 17.99 ms
+#           一定RRのみ                      RMSSD誤差 41.83 ms
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  loss: weighted_bce
+  pos_weight: 5.0

@@ -1,0 +1,50 @@
+train trials: 40
+training pairs: (666432, 8), positive fraction (>0.1): 0.167
+train done in 14.3s
+trial 48: f1=0.030 precision=0.429 recall=0.016 rr_mae_ms=40.0
+trial 49: f1=0.019 precision=0.125 recall=0.010 rr_mae_ms=5.0
+trial 50: f1=0.041 precision=0.571 recall=0.021 rr_mae_ms=15.0
+trial 51: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 52: f1=0.022 precision=0.400 recall=0.011 rr_mae_ms=5.0
+trial 53: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 54: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 55: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 56: f1=0.022 precision=0.214 recall=0.011 rr_mae_ms=25.0
+trial 57: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 58: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 59: f1=0.009 precision=0.200 recall=0.004 rr_mae_ms=None
+trial 60: f1=0.097 precision=0.786 recall=0.052 rr_mae_ms=16.0
+trial 61: f1=0.025 precision=0.125 recall=0.014 rr_mae_ms=40.0
+trial 62: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 63: f1=0.156 precision=0.760 recall=0.087 rr_mae_ms=12.222222222222221
+trial 64: f1=0.008 precision=0.200 recall=0.004 rr_mae_ms=None
+trial 65: f1=0.010 precision=0.083 recall=0.005 rr_mae_ms=None
+trial 66: f1=0.009 precision=0.500 recall=0.004 rr_mae_ms=None
+trial 67: f1=0.035 precision=0.500 recall=0.018 rr_mae_ms=3.3333333333333335
+trial 68: f1=0.024 precision=0.429 recall=0.012 rr_mae_ms=17.5
+trial 69: f1=0.016 precision=0.200 recall=0.008 rr_mae_ms=10.0
+trial 70: f1=0.008 precision=0.200 recall=0.004 rr_mae_ms=None
+trial 71: f1=0.008 precision=0.100 recall=0.004 rr_mae_ms=None
+trial 72: f1=0.139 precision=0.452 recall=0.082 rr_mae_ms=11.666666666666666
+trial 73: f1=0.017 precision=0.250 recall=0.009 rr_mae_ms=45.0
+trial 74: f1=0.008 precision=0.100 recall=0.004 rr_mae_ms=None
+trial 75: f1=0.033 precision=0.500 recall=0.017 rr_mae_ms=31.666666666666668
+trial 76: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 77: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 78: f1=0.031 precision=0.108 recall=0.018 rr_mae_ms=21.666666666666668
+trial 79: f1=0.014 precision=0.095 recall=0.007 rr_mae_ms=95.0
+trial 80: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 81: f1=0.037 precision=0.174 recall=0.021 rr_mae_ms=20.0
+trial 82: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 83: f1=0.033 precision=0.308 recall=0.018 rr_mae_ms=21.666666666661815
+trial 84: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 85: f1=0.027 precision=0.100 recall=0.015 rr_mae_ms=40.0
+trial 86: f1=0.009 precision=0.038 recall=0.005 rr_mae_ms=None
+trial 87: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 88: f1=0.009 precision=0.125 recall=0.005 rr_mae_ms=None
+trial 89: f1=0.024 precision=0.118 recall=0.014 rr_mae_ms=35.0
+trial 90: f1=0.014 precision=0.125 recall=0.007 rr_mae_ms=15.0
+trial 91: f1=0.176 precision=0.239 recall=0.140 rr_mae_ms=17.926829268292682
+
+[feature+GBM(非深層学習)] mean_f1=0.025 mean_rr_mae_ms=24.7 n_trials=44 rr_dropped=22
+total elapsed: 29.6s

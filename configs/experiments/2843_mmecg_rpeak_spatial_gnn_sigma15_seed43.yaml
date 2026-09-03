@@ -1,0 +1,32 @@
+# B4 (2026-08-23): 284 から seed だけを 42 -> 43 に変えた対照。
+# 目的: 僅差の判断が seed で揺れる事例(8epochプローブが本番50epochで再現しない)を
+#       確認済みのため、報告値のばらつきを seed 間で数値化する。
+# 単一変数(R4): seed 以外は 284 と完全に同一。
+seed: 43
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

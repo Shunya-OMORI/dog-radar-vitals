@@ -23,7 +23,13 @@ from dog_radar_vitals.models.deep.rpeak_spatial_fusion import RPeakSpatialFusion
 from dog_radar_vitals.models.deep.rpeak_spatial_gnn import RPeakSpatialGNN
 from dog_radar_vitals.seeding import make_generator, set_all_seeds
 from dog_radar_vitals.training.ecg_trainer import _pearson_corr
-from dog_radar_vitals.training.losses import heatmap_focal_loss
+from dog_radar_vitals.training.losses import (
+    adaptive_wing_loss,
+    box_bce_dice_loss,
+    heatmap_bce_localexp_loss,
+    heatmap_focal_loss,
+    heatmap_weighted_bce_loss,
+)
 from dog_radar_vitals.training.schedulers import build_scheduler
 
 _SPATIAL_MODEL_REGISTRY = {
@@ -66,6 +72,22 @@ def _build_loss_fn(model_name: str, train_cfg: dict):
     loss_name = train_cfg.get("loss", "bce")
     if loss_name == "focal":
         return heatmap_focal_loss
+    if loss_name == "weighted_bce":
+        # 見逃しを重く罰する (2026-08-25)。HRV を目的にすると、拍の見逃しは
+        # その区間の RR 間隔を倍にして RMSSD を壊すため、誤検出より害が大きい。
+        pos_weight = float(train_cfg.get("pos_weight", 10.0))
+        return lambda pred, y: heatmap_weighted_bce_loss(pred, y, pos_weight=pos_weight)
+    if loss_name == "bce_localexp":
+        loc_weight = float(train_cfg.get("loc_weight", 0.1))
+        half_win = int(train_cfg.get("loc_half_win", 17))
+        return lambda pred, y: heatmap_bce_localexp_loss(pred, y, loc_weight=loc_weight, half_win=half_win)
+    if loss_name == "adaptive_wing":
+        # 2026-08-28: Wang ら(ICCV 2019)。BCE系ではなくL1/Wing系の損失族との比較用。
+        return adaptive_wing_loss
+    if loss_name == "box_bce_dice":
+        # 2026-08-28: build_peak_box(矩形マスク教師)専用。QRS検出のU-Net系文献の定番構成。
+        dice_weight = float(train_cfg.get("dice_weight", 1.0))
+        return lambda pred, y: box_bce_dice_loss(pred, y, dice_weight=dice_weight)
     return nn.BCELoss()
 
 
@@ -85,6 +107,9 @@ def _build_dataset(data_cfg: dict, raw_root: Path, split: str, heatmap: bool) ->
         apply_bandpass=data_cfg.get("apply_bandpass", False),
         preprocess=data_cfg.get("preprocess", "none"),
         heatmap_sigma_ms=data_cfg.get("heatmap_sigma_ms", 10.0),
+        target_mode=data_cfg.get("target_mode", "all_peaks"),
+        target_shape=data_cfg.get("target_shape", "gaussian"),
+        box_half_width_ms=data_cfg.get("box_half_width_ms", 150.0),
     )
 
 

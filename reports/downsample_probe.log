@@ -1,0 +1,111 @@
+########## n_downsample=2 (296_mmecg_rpeak_spatial_gnn_ds2) ##########
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-051123_ecg_rpeak_spatial_gnn_ds2
+[epoch 0] lr=5.00e-04 train_loss=0.5169 train_corr=0.112 val_loss=0.3668 val_corr=0.141
+[epoch 1] lr=5.00e-04 train_loss=0.3255 train_corr=0.312 val_loss=0.2884 val_corr=0.200
+[epoch 2] lr=5.00e-04 train_loss=0.2319 train_corr=0.384 val_loss=0.2256 val_corr=0.223
+[epoch 3] lr=5.00e-04 train_loss=0.1844 train_corr=0.439 val_loss=0.1985 val_corr=0.194
+[epoch 4] lr=5.00e-04 train_loss=0.1594 train_corr=0.487 val_loss=0.2000 val_corr=0.168
+[epoch 5] lr=5.00e-04 train_loss=0.1439 train_corr=0.530 val_loss=0.1884 val_corr=0.160
+[epoch 6] lr=5.00e-04 train_loss=0.1339 train_corr=0.564 val_loss=0.2042 val_corr=0.165
+[epoch 7] lr=5.00e-04 train_loss=0.1271 train_corr=0.588 val_loss=0.1880 val_corr=0.166
+[epoch 8] lr=5.00e-04 train_loss=0.1214 train_corr=0.611 val_loss=0.2156 val_corr=0.127
+[epoch 9] lr=5.00e-04 train_loss=0.1180 train_corr=0.624 val_loss=0.2092 val_corr=0.139
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-051123_ecg_rpeak_spatial_gnn_ds2
+########## n_downsample=1 (297_mmecg_rpeak_spatial_gnn_ds1) ##########
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-051525_ecg_rpeak_spatial_gnn_ds1
+[epoch 0] lr=5.00e-04 train_loss=0.3521 train_corr=0.029 val_loss=0.2389 val_corr=-0.016
+[epoch 1] lr=5.00e-04 train_loss=0.2074 train_corr=0.152 val_loss=0.1932 val_corr=0.028
+[epoch 2] lr=5.00e-04 train_loss=0.1807 train_corr=0.235 val_loss=0.1887 val_corr=0.113
+[epoch 3] lr=5.00e-04 train_loss=0.1686 train_corr=0.288 val_loss=0.1889 val_corr=0.086
+[epoch 4] lr=5.00e-04 train_loss=0.1618 train_corr=0.324 val_loss=0.1975 val_corr=0.055
+[epoch 5] lr=5.00e-04 train_loss=0.1560 train_corr=0.363 val_loss=0.1998 val_corr=0.109
+[epoch 6] lr=5.00e-04 train_loss=0.1512 train_corr=0.396 val_loss=0.2619 val_corr=0.037
+[epoch 7] lr=5.00e-04 train_loss=0.1473 train_corr=0.423 val_loss=0.2029 val_corr=0.106
+[epoch 8] lr=5.00e-04 train_loss=0.1440 train_corr=0.447 val_loss=0.2154 val_corr=0.085
+[epoch 9] lr=5.00e-04 train_loss=0.1411 train_corr=0.465 val_loss=0.2129 val_corr=0.086
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-051525_ecg_rpeak_spatial_gnn_ds1
+########## 下流指標での評価 ##########
+===== n_downsample=2  best_model.pt =====
+======================================================================
+mean F1: 0.513
+RR-interval MAE (mean over 44 trials): 11.40 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 30.58 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 34.77 ms / 中央値|誤差| 33.56 ms / 符号つき平均(bias) +0.19 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 26.10 ms
+F1 (許容0.15s): 0.677
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 4.19 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 33.56 ms / 90パーセンタイル 49.04 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]          163.90          -         3.89
+RMSSD誤差[ms]           26.79      25.16         6.43
+SDNN誤差[ms]             8.26      36.80         6.44
+pNN50誤差[%]            17.05       6.74         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 44/44, RMSSD MAE: 26.79 ms, SDNN MAE: 8.26 ms
+===== n_downsample=2  epoch_009.pt =====
+======================================================================
+mean F1: 0.573
+RR-interval MAE (mean over 44 trials): 10.99 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 33.37 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 36.32 ms / 中央値|誤差| 36.41 ms / 符号つき平均(bias) -6.73 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 27.10 ms
+F1 (許容0.15s): 0.728
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 4.56 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 36.41 ms / 90パーセンタイル 52.37 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]           29.59          -         3.89
+RMSSD誤差[ms]           25.92      25.36         6.43
+SDNN誤差[ms]             8.92      37.04         6.44
+pNN50誤差[%]            17.49       6.89         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 43/44, RMSSD MAE: 25.92 ms, SDNN MAE: 8.92 ms
+===== n_downsample=1  best_model.pt =====
+======================================================================
+mean F1: 0.010
+RR-interval MAE (mean over 3 trials): 7.51 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 99.30 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 49.77 ms / 中央値|誤差| 50.30 ms / 符号つき平均(bias) -18.98 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 22.15 ms
+F1 (許容0.15s): 0.013
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 8.62 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 50.30 ms / 90パーセンタイル 58.05 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]           43.23          -         3.89
+RMSSD誤差[ms]           14.95       9.08         6.43
+SDNN誤差[ms]            18.69      46.81         6.44
+pNN50誤差[%]             0.00       0.00         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 1/44, RMSSD MAE: 14.95 ms, SDNN MAE: 18.69 ms
+===== n_downsample=1  epoch_009.pt =====
+======================================================================
+mean F1: 0.363
+RR-interval MAE (mean over 40 trials): 13.14 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 55.41 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 40.90 ms / 中央値|誤差| 38.90 ms / 符号つき平均(bias) -1.91 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 27.30 ms
+F1 (許容0.15s): 0.500
+--- Chen ら (IEEE T-MC 2024) の指標定義に揃えた値 ---
+R波 正規化タイミング誤差 中央値: 4.74 %  (Chen ら報告値: 0.4-0.7 %)
+R波 絶対タイミング誤差 中央値 38.90 ms / 90パーセンタイル 57.85 ms  (Chen ら報告値: 中央値 3 ms / 90パーセンタイル 9 ms)
+--- mmHRV (Wang ら, IEEE IoT-J 2021) の指標定義に揃えた HRV 成績 ---
+指標                       我々     一定RRのみ     mmHRV報告値
+平均IBI誤差[ms]          104.69          -         3.89
+RMSSD誤差[ms]           44.02      25.47         6.43
+SDNN誤差[ms]            17.62      37.16         6.44
+pNN50誤差[%]            25.41       7.26         2.52
+  ※ mmHRV は自前データセット(11名, LOS/NLOS)であり MMECG ではない。指標定義のみを揃えた参考値。
+  ※「一定RRのみ」= 入力を見ずに一定間隔で拍を置くモデル。RMSSD も pNN50 も 0 になるので誤差は正解値そのもの。この列を下回らない限り、変動を捉えられているとは言えない。
+HRV usable: 40/44, RMSSD MAE: 44.02 ms, SDNN MAE: 17.62 ms

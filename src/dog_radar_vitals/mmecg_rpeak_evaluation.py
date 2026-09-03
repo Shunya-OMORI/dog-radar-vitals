@@ -71,7 +71,13 @@ def evaluate_trial_peak_detection(
     window_sec: float,
     complex_input: bool = False,
     use_posxyz: bool = False,
+    height: float = 0.3,
+    peak_extractor=None,
 ) -> dict:
+    """peak_extractor: (heatmap, fs, height) -> peak_indices を受け取る差し替え可能な後処理。
+    既定はextract_peaks_from_heatmap(単純find_peaks)。2026-08-28: DARK系のTaylor展開デコード
+    や矩形マスク版(extract_peaks_from_box)など、モデルは変えず後処理だけ差し替えた比較に使う。
+    """
     rec = load_trial(raw_root, trial_id)
     rcg_z = zscore_channels(rec.rcg)
     rcg_input = analytic_signal_channels(rcg_z) if complex_input else rcg_z
@@ -84,7 +90,8 @@ def evaluate_trial_peak_detection(
     if model_kind == "waveform":
         pred_peaks = detect_r_peaks(pred, rec.fs)
     elif model_kind == "heatmap":
-        pred_peaks = extract_peaks_from_heatmap(pred, rec.fs, height=0.3)
+        extractor = peak_extractor or extract_peaks_from_heatmap
+        pred_peaks = extractor(pred, rec.fs, height)
     else:
         raise ValueError(f"unknown model_kind '{model_kind}'")
 
@@ -102,18 +109,30 @@ def evaluate_trial_peak_detection(
     }
 
 
-def evaluate_run_on_test_subjects(run_dir: Path, config: dict, repo_root: Path, model_kind: ModelKind) -> list[dict]:
-    """runのtest被験者すべてのトライアルについてevaluate_trial_peak_detectionを実行する。"""
+def evaluate_run_on_test_subjects(
+    run_dir: Path,
+    config: dict,
+    repo_root: Path,
+    model_kind: ModelKind,
+    split: str = "test",
+    height: float = 0.3,
+    peak_extractor=None,
+) -> list[dict]:
+    """runのsplit(既定test)被験者すべてのトライアルについてevaluate_trial_peak_detectionを実行する。
+
+    split="val": 2026-08-28、後処理(height等)をtestを見ずにvalだけで選ぶための追加。
+    """
     data_cfg = config["data"]
     raw_root = repo_root / data_cfg["raw_root"]
-    trial_ids = trial_ids_for_subjects(raw_root, data_cfg["subjects"]["test"])
+    trial_ids = trial_ids_for_subjects(raw_root, data_cfg["subjects"][split])
 
     model = load_mmecg_model(run_dir, config)
     complex_input = data_cfg.get("complex_input", False)
     use_posxyz = config["model"]["family"] in SPATIAL_FAMILIES
     return [
         evaluate_trial_peak_detection(
-            model, model_kind, trial_id, raw_root, data_cfg["window_sec"], complex_input, use_posxyz
+            model, model_kind, trial_id, raw_root, data_cfg["window_sec"], complex_input, use_posxyz,
+            height=height, peak_extractor=peak_extractor,
         )
         for trial_id in trial_ids
     ]

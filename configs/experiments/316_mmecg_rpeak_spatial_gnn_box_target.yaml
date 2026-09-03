@@ -1,0 +1,39 @@
+# 316: config284(採用中)と完全に同じだが、教師の"形"と損失を同時に(ワンセットで)差し替える。
+# target_shape=gaussian -> box は単独では意味が薄い(box教師にBCEだけを組み合わせても
+# QRS-U-Net系文献の想定構成にならない)ため、data.target_shape と train.loss の
+# 2箇所セットを「教師表現の選択」という1つの設計変数として扱う(R4の単一変数は
+# 「教師表現をガウシアンから矩形へ」という1つの設計判断の単位で見る)。
+#
+# 狙い(2026-08-28, ユーザ指示): QRS検出のU-Net系文献(Sereda ら, arXiv:1912.09223 等)で
+# 一般的な「ピーク中心の矩形(0/1)マスクをBCE+Diceで学習する」構成との比較。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0  # box target_shapeでは未使用(gaussianとの後方互換のため残す)
+  target_shape: box
+  box_half_width_ms: 150.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  loss: box_bce_dice

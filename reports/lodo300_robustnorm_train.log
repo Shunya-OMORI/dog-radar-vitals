@@ -1,0 +1,60 @@
+
+=== fold 0: test_subject=1 val_subject=2 ===
+train_subjects=[5, 9, 10, 13, 14, 16, 17, 29, 30]
+[epoch 0] lr=5.00e-04 train_loss=0.4197 train_corr=0.349 val_loss=0.2980 val_corr=0.234
+[epoch 1] lr=5.00e-04 train_loss=0.1975 train_corr=0.540 val_loss=0.2279 val_corr=0.146
+[epoch 2] lr=5.00e-04 train_loss=0.1346 train_corr=0.613 val_loss=0.2107 val_corr=0.056
+[epoch 3] lr=5.00e-04 train_loss=0.1134 train_corr=0.662 val_loss=0.2270 val_corr=0.033
+[epoch 4] lr=5.00e-04 train_loss=0.1033 train_corr=0.697 val_loss=0.2457 val_corr=0.014
+[epoch 5] lr=5.00e-04 train_loss=0.0959 train_corr=0.728 val_loss=0.2345 val_corr=0.054
+[epoch 6] lr=5.00e-04 train_loss=0.0906 train_corr=0.753 val_loss=0.2611 val_corr=-0.005
+[epoch 7] lr=5.00e-04 train_loss=0.0865 train_corr=0.774 val_loss=0.2633 val_corr=0.019
+[epoch 8] lr=5.00e-04 train_loss=0.0827 train_corr=0.794 val_loss=0.2865 val_corr=-0.021
+[epoch 9] lr=5.00e-04 train_loss=0.0795 train_corr=0.811 val_loss=0.2689 val_corr=0.018
+[epoch 10] lr=5.00e-04 train_loss=0.0765 train_corr=0.827 val_loss=0.3112 val_corr=-0.031
+[epoch 11] lr=5.00e-04 train_loss=0.0742 train_corr=0.839 val_loss=0.2927 val_corr=-0.014
+[epoch 12] lr=5.00e-04 train_loss=0.0724 train_corr=0.849 val_loss=0.3154 val_corr=-0.029
+[epoch 13] lr=5.00e-04 train_loss=0.0707 train_corr=0.857 val_loss=0.3155 val_corr=-0.022
+[epoch 14] lr=5.00e-04 train_loss=0.0694 train_corr=0.865 val_loss=0.3304 val_corr=-0.035
+[epoch 15] lr=5.00e-04 train_loss=0.0681 train_corr=0.872 val_loss=0.3454 val_corr=-0.044
+[epoch 16] lr=5.00e-04 train_loss=0.0668 train_corr=0.879 val_loss=0.3375 val_corr=-0.032
+[epoch 17] lr=5.00e-04 train_loss=0.0661 train_corr=0.883 val_loss=0.3250 val_corr=-0.023
+[epoch 18] lr=5.00e-04 train_loss=0.0652 train_corr=0.887 val_loss=0.3433 val_corr=-0.034
+[epoch 19] lr=5.00e-04 train_loss=0.0644 train_corr=0.892 val_loss=0.3576 val_corr=-0.047
+[epoch 20] lr=5.00e-04 train_loss=0.0634 train_corr=0.897 val_loss=0.3240 val_corr=-0.017
+[epoch 21] lr=5.00e-04 train_loss=0.0626 train_corr=0.902 val_loss=0.3496 val_corr=-0.043
+[epoch 22] lr=5.00e-04 train_loss=0.0618 train_corr=0.906 val_loss=0.3311 val_corr=-0.028
+[epoch 23] lr=5.00e-04 train_loss=0.0616 train_corr=0.907 val_loss=0.3140 val_corr=0.008
+[epoch 24] lr=5.00e-04 train_loss=0.0610 train_corr=0.911 val_loss=0.3278 val_corr=-0.017
+[epoch 25] lr=5.00e-04 train_loss=0.0603 train_corr=0.914 val_loss=0.3587 val_corr=-0.038
+[epoch 26] lr=5.00e-04 train_loss=0.0601 train_corr=0.915 val_loss=0.3254 val_corr=-0.008
+[epoch 27] lr=5.00e-04 train_loss=0.0593 train_corr=0.919 val_loss=0.3667 val_corr=-0.043
+[epoch 28] lr=5.00e-04 train_loss=0.0591 train_corr=0.920 val_loss=0.3620 val_corr=-0.040
+[epoch 29] lr=5.00e-04 train_loss=0.0588 train_corr=0.922 val_loss=0.3054 val_corr=0.016
+[epoch 30] lr=5.00e-04 train_loss=0.0586 train_corr=0.924 val_loss=0.3448 val_corr=-0.028
+[epoch 31] lr=5.00e-04 train_loss=0.0582 train_corr=0.925 val_loss=0.3363 val_corr=-0.011
+[epoch 32] lr=5.00e-04 train_loss=0.0578 train_corr=0.928 val_loss=0.3481 val_corr=-0.029
+[epoch 33] lr=5.00e-04 train_loss=0.0572 train_corr=0.930 val_loss=0.3207 val_corr=0.002
+[epoch 34] lr=5.00e-04 train_loss=0.0574 train_corr=0.929 val_loss=0.3343 val_corr=-0.017
+[epoch 35] lr=5.00e-04 train_loss=0.0572 train_corr=0.931 val_loss=0.3307 val_corr=-0.011
+[epoch 36] lr=5.00e-04 train_loss=0.0566 train_corr=0.934 val_loss=0.3293 val_corr=-0.019
+[epoch 37] lr=5.00e-04 train_loss=0.0566 train_corr=0.935 val_loss=0.3388 val_corr=-0.009
+[epoch 38] lr=5.00e-04 train_loss=0.0561 train_corr=0.936 val_loss=0.3228 val_corr=-0.007
+[epoch 39] lr=5.00e-04 train_loss=0.0562 train_corr=0.936 val_loss=0.3452 val_corr=-0.015
+[epoch 40] lr=5.00e-04 train_loss=0.0558 train_corr=0.938 val_loss=0.3264 val_corr=-0.003
+[epoch 41] lr=5.00e-04 train_loss=0.0557 train_corr=0.939 val_loss=0.3135 val_corr=0.009
+[epoch 42] lr=5.00e-04 train_loss=0.0554 train_corr=0.940 val_loss=0.3058 val_corr=0.004
+[epoch 43] lr=5.00e-04 train_loss=0.0551 train_corr=0.942 val_loss=0.3304 val_corr=-0.013
+[epoch 44] lr=5.00e-04 train_loss=0.0553 train_corr=0.941 val_loss=0.3369 val_corr=-0.022
+[epoch 45] lr=5.00e-04 train_loss=0.0550 train_corr=0.942 val_loss=0.3052 val_corr=0.004
+[epoch 46] lr=5.00e-04 train_loss=0.0551 train_corr=0.942 val_loss=0.3089 val_corr=-0.004
+[epoch 47] lr=5.00e-04 train_loss=0.0547 train_corr=0.944 val_loss=0.3406 val_corr=-0.023
+[epoch 48] lr=5.00e-04 train_loss=0.0547 train_corr=0.944 val_loss=0.3168 val_corr=-0.005
+[epoch 49] lr=5.00e-04 train_loss=0.0543 train_corr=0.946 val_loss=0.3407 val_corr=-0.017
+fold 0 done. checkpoint exists: True -> /home/shunya/research/dog-radar-vitals/runs/20260825-100125_ecg_rpeak_spatial_gnn_lodo300_robustnorm_fold0_test1/epoch_004.pt
+
+=== fold 1: test_subject=2 val_subject=5 ===
+train_subjects=[1, 9, 10, 13, 14, 16, 17, 29, 30]
+[epoch 0] lr=5.00e-04 train_loss=0.4370 train_corr=0.364 val_loss=0.3137 val_corr=0.099
+[epoch 1] lr=5.00e-04 train_loss=0.2175 train_corr=0.556 val_loss=0.2235 val_corr=0.063
+[epoch 2] lr=5.00e-04 train_loss=0.1398 train_corr=0.631 val_loss=0.2092 val_corr=0.046

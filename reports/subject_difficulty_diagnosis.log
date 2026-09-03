@@ -1,0 +1,30 @@
+subject   1: n= 2  cardiac_max=0.0159  cardiac_mean=0.0061  HR=66.0  rr_std=37.9ms  ecg_nan=0.000  F1=0.414
+subject   2: n= 2  cardiac_max=0.0173  cardiac_mean=0.0061  HR=80.6  rr_std=23.3ms  ecg_nan=0.000  F1=0.653
+subject   5: n=12  cardiac_max=0.0388  cardiac_mean=0.0108  HR=81.1  rr_std=40.8ms  ecg_nan=0.000  F1=0.244
+subject   9: n= 6  cardiac_max=0.0565  cardiac_mean=0.0125  HR=68.7  rr_std=41.8ms  ecg_nan=0.000  F1=0.113
+subject  10: n= 3  cardiac_max=0.0519  cardiac_mean=0.0119  HR=74.0  rr_std=81.2ms  ecg_nan=0.000  F1=0.743
+subject  13: n= 6  cardiac_max=0.0634  cardiac_mean=0.0169  HR=61.9  rr_std=59.7ms  ecg_nan=0.000  F1=0.793
+subject  14: n= 9  cardiac_max=0.0650  cardiac_mean=0.0128  HR=68.9  rr_std=81.2ms  ecg_nan=0.000  F1=0.548
+subject  16: n= 7  cardiac_max=0.0855  cardiac_mean=0.0180  HR=73.1  rr_std=53.7ms  ecg_nan=0.000  F1=0.443
+subject  17: n= 9  cardiac_max=0.0372  cardiac_mean=0.0110  HR=64.7  rr_std=55.6ms  ecg_nan=0.000  F1=0.906
+subject  29: n=23  cardiac_max=0.0366  cardiac_mean=0.0098  HR=76.9  rr_std=27.7ms  ecg_nan=0.000  F1=0.590
+subject  30: n=12  cardiac_max=0.0482  cardiac_mean=0.0143  HR=75.5  rr_std=42.5ms  ecg_nan=0.000  F1=0.787
+
+=== LOSO の F1 との Spearman 順位相関 (n=11) ===
+  cardiac_max    vs F1 : rho = -0.045
+  cardiac_mean   vs F1 : rho = +0.164
+  hr_mean        vs F1 : rho = -0.255
+  rr_std         vs F1 : rho = +0.364
+  ecg_nan_frac   vs F1 : rho = +0.509
+  n_trials       vs F1 : rho = +0.182
+
+=== LOSO の RR間隔MAE との Spearman 順位相関 ===
+  cardiac_max    vs RR-MAE : rho = +0.382
+  cardiac_mean   vs RR-MAE : rho = +0.382
+  hr_mean        vs RR-MAE : rho = -0.527
+  rr_std         vs RR-MAE : rho = +0.573
+  n_trials       vs RR-MAE : rho = -0.182
+
+注意: n=11 なので |rho| が 0.6 程度でも偶然の範囲に入りうる。強い相関が出た量だけを、条件つきの説明として扱う。
+
+保存: /home/shunya/research/dog-radar-vitals/reports/subject_difficulty_diagnosis.json

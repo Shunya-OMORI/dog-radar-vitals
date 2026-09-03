@@ -1,0 +1,40 @@
+=========== seed 42 (284, 既報告) ===========
+mean F1: 0.750
+RR-interval MAE (mean over 44 trials): 8.43 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 17.09 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 30.57 ms / 中央値|誤差| 29.93 ms / 符号つき平均(bias) +10.57 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 26.96 ms
+F1 (許容0.15s): 0.880
+HRV usable: 44/44, RMSSD MAE: 10.35 ms, SDNN MAE: 2.80 ms
+
+=========== seed 43  (/home/shunya/research/dog-radar-vitals/runs/20260823-135509_ecg_rpeak_spatial_gnn) ===========
+mean F1: 0.652
+RR-interval MAE (mean over 44 trials): 9.99 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 22.79 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 33.52 ms / 中央値|誤差| 32.35 ms / 符号つき平均(bias) +15.60 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 28.71 ms
+F1 (許容0.15s): 0.802
+HRV usable: 44/44, RMSSD MAE: 18.52 ms, SDNN MAE: 5.95 ms
+
+=========== seed 44  (/home/shunya/research/dog-radar-vitals/runs/20260823-140604_ecg_rpeak_spatial_gnn) ===========
+mean F1: 0.701
+RR-interval MAE (mean over 43 trials): 9.09 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 19.96 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 32.96 ms / 中央値|誤差| 32.26 ms / 符号つき平均(bias) +14.51 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 28.16 ms
+F1 (許容0.15s): 0.849
+HRV usable: 44/44, RMSSD MAE: 13.26 ms, SDNN MAE: 3.89 ms
+
+=========== seed 45  (/home/shunya/research/dog-radar-vitals/runs/20260823-141703_ecg_rpeak_spatial_gnn) ===========
+mean F1: 0.725
+RR-interval MAE (mean over 44 trials): 8.79 ms
+--- radarODE の指標定義に揃えた値 (振幅条件は未実装、我々に有利な側) ---
+MDR (規則1+2, 許容0.15s): 17.72 %
+R波タイミング誤差 (許容0.15sで対応づいた拍): 平均|誤差| 31.82 ms / 中央値|誤差| 30.86 ms / 符号つき平均(bias) +8.16 ms
+R波タイミング誤差 (許容±0.05sで対応づいた拍のみ): 27.59 ms
+F1 (許容0.15s): 0.874
+HRV usable: 44/44, RMSSD MAE: 15.81 ms, SDNN MAE: 4.63 ms
+

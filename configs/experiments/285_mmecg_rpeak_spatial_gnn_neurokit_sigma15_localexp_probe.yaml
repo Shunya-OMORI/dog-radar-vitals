@@ -1,0 +1,39 @@
+# 285: 局所soft-argmax位置損失(bce_localexp)の8epochプローブ。
+# 背景: 推論側の重心復号(refine_peaks_centroid, ±85ms)でRR-MAE 11.76→8.41msを達成
+# したが、残る誤差の主体はピーク位置ジッタ(timing error std ~27ms)。BCEは画素単位の
+# 分類でheatmap質量中心の位置を直接罰しないため、各GT中心±85ms窓での重心オフセット
+# 期待値をL1で罰する項を追加する(losses.heatmap_bce_localexp_loss、
+# Sun et al. ECCV2018 / Nibali et al. DSNT 2018のマルチピーク局所1D版)。
+# 単一変数(R4): 283(sigma15プローブ)からの変更はtrain.loss(+係数)のみ。
+# 比較対象: 283 epoch4 + old + 重心復号(85ms×2) → キャッシュ評価で比較する。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 8
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  loss: bce_localexp
+  loc_weight: 0.01
+  loc_half_win: 17

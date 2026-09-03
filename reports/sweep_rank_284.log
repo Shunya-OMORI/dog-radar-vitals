@@ -1,0 +1,8 @@
+subject   1: val(subj 2) で選んだ h=0.95 → test F1=0.981 R=0.974 RR=12.21 ms RMSSD誤差=10.92 (一定RR 36.90) pNN50誤差=14.40 平均IBI誤差=0.77
+subject   2: val(subj 5) で選んだ h=0.85 → test F1=0.849 R=0.998 RR=12.97 ms RMSSD誤差=19.95 (一定RR 13.71) pNN50誤差=9.95 平均IBI誤差=189.93
+subject   5: val(subj 9) で選んだ h=0.90 → test F1=0.871 R=0.855 RR=22.14 ms RMSSD誤差=19.67 (一定RR 26.60) pNN50誤差=18.86 平均IBI誤差=3.00
+subject   9: val(subj 10) で選んだ h=0.90 → test F1=0.849 R=0.838 RR=30.36 ms RMSSD誤差=29.46 (一定RR 36.98) pNN50誤差=23.66 平均IBI誤差=65.60
+subject  10: val(subj 13) で選んだ h=0.90 → test F1=0.875 R=0.887 RR=16.54 ms RMSSD誤差=4.66 (一定RR 72.31) pNN50誤差=3.85 平均IBI誤差=8.29
+subject  13: val(subj 14) で選んだ h=0.90 → test F1=0.886 R=0.947 RR=13.79 ms RMSSD誤差=13.23 (一定RR 47.70) pNN50誤差=11.35 平均IBI誤差=41.51
+subject  14: val(subj 16) で選んだ h=0.85 → test F1=0.836 R=0.915 RR=18.61 ms RMSSD誤差=7.84 (一定RR 72.77) pNN50誤差=3.88 平均IBI誤差=14.95
+subject  16: val(subj 17) で選んだ h=0.90 → test F1=0.772 R=0.774 RR=36.29 ms RMSSD誤差=19.43 (一定RR 59.21) pNN50誤差=12.38 平均IBI誤差=28.73

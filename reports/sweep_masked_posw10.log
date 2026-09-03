@@ -1,0 +1,50 @@
+subject   1: val(subj 2) で選んだ h=0.60 → test F1=0.990 R=0.993 RR=11.27 ms RMSSD誤差=7.04 (一定RR 36.90) pNN50誤差=10.41 平均IBI誤差=0.19
+subject   2: val(subj 5) で選んだ h=0.05 → test F1=0.819 R=1.000 RR=9.86 ms RMSSD誤差=53.04 (一定RR 13.71) pNN50誤差=77.40 平均IBI誤差=356.33
+subject   5: val(subj 9) で選んだ h=0.10 → test F1=0.820 R=0.830 RR=15.15 ms RMSSD誤差=19.14 (一定RR 26.60) pNN50誤差=16.10 平均IBI誤差=14.86
+subject   9: val(subj 10) で選んだ h=0.50 → test F1=0.624 R=0.519 RR=24.99 ms RMSSD誤差=32.97 (一定RR 36.98) pNN50誤差=32.60 平均IBI誤差=68.63
+subject  10: val(subj 13) で選んだ h=0.60 → test F1=0.899 R=0.959 RR=16.35 ms RMSSD誤差=15.72 (一定RR 72.31) pNN50誤差=4.33 平均IBI誤差=17.78
+subject  13: val(subj 14) で選んだ h=0.60 → test F1=0.805 R=0.966 RR=14.02 ms RMSSD誤差=47.74 (一定RR 47.70) pNN50誤差=28.71 平均IBI誤差=210.93
+subject  14: val(subj 16) で選んだ h=0.10 → test F1=0.859 R=0.950 RR=15.52 ms RMSSD誤差=7.31 (一定RR 72.77) pNN50誤差=5.39 平均IBI誤差=47.97
+subject  16: val(subj 17) で選んだ h=0.40 → test F1=0.676 R=0.618 RR=35.94 ms RMSSD誤差=23.52 (一定RR 59.21) pNN50誤差=15.16 平均IBI誤差=11.73
+subject  17: val(subj 29) で選んだ h=0.60 → test F1=0.961 R=0.968 RR=13.23 ms RMSSD誤差=10.67 (一定RR 47.57) pNN50誤差=11.75 平均IBI誤差=1.80
+subject  29: val(subj 30) で選んだ h=0.50 → test F1=0.939 R=0.928 RR=11.58 ms RMSSD誤差=14.53 (一定RR 16.81) pNN50誤差=10.14 平均IBI誤差=2.00
+subject  30: val(subj 1) で選んだ h=0.60 → test F1=0.942 R=0.985 RR=12.48 ms RMSSD誤差=16.10 (一定RR 24.13) pNN50誤差=10.61 平均IBI誤差=4.66
+  RMSSD誤差 22.53 ± 15.66 ms   (一定RRのみ: 41.34 ms)
+  pNN50誤差 20.24 ± 20.91 %   (一定RRのみ: 19.59 %)
+  平均IBI誤差 66.99 ± 113.94 ms
+
+=== val でしきい値を選んだ場合の正式値 (n=11 fold) ===
+  F1 0.849 ± 0.117   RR間隔MAE 16.40 ms
+  選ばれたしきい値: subj1:0.60, subj2:0.05, subj5:0.10, subj9:0.50, subj10:0.60, subj13:0.60, subj14:0.10, subj16:0.40, subj17:0.60, subj29:0.50, subj30:0.60
+
+=== 全被験者平均 (しきい値を全員共通にした場合) ===
+  h=0.05: F1 0.776  precision 0.673  recall 0.955  RR間隔MAE 18.30 ms  RMSSD誤差 24.58 ms  pNN50誤差 25.87 %  平均IBI誤差 250.49 ms
+  h=0.10: F1 0.813  precision 0.738  recall 0.943  RR間隔MAE 17.42 ms  RMSSD誤差 22.64 ms  pNN50誤差 21.59 %  平均IBI誤差 158.25 ms
+  h=0.15: F1 0.828  precision 0.768  recall 0.934  RR間隔MAE 17.09 ms  RMSSD誤差 21.73 ms  pNN50誤差 17.40 %  平均IBI誤差 130.27 ms
+  h=0.20: F1 0.838  precision 0.791  recall 0.925  RR間隔MAE 17.19 ms  RMSSD誤差 18.52 ms  pNN50誤差 16.17 %  平均IBI誤差 123.55 ms
+  h=0.30: F1 0.847  precision 0.826  recall 0.904  RR間隔MAE 16.91 ms  RMSSD誤差 19.51 ms  pNN50誤差 15.13 %  平均IBI誤差 85.81 ms
+  h=0.40: F1 0.847  precision 0.848  recall 0.883  RR間隔MAE 17.43 ms  RMSSD誤差 13.91 ms  pNN50誤差 11.88 %  平均IBI誤差 60.48 ms
+  h=0.50: F1 0.841  precision 0.869  recall 0.856  RR間隔MAE 16.98 ms  RMSSD誤差 17.07 ms  pNN50誤差 12.61 %  平均IBI誤差 44.47 ms
+  h=0.60: F1 0.824  precision 0.888  recall 0.820  RR間隔MAE 15.48 ms  RMSSD誤差 16.27 ms  pNN50誤差 12.80 %  平均IBI誤差 30.98 ms
+  (参考) 入力を見ずに一定RRを出すだけのモデル: RMSSD誤差 41.34 ms  pNN50誤差 19.59 %
+
+=== 被験者ごとに最良しきい値を選んだ場合 (上限の目安、テストを見て選ぶので楽観的) ===
+  F1 0.889   選ばれたしきい値: subj1:0.60, subj2:0.60, subj5:0.05, subj9:0.10, subj10:0.60, subj13:0.60, subj14:0.40, subj16:0.10, subj17:0.60, subj29:0.40, subj30:0.60
+
+保存: /home/shunya/research/dog-radar-vitals/reports/height_sweep_loso.json
+
+- F1 >= 0.80 を保てる範囲での最小 RMSSD 誤差: 13.91 ms (しきい値 0.40, F1 0.847)
+- RMSSD 誤差 <= 15.0 ms を保てる範囲での最大 F1: 0.847 (しきい値 0.40, RMSSD 誤差 13.91 ms)
+- 理想点からの正規化距離が最小の動作点: しきい値 0.40 (F1 0.847, RMSSD 誤差 13.91 ms)
+- F1 が最大の動作点: しきい値 0.40 (F1 0.847, RMSSD 誤差 13.91 ms)
+- RMSSD 誤差が最小の動作点: しきい値 0.40 (F1 0.847, RMSSD 誤差 13.91 ms)
+- → 2 つの動作点が一致した。この条件ではトレードオフが観測されない。
+- 参考: 入力を見ずに一定 RR を出すだけのモデルの RMSSD 誤差 41.34 ms (この値を下回らない限り、変動を捉えたとは言えない)
+
+## 図
+
+- `fig1_operating_characteristic.png` しきい値を回したときの 2 指標の動き
+- `fig2_pareto.png` パレート境界（多目的最適化でトレードオフを示す標準的な図法）
+- `fig3_bland_altman.png` RMSSD の一致性（Bland & Altman, Lancet, 1986）　※ 個票データが要るので `--bland_altman_log` を渡したときだけ作る
+
+保存先: /home/shunya/research/dog-radar-vitals/reports/tradeoff_masked_posw10

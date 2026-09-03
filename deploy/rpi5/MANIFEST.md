@@ -1,13 +1,15 @@
 # Raspberry Pi 5 実機検証 エンド2エンド・マニフェスト
 
-**状態: 前処理・後処理の組み合わせが確定(2026-08-07)。config281(channel_weight前処理)
-の本番50epochを周期チェックポイント込みで再学習・全epoch下流評価した結果、
-どのepochも274(前処理なし)のRMSSD-MAEを下回れず棄却
-(`reports/findings_2026-08-07_rpeak_heatmap_investigation.md`参照)。
-確定構成: **config274(前処理なし)の空間GNN + `extract_peaks_adaptive_searchback`
-後処理**(F1=0.687, RR-MAE=10.69ms, RMSSD-MAE=16.27ms)。
-モデル系統(Anchor CNN vs 空間GNN)の選択は下記のARM対応トレードオフに従い
-実機到着後に決定。**
+**状態: 準備完了(2026-08-07更新)。確定構成は config284 epoch4(sigma=15ms教師)の
+空間GNN + 固定しきい値0.3 + サブサンプル重心復号 `refine_peaks_centroid`(±85ms×2回)
+= F1=0.749, RR-MAE=8.41ms, RMSSD-MAE=10.27ms
+(`reports/findings_2026-08-07_rpeak_heatmap_investigation.md`参照。
+旧記載のconfig274+adaptive_searchbackは重心復号の導入により置き換え)。
+推論エントリポイント `run_inference.py`・チェックポイント・requirements.txt を
+本ディレクトリに配置済みで、WSL側のCPU 4スレッドスモークテストも通過
+(trial 48: 1窓9.8ms, F1=0.940)。セットアップ手順は `README.md` 参照。
+ARM対応リスク(torch-scatter等)は「torch_geometricのpure-Pythonフォールバックで
+動作」を確認済みのため解消。モデル系統は空間GNNで確定。**
 
 目的: レーダI/Q -> RCG(50点3D変位) -> R波heatmap -> R波位置、という推論パイプラインを
 Raspberry Pi 5（4コアCPU、GPUなし）上で動かし、消費電力・発熱・レイテンシをエッジ

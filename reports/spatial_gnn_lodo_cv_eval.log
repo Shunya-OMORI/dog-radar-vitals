@@ -1,0 +1,66 @@
+=========== fold 0: test subject 1 ===========
+======================================================================
+mean F1: 0.414
+RR-interval MAE (mean over 1 trials): 9.99 ms
+HRV usable: 2/2, RMSSD MAE: 9.27 ms, SDNN MAE: 4.51 ms
+
+=========== fold 1: test subject 2 ===========
+======================================================================
+mean F1: 0.653
+RR-interval MAE (mean over 2 trials): 8.25 ms
+HRV usable: 2/2, RMSSD MAE: 12.45 ms, SDNN MAE: 5.29 ms
+
+=========== fold 2: test subject 5 ===========
+======================================================================
+mean F1: 0.244
+RR-interval MAE (mean over 7 trials): 8.60 ms
+HRV usable: 9/12, RMSSD MAE: 14.64 ms, SDNN MAE: 4.33 ms
+
+=========== fold 3: test subject 9 ===========
+======================================================================
+mean F1: 0.113
+RR-interval MAE (mean over 6 trials): 14.29 ms
+HRV usable: 3/6, RMSSD MAE: 59.57 ms, SDNN MAE: 37.51 ms
+
+=========== fold 4: test subject 10 ===========
+======================================================================
+mean F1: 0.743
+RR-interval MAE (mean over 3 trials): 13.36 ms
+HRV usable: 3/3, RMSSD MAE: 6.49 ms, SDNN MAE: 4.71 ms
+
+=========== fold 5: test subject 13 ===========
+======================================================================
+mean F1: 0.793
+RR-interval MAE (mean over 6 trials): 11.89 ms
+HRV usable: 6/6, RMSSD MAE: 12.69 ms, SDNN MAE: 8.99 ms
+
+=========== fold 6: test subject 14 ===========
+======================================================================
+mean F1: 0.548
+RR-interval MAE (mean over 7 trials): 11.26 ms
+HRV usable: 9/9, RMSSD MAE: 15.39 ms, SDNN MAE: 6.96 ms
+
+=========== fold 7: test subject 16 ===========
+======================================================================
+mean F1: 0.443
+RR-interval MAE (mean over 5 trials): 8.58 ms
+HRV usable: 6/7, RMSSD MAE: 20.29 ms, SDNN MAE: 8.00 ms
+
+=========== fold 8: test subject 17 ===========
+======================================================================
+mean F1: 0.906
+RR-interval MAE (mean over 9 trials): 9.31 ms
+HRV usable: 9/9, RMSSD MAE: 8.10 ms, SDNN MAE: 2.35 ms
+
+=========== fold 9: test subject 29 ===========
+======================================================================
+mean F1: 0.590
+RR-interval MAE (mean over 22 trials): 8.72 ms
+HRV usable: 23/23, RMSSD MAE: 13.30 ms, SDNN MAE: 4.36 ms
+
+=========== fold 10: test subject 30 ===========
+======================================================================
+mean F1: 0.787
+RR-interval MAE (mean over 12 trials): 11.22 ms
+HRV usable: 12/12, RMSSD MAE: 14.19 ms, SDNN MAE: 2.58 ms
+

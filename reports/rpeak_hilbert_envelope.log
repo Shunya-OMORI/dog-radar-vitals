@@ -1,0 +1,64 @@
+=== probe: 319 hilbert_envelope (8epoch) ===
+[epoch 0] lr=5.00e-04 train_loss=0.5099 train_corr=0.212 val_loss=0.4199 val_corr=0.231
+[epoch 1] lr=5.00e-04 train_loss=0.3434 train_corr=0.376 val_loss=0.2936 val_corr=0.239
+[epoch 2] lr=5.00e-04 train_loss=0.2489 train_corr=0.442 val_loss=0.2286 val_corr=0.305
+[epoch 3] lr=5.00e-04 train_loss=0.1909 train_corr=0.498 val_loss=0.1853 val_corr=0.295
+[epoch 4] lr=5.00e-04 train_loss=0.1576 train_corr=0.548 val_loss=0.1756 val_corr=0.331
+[epoch 5] lr=5.00e-04 train_loss=0.1375 train_corr=0.593 val_loss=0.1678 val_corr=0.354
+[epoch 6] lr=5.00e-04 train_loss=0.1240 train_corr=0.632 val_loss=0.1670 val_corr=0.340
+[epoch 7] lr=5.00e-04 train_loss=0.1140 train_corr=0.665 val_loss=0.1715 val_corr=0.290
+PROBE_RUN_DIR /home/shunya/research/dog-radar-vitals/runs/20260828-120259_ecg_rpeak_spatial_gnn_319_hilbert_envelope_probe8ep
+=== full: 319 hilbert_envelope (50epoch) ===
+[epoch 0] lr=5.00e-04 train_loss=0.5100 train_corr=0.207 val_loss=0.4146 val_corr=0.223
+[epoch 1] lr=5.00e-04 train_loss=0.3443 train_corr=0.367 val_loss=0.3041 val_corr=0.268
+[epoch 2] lr=5.00e-04 train_loss=0.2503 train_corr=0.431 val_loss=0.2243 val_corr=0.288
+[epoch 3] lr=5.00e-04 train_loss=0.1925 train_corr=0.490 val_loss=0.2043 val_corr=0.305
+[epoch 4] lr=5.00e-04 train_loss=0.1585 train_corr=0.542 val_loss=0.1764 val_corr=0.318
+[epoch 5] lr=5.00e-04 train_loss=0.1379 train_corr=0.588 val_loss=0.1695 val_corr=0.321
+[epoch 6] lr=5.00e-04 train_loss=0.1244 train_corr=0.629 val_loss=0.1683 val_corr=0.318
+[epoch 7] lr=5.00e-04 train_loss=0.1142 train_corr=0.664 val_loss=0.1752 val_corr=0.262
+[epoch 8] lr=5.00e-04 train_loss=0.1073 train_corr=0.691 val_loss=0.1847 val_corr=0.214
+[epoch 9] lr=5.00e-04 train_loss=0.1012 train_corr=0.721 val_loss=0.1867 val_corr=0.236
+[epoch 10] lr=5.00e-04 train_loss=0.0975 train_corr=0.735 val_loss=0.1935 val_corr=0.237
+[epoch 11] lr=5.00e-04 train_loss=0.0937 train_corr=0.753 val_loss=0.2033 val_corr=0.137
+[epoch 12] lr=5.00e-04 train_loss=0.0903 train_corr=0.769 val_loss=0.2041 val_corr=0.190
+[epoch 13] lr=5.00e-04 train_loss=0.0873 train_corr=0.783 val_loss=0.2028 val_corr=0.232
+[epoch 14] lr=5.00e-04 train_loss=0.0846 train_corr=0.798 val_loss=0.2131 val_corr=0.135
+[epoch 15] lr=5.00e-04 train_loss=0.0824 train_corr=0.808 val_loss=0.2123 val_corr=0.173
+[epoch 16] lr=5.00e-04 train_loss=0.0801 train_corr=0.820 val_loss=0.2199 val_corr=0.171
+[epoch 17] lr=5.00e-04 train_loss=0.0789 train_corr=0.824 val_loss=0.2163 val_corr=0.186
+[epoch 18] lr=5.00e-04 train_loss=0.0772 train_corr=0.833 val_loss=0.2240 val_corr=0.195
+[epoch 19] lr=5.00e-04 train_loss=0.0757 train_corr=0.841 val_loss=0.2244 val_corr=0.161
+[epoch 20] lr=5.00e-04 train_loss=0.0736 train_corr=0.850 val_loss=0.2253 val_corr=0.205
+[epoch 21] lr=5.00e-04 train_loss=0.0728 train_corr=0.853 val_loss=0.2292 val_corr=0.148
+[epoch 22] lr=5.00e-04 train_loss=0.0720 train_corr=0.857 val_loss=0.2180 val_corr=0.235
+[epoch 23] lr=5.00e-04 train_loss=0.0710 train_corr=0.862 val_loss=0.2261 val_corr=0.206
+[epoch 24] lr=5.00e-04 train_loss=0.0700 train_corr=0.867 val_loss=0.2553 val_corr=0.150
+[epoch 25] lr=5.00e-04 train_loss=0.0687 train_corr=0.873 val_loss=0.2386 val_corr=0.190
+[epoch 26] lr=5.00e-04 train_loss=0.0676 train_corr=0.878 val_loss=0.2563 val_corr=0.150
+[epoch 27] lr=5.00e-04 train_loss=0.0673 train_corr=0.879 val_loss=0.2409 val_corr=0.208
+[epoch 28] lr=5.00e-04 train_loss=0.0664 train_corr=0.884 val_loss=0.2441 val_corr=0.219
+[epoch 29] lr=5.00e-04 train_loss=0.0656 train_corr=0.888 val_loss=0.2323 val_corr=0.242
+[epoch 30] lr=5.00e-04 train_loss=0.0653 train_corr=0.890 val_loss=0.2442 val_corr=0.243
+[epoch 31] lr=5.00e-04 train_loss=0.0644 train_corr=0.894 val_loss=0.2438 val_corr=0.187
+[epoch 32] lr=5.00e-04 train_loss=0.0646 train_corr=0.894 val_loss=0.2447 val_corr=0.231
+[epoch 33] lr=5.00e-04 train_loss=0.0637 train_corr=0.898 val_loss=0.2610 val_corr=0.200
+[epoch 34] lr=5.00e-04 train_loss=0.0626 train_corr=0.903 val_loss=0.2317 val_corr=0.281
+[epoch 35] lr=5.00e-04 train_loss=0.0622 train_corr=0.904 val_loss=0.2444 val_corr=0.226
+[epoch 36] lr=5.00e-04 train_loss=0.0615 train_corr=0.908 val_loss=0.2531 val_corr=0.200
+[epoch 37] lr=5.00e-04 train_loss=0.0612 train_corr=0.909 val_loss=0.2428 val_corr=0.250
+[epoch 38] lr=5.00e-04 train_loss=0.0611 train_corr=0.910 val_loss=0.2557 val_corr=0.179
+[epoch 39] lr=5.00e-04 train_loss=0.0604 train_corr=0.914 val_loss=0.2362 val_corr=0.267
+[epoch 40] lr=5.00e-04 train_loss=0.0605 train_corr=0.913 val_loss=0.2729 val_corr=0.199
+[epoch 41] lr=5.00e-04 train_loss=0.0597 train_corr=0.917 val_loss=0.2828 val_corr=0.194
+[epoch 42] lr=5.00e-04 train_loss=0.0593 train_corr=0.919 val_loss=0.2650 val_corr=0.193
+[epoch 43] lr=5.00e-04 train_loss=0.0592 train_corr=0.919 val_loss=0.2501 val_corr=0.220
+[epoch 44] lr=5.00e-04 train_loss=0.0588 train_corr=0.921 val_loss=0.2732 val_corr=0.222
+[epoch 45] lr=5.00e-04 train_loss=0.0587 train_corr=0.921 val_loss=0.2761 val_corr=0.186
+[epoch 46] lr=5.00e-04 train_loss=0.0583 train_corr=0.923 val_loss=0.2768 val_corr=0.174
+[epoch 47] lr=5.00e-04 train_loss=0.0585 train_corr=0.923 val_loss=0.2837 val_corr=0.174
+[epoch 48] lr=5.00e-04 train_loss=0.0578 train_corr=0.926 val_loss=0.2754 val_corr=0.187
+[epoch 49] lr=5.00e-04 train_loss=0.0578 train_corr=0.927 val_loss=0.2643 val_corr=0.196
+run_dir /home/shunya/research/dog-radar-vitals/runs/20260828-120509_ecg_rpeak_spatial_gnn_319_hilbert_envelope_full
+mean_f1 0.11625686167542128 mean_rr_mae_ms 29.32392897511467 rr_dropped 0 / 44
+rpeak_hilbert_envelope done

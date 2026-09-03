@@ -8,16 +8,33 @@ dist/
 build/
 
 # データは大容量かつ再取得可能なため追跡しない。配置方法は data/raw/README.md を参照。
-data/raw/*
-!data/raw/README.md
+#
+# ⚠️2026-09-03、2点まとめて修正した。
+#
+# (1) 除外を「中身」(data/case/*)から「ディレクトリごと」(data/case/)に変更。
+#     data/case は CASEデータセットを git clone したもので **それ自体がgitリポジトリ**。
+#     中身だけを除外するとディレクトリ自体は除外されないため、git がそこを
+#     サブモジュール候補とみなし `git add .` のたびに
+#     "warning: adding embedded git repository" を出していた。
+#     ディレクトリごと除外すれば git はそこへ降りていかないので警告も出ない。
+#
+# (2) **data/external/ が除外されていなかった** (8GB)。
+#     実際に `git add .` で 8GB の .npy が stage される事故が起きた(即 reset で復旧)。
+#     data/ 配下は既定で全部除外し、追跡したいものだけを明示的に戻す方式に変える。
+#
+# なお data/raw/README.md と runs/README.md は**既に追跡済み**であり、
+# .gitignore は追跡済みファイルには効かないので、これまでどおり管理され続ける。
+data/
+data/case/
+data/external/
 data/processed/
-
-# CASEデータセット(Sharma et al. 2019, gitlab.com/karan-shr/case_dataset)。
-# git clone したリポジトリをそのまま置いているため .git を含み大容量。
-# 再取得方法は data/case/README.md を参照。
-data/case/*
-!data/case/NOTES.md
+data/raw/
 
 # 実行結果は EXPERIMENTS.md に要約を残し、生データ（チェックポイント等）は追跡しない。
-runs/*
-!runs/README.md
+runs/
+
+# 2026-09-03 追加。
+# 論文PDFは著作権上、公開リポジトリに置けない(要約・書誌はmarkdownで残す)。
+*.pdf
+# 中間生成物。モデル出力のheatmapキャッシュは再生成できる。
+cache/

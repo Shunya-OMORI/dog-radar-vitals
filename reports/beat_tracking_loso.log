@@ -1,0 +1,25 @@
+  subject 1 完了
+  subject 2 完了
+  subject 5 完了
+  subject 9 完了
+  subject 10 完了
+  subject 13 完了
+  subject 14 完了
+  subject 16 完了
+  subject 17 完了
+  subject 29 完了
+  subject 30 完了
+
+手法                              F1     RR間隔MAE    RMSSD誤差     推定RMSSD/正解
+現行(しきい値0.30)                 0.571       10.20      14.99          1.550
+ビート追跡 alpha=0.02             0.558       12.36      22.19          1.890
+ビート追跡 alpha=0.05             0.568       12.08      21.39          1.862
+ビート追跡 alpha=0.10             0.606       12.06      19.45          1.774
+ビート追跡 alpha=0.20             0.627       12.03      19.02          1.778
+ビート追跡 alpha=0.50             0.638       11.82      19.31          1.791
+ビート追跡 alpha=1.00             0.643       11.79      17.28          1.734
+
+**推定RMSSD/正解 が 1 を大きく下回る alpha は、周期性を課しすぎて
+  ゆらぎ(=測りたい量)を潰しているので、F1 が良くても採用できない。**
+
+保存: /home/shunya/research/dog-radar-vitals/reports/beat_tracking_loso.json

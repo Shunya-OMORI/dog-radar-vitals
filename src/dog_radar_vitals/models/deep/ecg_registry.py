@@ -22,6 +22,7 @@ from dog_radar_vitals.models.deep.rpeak_complex_cnn_v2 import RPeakComplexCNN1DV
 from dog_radar_vitals.models.deep.rpeak_conformer import RPeakConformer
 from dog_radar_vitals.models.deep.rpeak_conv_ncp import RPeakConvNCP
 from dog_radar_vitals.models.deep.rpeak_lstm import RPeakLSTM
+from dog_radar_vitals.models.deep.rpeak_attention_unet1d import RPeakAttentionUNet1D
 from dog_radar_vitals.models.deep.rpeak_ncp import RPeakNCP
 from dog_radar_vitals.models.deep.rpeak_transformer import RPeakTransformer
 from dog_radar_vitals.models.deep.rpeak_unet1d import RPeakUNet1D
@@ -43,6 +44,7 @@ ECG_MODEL_REGISTRY: dict[str, type] = {
     "rpeak_conformer": RPeakConformer,
     "ecg_unet1d": ECGWaveformUNet1D,
     "rpeak_unet1d": RPeakUNet1D,
+    "rpeak_attention_unet1d": RPeakAttentionUNet1D,
     "ecg_conv_ncp": ECGConvNCP,
     "rpeak_conv_ncp": RPeakConvNCP,
 }

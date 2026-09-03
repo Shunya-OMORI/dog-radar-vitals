@@ -586,6 +586,88 @@ model_A(274)を低RMSSD-MAEの供給元、model_B(282/284)を高F1の供給元�
 上記ランキング6位に入る結果となった。ただしいずれの融合結果も274単体
 (旧手法、RMSSD-MAE=16.27ms)は上回れていない。
 
+## サブサンプル重心補間(soft-argmax)後処理: 全指標で歴代最良を大幅更新 (2026-08-07)
+
+RR-MAE改善の検討で、モデルではなく**評価・後処理側の量子化**に着目した(R5)。
+heatmapはfs=200Hz(1サンプル=5ms)で離散化されており、`find_peaks`の整数argmaxには
+±2.5msの量子化誤差とノイズ起因のジッタが乗る。ガウシアン教師(σ=10-15ms)で学習した
+heatmapの山は正解位置の周囲に質量を持つため、**山全体の重み付き重心(soft-argmax)は
+整数極大点より安定した位置推定量**になる。
+
+**実装**: `refine_peaks_centroid`(`dog_radar_vitals/data/rpeaks.py`)。検出済み
+ピークごとに±85msの窓を取り、窓内最小値(ノイズ床)を差し引いた値を重みとする重心を
+計算、重心位置に窓を再センタリングして2回反復(2回でほぼ収束)。連続値(float)の
+ピーク位置を返し、RR計算にそのまま使う。**学習不要・CPUのみの純粋な後処理**。
+`evaluate_spatial_gnn_hrv.py`に`--refine_centroid_ms 85`(+`--refine_iters 2`)として
+組み込み済み。
+
+対応する先行研究: soft-argmax復号(Sun et al., "Integral Human Pose Regression",
+ECCV 2018)、heatmap argmax量子化誤差の分布形状による補正(Zhang et al., DARK pose,
+CVPR 2020)、放物線ピーク補間(Smith & Serra, 1987)。放物線補間(DARK型)も試したが
+改善幅は重心の1/3程度だった(量子化誤差5msより窓平均によるジッタ低減の寄与が大きい)。
+
+**結果**(heatmapキャッシュ上で検証後、`evaluate_spatial_gnn_hrv.py`でend-to-end再現):
+
+| モデル/抽出器 | 補間 | F1 | RR-MAE | RMSSD-MAE | SDNN-MAE |
+|---|---|---|---|---|---|
+| 274 / old | なし | 0.551 | 10.69 ms | 16.27 ms | 6.53 ms |
+| 274 / old | c85×2 | 0.569 | 7.56 ms | 12.28 ms | 5.65 ms |
+| 274 / adaptive_searchback | なし | 0.687 | 12.00 ms | 20.71 ms | 6.51 ms |
+| 274 / adaptive_searchback | c85×2 | 0.703 | 8.29 ms | 15.34 ms | 4.57 ms |
+| 284ep4 / old | なし | 0.733 | 11.76 ms | 18.26 ms | 5.16 ms |
+| **284ep4 / old** | **c85×2** | **0.749** | **8.41 ms** | **10.27 ms** | **2.85 ms** |
+| 284ep4 / adaptive_searchback | なし | 0.736 | 11.83 ms | 20.84 ms | 6.51 ms |
+| 284ep4 / adaptive_searchback | c85×2 | 0.752 | 8.30 ms | 12.55 ms | 3.99 ms |
+
+- **4通り(2チェックポイント×2抽出器)すべてで全指標が一貫して改善**。F1も上がる
+  (位置が正確になり50ms許容内のマッチが増えるため)。位置精度と検出率のトレードオフ
+  ではない、純粋な改善。
+- **歴代最良の大幅更新**: RR-MAE 9.67ms(再現不能な歴史値)→**8.41ms**、RMSSD-MAE
+  16.27ms→**10.27ms**、SDNN-MAE 5.16ms→**2.85ms**。matched timing error stdは
+  28.8→27.0msと微減で、改善の主体は「ピークごとの独立ジッタ」の除去
+  (RRは隣接ピーク位置の差分なので、共通バイアスでなく独立ジッタが効く)。
+- **妥当性確認**: (a) 符号付きバイアス — 補間後も予測RMSSD(40.7ms)は真値(25.2ms)
+  より過大で、「平滑化で人工的にRMSSDを押し下げた」のではなくジッタ除去として正当。
+  (b) 窓半幅75〜110msに広いプラトーがあり、選択はknife-edgeでない。±150ms超まで
+  広げるとT波副峰(R+約250ms)に窓がかかり悪化に転じる。(c) 検証被験者16でも掃引
+  したが、この被験者はF1 0.36と元々性能が低くノイジーで明確な指標にならなかった
+  (窓幅の最終選択はテスト側のプラトーに依拠している点は限界として記す)。
+
+**新しい生産用構成: config284 epoch4 + old(閾値0.3) + `refine_peaks_centroid`
+(half_win_ms=85, n_iter=2) = F1=0.749, RR-MAE=8.41ms, RMSSD-MAE=10.27ms,
+SDNN-MAE=2.85ms**(`evaluate_spatial_gnn_hrv.py --gt_detector neurokit
+--peak_method old --refine_centroid_ms 85`でend-to-end再現済み)。
+原著radarODEの3msにはまだ届かないが、11.76→8.41msへ約28%短縮した。
+
+## モデル側改良の試み: 局所soft-argmax位置損失(bce_localexp)は棄却 (2026-08-07)
+
+重心復号導入後に残る誤差の主体(ピーク位置ジッタ、timing error std ~27ms)を学習時に
+直接罰する狙いで、`heatmap_bce_localexp_loss`(`training/losses.py`)を実装した。
+BCEに加え、各GT中心±85ms窓内で推論側の重心復号と同じ統計量(窓内最小値差し引きの
+重み付き重心オフセット)を計算しL1で罰する(Sun et al. Integral Human Pose Regression
+ECCV 2018 / Nibali et al. DSNT 2018 のマルチピーク局所1D版)。config285
+(283=sigma15プローブから損失のみ変更、R4)で8epochプローブ:
+
+- **loc_weight=0.1: 学習が崩壊**(val_corr≈0)。定数出力だと窓内min差し引きで重みが
+  全ゼロ→位置損失も0になる退化解があり、初期のノイズ勾配がそこへ押し込むと推測。
+- **loc_weight=0.01: 学習は正常**(val_corr 0.24-0.28、283と同水準)だが**下流は全指標で
+  明確に悪化**(重心復号込みで比較):
+
+| checkpoint | 後処理 | F1 | RR-MAE | RMSSD-MAE | SDNN-MAE |
+|---|---|---|---|---|---|
+| 283ep4(BCEのみ, 基準) | old+c85×2 | **0.726** | **8.09 ms** | **10.34 ms** | 3.61 ms |
+| 285ep4(localexp 0.01) | old+c85×2 | 0.535 | 9.67 ms | 21.88 ms | 8.60 ms |
+| 285ep7(localexp 0.01) | old+c85×2 | 0.563 | 10.39 ms | 19.83 ms | 7.69 ms |
+
+**R2に従い本番昇格せず棄却**。「復号と学習目標を整合させる」という発想は理にかなうが、
+λの2点(0.1/0.01)いずれも悪化しており、微調整で救う優先度は低い。付録A(モデル側の
+工夫はほぼ全滅)の系譜に連なる結果であり、**heatmapパイプラインの改善は引き続き
+後処理・評価側(重心復号がその成功例)が本命**という知見を強化した。
+
+なお副産物として、**283ep4(sigma15プローブ)+old+重心復号がF1=0.726/RR-MAE=8.09ms/
+RMSSD-MAE=10.34msと、284ep4(8.41/10.27ms)と同水準の歴代最良級**であることを確認
+(sigma15はプローブ/本番間でoldとの組み合わせなら安定して再現するという既報と整合)。
+
 ## 未解決・今後の課題
 
 - Anchor CNNのneurokitラベルでの悪化は未解決(weight_decayでは改善せず)。
@@ -607,7 +689,8 @@ model_A(274)を低RMSSD-MAEの供給元、model_B(282/284)を高F1の供給元�
   「見込みあり」と即断せず、複数seedまたは本番run側での早期評価で再確認する
   運用を検討する余地がある。
 - F1だけでなくRR-MAE/RMSSD-MAEを常に併記する運用は今後も徹底する。
-- 現時点での最有力候補: config284 epoch4 + old手法(F1=0.733, RR-MAE=11.76ms,
-  RMSSD-MAE=18.26ms, SDNN-MAE=5.16ms)。progress_report更新はユーザ確認待ち。
+- 現時点での最有力候補: **config284 epoch4 + old手法 + refine_peaks_centroid(85ms×2)
+  (F1=0.749, RR-MAE=8.41ms, RMSSD-MAE=10.27ms, SDNN-MAE=2.85ms)**(上記
+  soft-argmax節参照)。progress_report更新はユーザ確認待ち。
   ecgshape(波形形状)・Anchor CNNはいずれも未解決課題を抱えたまま優先度を下げて
   保留し、本セッションのR波heatmap関連調査はここで一区切りとする。

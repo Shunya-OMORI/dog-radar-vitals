@@ -1,0 +1,37 @@
+# 315: config284(採用中)と完全に同じだが、損失関数だけを差し替える。
+# 単一変数(R4): train.loss のみ config284(既定bce) から adaptive_wing に変更。
+#
+# 狙い(2026-08-28, ユーザ指示): 損失設計の先行研究サーベイの結果、Adaptive Wing Loss
+# (Wang ら, ICCV 2019, arXiv:1904.07399)は顔ランドマークのheatmap回帰で本タスクと
+# 同程度の強いクラス不均衡(前景1.2%程度)に対処するために提案された、BCE系ではなく
+# L1/Wing系の損失関数。現行のBCE/weighted_bce/focalはいずれもBCE系(交差エントロピー)
+# であり、損失関数の"族"自体を変える比較として最優先候補とした。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  loss: adaptive_wing

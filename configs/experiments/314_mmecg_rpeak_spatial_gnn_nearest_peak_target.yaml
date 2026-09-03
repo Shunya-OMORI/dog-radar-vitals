@@ -1,0 +1,38 @@
+# 314: config284(採用中)と完全に同じだが、教師の作り方だけを差し替える。
+# 単一変数(R4): data.target_mode のみ config284 から変更（all_peaks -> nearest_peak）。
+#
+# 狙い(2026-08-27, ユーザ指示): 「教師を一番近いRの点にする」という、他の先行研究
+# （prepare_mmecg_dataset.py の ecg_seg/PPI 構築で使っている「窓中心に最も近い
+# ピークを基準ビートとする」考え方、および一般に per-window 1-target 形式で
+# ビート検出を定式化する手法）との比較。現行は窓内の全R波にガウシアンを立てる
+# (all_peaks) が、この構成では窓中心に最も近い1拍だけを教師にする。
+# 「1窓=1拍」という単純化されたタスクにした場合、検出・RR間隔精度がどう変わるかを見る。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  target_mode: nearest_peak
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

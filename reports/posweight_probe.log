@@ -1,0 +1,109 @@
+########## pos_weight=5 (292_mmecg_rpeak_spatial_gnn_posw5) ##########
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-002238_ecg_rpeak_spatial_gnn_posw5
+[epoch 0] lr=5.00e-04 train_loss=0.6379 train_corr=0.337 val_loss=0.5950 val_corr=0.301
+[epoch 1] lr=5.00e-04 train_loss=0.4588 train_corr=0.528 val_loss=0.5305 val_corr=0.279
+[epoch 2] lr=5.00e-04 train_loss=0.3658 train_corr=0.590 val_loss=0.5509 val_corr=0.248
+[epoch 3] lr=5.00e-04 train_loss=0.3064 train_corr=0.639 val_loss=0.5692 val_corr=0.209
+[epoch 4] lr=5.00e-04 train_loss=0.2669 train_corr=0.682 val_loss=0.6104 val_corr=0.179
+[epoch 5] lr=5.00e-04 train_loss=0.2415 train_corr=0.713 val_loss=0.6321 val_corr=0.176
+[epoch 6] lr=5.00e-04 train_loss=0.2217 train_corr=0.741 val_loss=0.6497 val_corr=0.202
+[epoch 7] lr=5.00e-04 train_loss=0.2077 train_corr=0.762 val_loss=0.6579 val_corr=0.237
+[epoch 8] lr=5.00e-04 train_loss=0.1947 train_corr=0.781 val_loss=0.6916 val_corr=0.225
+[epoch 9] lr=5.00e-04 train_loss=0.1847 train_corr=0.795 val_loss=0.6929 val_corr=0.239
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-002238_ecg_rpeak_spatial_gnn_posw5
+########## pos_weight=10 (293_mmecg_rpeak_spatial_gnn_posw10) ##########
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-002506_ecg_rpeak_spatial_gnn_posw10
+[epoch 0] lr=5.00e-04 train_loss=0.7559 train_corr=0.385 val_loss=0.8171 val_corr=0.280
+[epoch 1] lr=5.00e-04 train_loss=0.5528 train_corr=0.544 val_loss=0.8114 val_corr=0.246
+[epoch 2] lr=5.00e-04 train_loss=0.4438 train_corr=0.610 val_loss=0.8464 val_corr=0.235
+[epoch 3] lr=5.00e-04 train_loss=0.3693 train_corr=0.665 val_loss=0.9196 val_corr=0.219
+[epoch 4] lr=5.00e-04 train_loss=0.3250 train_corr=0.699 val_loss=0.9715 val_corr=0.207
+[epoch 5] lr=5.00e-04 train_loss=0.2934 train_corr=0.725 val_loss=1.0189 val_corr=0.180
+[epoch 6] lr=5.00e-04 train_loss=0.2734 train_corr=0.742 val_loss=1.0378 val_corr=0.251
+[epoch 7] lr=5.00e-04 train_loss=0.2587 train_corr=0.754 val_loss=1.0475 val_corr=0.265
+[epoch 8] lr=5.00e-04 train_loss=0.2463 train_corr=0.766 val_loss=1.2122 val_corr=0.221
+[epoch 9] lr=5.00e-04 train_loss=0.2355 train_corr=0.777 val_loss=1.1099 val_corr=0.260
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-002506_ecg_rpeak_spatial_gnn_posw10
+########## pos_weight=20 (294_mmecg_rpeak_spatial_gnn_posw20) ##########
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-002731_ecg_rpeak_spatial_gnn_posw20
+[epoch 0] lr=5.00e-04 train_loss=0.9412 train_corr=0.395 val_loss=1.1013 val_corr=0.298
+[epoch 1] lr=5.00e-04 train_loss=0.6821 train_corr=0.528 val_loss=1.3048 val_corr=0.243
+[epoch 2] lr=5.00e-04 train_loss=0.5553 train_corr=0.582 val_loss=1.3351 val_corr=0.246
+[epoch 3] lr=5.00e-04 train_loss=0.4711 train_corr=0.625 val_loss=1.7202 val_corr=0.222
+[epoch 4] lr=5.00e-04 train_loss=0.4232 train_corr=0.652 val_loss=1.8355 val_corr=0.212
+[epoch 5] lr=5.00e-04 train_loss=0.3913 train_corr=0.672 val_loss=1.8332 val_corr=0.174
+[epoch 6] lr=5.00e-04 train_loss=0.3657 train_corr=0.688 val_loss=1.7376 val_corr=0.268
+[epoch 7] lr=5.00e-04 train_loss=0.3452 train_corr=0.705 val_loss=1.9896 val_corr=0.266
+[epoch 8] lr=5.00e-04 train_loss=0.3323 train_corr=0.714 val_loss=1.8159 val_corr=0.267
+[epoch 9] lr=5.00e-04 train_loss=0.3154 train_corr=0.727 val_loss=2.0156 val_corr=0.271
+run_dir: /home/shunya/research/dog-radar-vitals/runs/20260825-002731_ecg_rpeak_spatial_gnn_posw20
+########## 下流指標での評価 ##########
+===== pos_weight=5  epoch_009.pt =====
+                                   [--device DEVICE]
+                                   [--n_downsample N_DOWNSAMPLE]
+                                   [--peak_method {old,paired_dedup,rhythmic,adaptive_searchback,viterbi}]
+                                   [--pair_merge_sec PAIR_MERGE_SEC]
+                                   [--rhythmic_candidate_height RHYTHMIC_CANDIDATE_HEIGHT]
+                                   [--as_candidate_height AS_CANDIDATE_HEIGHT]
+                                   [--vit_candidate_height VIT_CANDIDATE_HEIGHT]
+                                   [--vit_min_rr VIT_MIN_RR]
+                                   [--vit_max_rr VIT_MAX_RR]
+                                   [--vit_prior_sigma VIT_PRIOR_SIGMA]
+                                   [--vit_prior_weight VIT_PRIOR_WEIGHT]
+                                   [--as_threshold_frac AS_THRESHOLD_FRAC]
+                                   [--as_searchback_threshold_frac AS_SEARCHBACK_THRESHOLD_FRAC]
+                                   [--gt_detector {legacy,neurokit}]
+                                   [--preprocess {none,ema_clutter,channel_weight}]
+                                   [--refine_centroid_ms REFINE_CENTROID_MS]
+                                   [--refine_iters REFINE_ITERS]
+                                   [--test_subjects TEST_SUBJECTS [TEST_SUBJECTS ...]]
+                                   [--calib_sec CALIB_SEC]
+                                   [--spatial_aggregation {knn_gat,none,full_attn}]
+                                   [--prior_work_metrics]
+evaluate_spatial_gnn_hrv.py: error: argument --test_subjects: invalid int value: '17,29,30'
+===== pos_weight=10  epoch_009.pt =====
+                                   [--device DEVICE]
+                                   [--n_downsample N_DOWNSAMPLE]
+                                   [--peak_method {old,paired_dedup,rhythmic,adaptive_searchback,viterbi}]
+                                   [--pair_merge_sec PAIR_MERGE_SEC]
+                                   [--rhythmic_candidate_height RHYTHMIC_CANDIDATE_HEIGHT]
+                                   [--as_candidate_height AS_CANDIDATE_HEIGHT]
+                                   [--vit_candidate_height VIT_CANDIDATE_HEIGHT]
+                                   [--vit_min_rr VIT_MIN_RR]
+                                   [--vit_max_rr VIT_MAX_RR]
+                                   [--vit_prior_sigma VIT_PRIOR_SIGMA]
+                                   [--vit_prior_weight VIT_PRIOR_WEIGHT]
+                                   [--as_threshold_frac AS_THRESHOLD_FRAC]
+                                   [--as_searchback_threshold_frac AS_SEARCHBACK_THRESHOLD_FRAC]
+                                   [--gt_detector {legacy,neurokit}]
+                                   [--preprocess {none,ema_clutter,channel_weight}]
+                                   [--refine_centroid_ms REFINE_CENTROID_MS]
+                                   [--refine_iters REFINE_ITERS]
+                                   [--test_subjects TEST_SUBJECTS [TEST_SUBJECTS ...]]
+                                   [--calib_sec CALIB_SEC]
+                                   [--spatial_aggregation {knn_gat,none,full_attn}]
+                                   [--prior_work_metrics]
+evaluate_spatial_gnn_hrv.py: error: argument --test_subjects: invalid int value: '17,29,30'
+===== pos_weight=20  epoch_009.pt =====
+                                   [--device DEVICE]
+                                   [--n_downsample N_DOWNSAMPLE]
+                                   [--peak_method {old,paired_dedup,rhythmic,adaptive_searchback,viterbi}]
+                                   [--pair_merge_sec PAIR_MERGE_SEC]
+                                   [--rhythmic_candidate_height RHYTHMIC_CANDIDATE_HEIGHT]
+                                   [--as_candidate_height AS_CANDIDATE_HEIGHT]
+                                   [--vit_candidate_height VIT_CANDIDATE_HEIGHT]
+                                   [--vit_min_rr VIT_MIN_RR]
+                                   [--vit_max_rr VIT_MAX_RR]
+                                   [--vit_prior_sigma VIT_PRIOR_SIGMA]
+                                   [--vit_prior_weight VIT_PRIOR_WEIGHT]
+                                   [--as_threshold_frac AS_THRESHOLD_FRAC]
+                                   [--as_searchback_threshold_frac AS_SEARCHBACK_THRESHOLD_FRAC]
+                                   [--gt_detector {legacy,neurokit}]
+                                   [--preprocess {none,ema_clutter,channel_weight}]
+                                   [--refine_centroid_ms REFINE_CENTROID_MS]
+                                   [--refine_iters REFINE_ITERS]
+                                   [--test_subjects TEST_SUBJECTS [TEST_SUBJECTS ...]]
+                                   [--calib_sec CALIB_SEC]
+                                   [--spatial_aggregation {knn_gat,none,full_attn}]
+                                   [--prior_work_metrics]
+evaluate_spatial_gnn_hrv.py: error: argument --test_subjects: invalid int value: '17,29,30'

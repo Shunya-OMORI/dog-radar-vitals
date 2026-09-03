@@ -1,0 +1,37 @@
+# 318: 317(プレーンな1D U-Net)と完全に同じ条件で、モデルだけをAttention U-Net
+# (`rpeak_attention_unet1d.py`、スキップ接続にAttention Gateを挿入)に差し替える。
+# 単一変数(R4): 317とはmodel.nameだけが異なる(パラメータ数もほぼ同じ:2.028M→2.050M)。
+#
+# 狙い(2026-08-28, ユーザ指示): 「Attention U-Netも使えるかな？」への対応。
+# 対応する先行研究: Oktay ら, "Attention U-Net: Learning Where to Look for the
+# Pancreas," MIDL 2018 (arXiv:1804.03999)。R波heatmapは4秒窓の9割以上が背景
+# (§3.7と同じ不均衡)なので、「どこを見るか」を明示的に絞るAttention Gateが
+# 317(素のU-Net)より効くかを検証する。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_attention_unet1d
+  in_channels: 50
+  base_channels: 32
+  depth: 3
+  kernel_size: 9
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

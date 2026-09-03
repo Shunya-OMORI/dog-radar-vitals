@@ -1,0 +1,36 @@
+# 317: config284と教師・前処理・学習設定を完全に揃えた上で、モデルだけを
+# プレーンな1D U-Net(重み共有なし・スキップ接続にAttentionなし)に差し替える。
+# 単一変数(R4): data/train節はconfig284からのコピー。変えるのはmodel節のみ。
+#
+# 狙い(2026-08-28, ユーザ指示): 「Attention U-Netも使えるか」という問いに答えるため、
+# まずAttention"なし"の素のU-Net(318との対照)を、config284と条件を揃えて測る。
+# 既存の221_...yamlは旧split・旧教師(detector未指定=legacy, sigma未指定=10ms)を
+# 使っていたため使い回さず、312/313と同じ条件で新規に作る。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_unet1d
+  in_channels: 50
+  base_channels: 32
+  depth: 3
+  kernel_size: 9
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

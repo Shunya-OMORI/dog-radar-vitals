@@ -1,0 +1,47 @@
+trial 48: f1=0.005 precision=0.005 recall=0.005 rr_mae_ms=None
+trial 49: f1=0.068 precision=0.045 recall=0.140 rr_mae_ms=20.74074074074074
+trial 50: f1=0.077 precision=0.050 recall=0.159 rr_mae_ms=6.206896551724138
+trial 51: f1=0.011 precision=0.010 recall=0.011 rr_mae_ms=65.0
+trial 52: f1=0.078 precision=0.052 recall=0.164 rr_mae_ms=28.21428571428576
+trial 53: f1=0.160 precision=0.106 recall=0.324 rr_mae_ms=17.18181818181818
+trial 54: f1=0.028 precision=0.018 recall=0.057 rr_mae_ms=41.111111111111114
+trial 55: f1=0.060 precision=0.040 recall=0.123 rr_mae_ms=23.75000000000004
+trial 56: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 57: f1=0.279 precision=0.263 recall=0.298 rr_mae_ms=25.65573770491803
+trial 58: f1=0.123 precision=0.085 recall=0.222 rr_mae_ms=10.714285714285714
+trial 59: f1=0.078 precision=0.074 recall=0.083 rr_mae_ms=31.11111111111111
+trial 60: f1=0.037 precision=0.033 recall=0.042 rr_mae_ms=35.0
+trial 61: f1=0.200 precision=0.186 recall=0.215 rr_mae_ms=29.8888888888889
+trial 62: f1=0.063 precision=0.062 recall=0.065 rr_mae_ms=18.46153846153846
+trial 63: f1=0.111 precision=0.104 recall=0.119 rr_mae_ms=31.19999999999998
+trial 64: f1=0.028 precision=0.027 recall=0.030 rr_mae_ms=40.833333333333336
+trial 65: f1=0.082 precision=0.078 recall=0.085 rr_mae_ms=22.0
+trial 66: f1=0.388 precision=0.357 recall=0.425 rr_mae_ms=31.020408163265305
+trial 67: f1=0.026 precision=0.018 recall=0.050 rr_mae_ms=34.5
+trial 68: f1=0.231 precision=0.214 recall=0.252 rr_mae_ms=12.540983606557377
+trial 69: f1=0.105 precision=0.098 recall=0.113 rr_mae_ms=21.73076923076923
+trial 70: f1=0.103 precision=0.070 recall=0.190 rr_mae_ms=33.29545454545457
+trial 71: f1=0.103 precision=0.070 recall=0.196 rr_mae_ms=43.86363636363637
+trial 72: f1=0.121 precision=0.114 recall=0.130 rr_mae_ms=19.655172413793103
+trial 73: f1=0.062 precision=0.043 recall=0.116 rr_mae_ms=24.423076923076923
+trial 74: f1=0.085 precision=0.057 recall=0.163 rr_mae_ms=27.22222222222226
+trial 75: f1=0.190 precision=0.182 recall=0.199 rr_mae_ms=13.0
+trial 76: f1=0.127 precision=0.087 recall=0.239 rr_mae_ms=18.962264150943398
+trial 77: f1=0.086 precision=0.058 recall=0.163 rr_mae_ms=27.91666666666678
+trial 78: f1=0.102 precision=0.103 recall=0.102 rr_mae_ms=26.136363636363637
+trial 79: f1=0.249 precision=0.236 recall=0.264 rr_mae_ms=26.690140845070417
+trial 80: f1=0.005 precision=0.005 recall=0.005 rr_mae_ms=None
+trial 81: f1=0.010 precision=0.010 recall=0.010 rr_mae_ms=55.0
+trial 82: f1=0.073 precision=0.050 recall=0.141 rr_mae_ms=23.333333333333332
+trial 83: f1=0.013 precision=0.013 recall=0.013 rr_mae_ms=22.5
+trial 84: f1=0.074 precision=0.072 recall=0.076 rr_mae_ms=19.999999999999968
+trial 85: f1=0.040 precision=0.026 recall=0.082 rr_mae_ms=41.666666666666664
+trial 86: f1=0.011 precision=0.011 recall=0.011 rr_mae_ms=30.0
+trial 87: f1=0.061 precision=0.061 recall=0.062 rr_mae_ms=43.18181818181818
+trial 88: f1=0.139 precision=0.095 recall=0.259 rr_mae_ms=26.785714285714285
+trial 89: f1=0.000 precision=0.000 recall=0.000 rr_mae_ms=None
+trial 90: f1=0.071 precision=0.068 recall=0.073 rr_mae_ms=36.578947368421055
+trial 91: f1=0.007 precision=0.007 recall=0.007 rr_mae_ms=5.0
+
+[古典自己相関ベースライン] mean_f1=0.090 mean_rr_mae_ms=27.8 n_trials=44 rr_dropped=4
+autocorr_baseline done

@@ -1,0 +1,28 @@
+subject   1: val(subj 2) で選んだ h=0.15 → test F1=0.411 P=0.409 R=0.413 RR=9.99 ms   (test最良 h=0.30 で F1=0.414)
+subject   2: val(subj 5) で選んだ h=0.10 → test F1=0.637 P=0.565 R=0.729 RR=8.14 ms   (test最良 h=0.20 で F1=0.661)
+subject   5: val(subj 9) で選んだ h=0.05 → test F1=0.261 P=0.255 R=0.270 RR=13.73 ms   (test最良 h=0.10 で F1=0.262)
+subject   9: val(subj 10) で選んだ h=0.10 → test F1=0.472 P=0.764 R=0.376 RR=18.75 ms   (test最良 h=0.05 で F1=0.608)
+subject  10: val(subj 13) で選んだ h=0.15 → test F1=0.840 P=0.842 R=0.842 RR=15.44 ms   (test最良 h=0.10 で F1=0.848)
+subject  13: val(subj 14) で選んだ h=0.15 → test F1=0.838 P=0.810 R=0.871 RR=12.53 ms   (test最良 h=0.15 で F1=0.838)
+subject  14: val(subj 16) で選んだ h=0.05 → test F1=0.689 P=0.647 R=0.739 RR=11.48 ms   (test最良 h=0.10 で F1=0.700)
+subject  16: val(subj 17) で選んだ h=0.15 → test F1=0.510 P=0.547 R=0.487 RR=10.84 ms   (test最良 h=0.10 で F1=0.518)
+subject  17: val(subj 29) で選んだ h=0.20 → test F1=0.914 P=0.904 R=0.925 RR=9.38 ms   (test最良 h=0.20 で F1=0.914)
+subject  29: val(subj 30) で選んだ h=0.15 → test F1=0.660 P=0.641 R=0.689 RR=10.51 ms   (test最良 h=0.15 で F1=0.660)
+subject  30: val(subj 1) で選んだ h=0.10 → test F1=0.779 P=0.749 R=0.813 RR=11.31 ms   (test最良 h=0.20 で F1=0.799)
+
+=== val でしきい値を選んだ場合の正式値 (n=11 fold) ===
+  F1 0.638 ± 0.204   RR間隔MAE 12.01 ms
+  選ばれたしきい値: subj1:0.15, subj2:0.10, subj5:0.05, subj9:0.10, subj10:0.15, subj13:0.15, subj14:0.05, subj16:0.15, subj17:0.20, subj29:0.15, subj30:0.10
+
+=== 全被験者平均 (しきい値を全員共通にした場合) ===
+  h=0.05: F1 0.610  precision 0.559  recall 0.693  RR間隔MAE 12.18 ms
+  h=0.10: F1 0.632  precision 0.629  recall 0.663  RR間隔MAE 12.20 ms
+  h=0.15: F1 0.627  precision 0.660  recall 0.630  RR間隔MAE 12.08 ms
+  h=0.20: F1 0.614  precision 0.682  recall 0.597  RR間隔MAE 11.83 ms
+  h=0.30: F1 0.567  precision 0.712  recall 0.519  RR間隔MAE 10.50 ms
+  h=0.40: F1 0.465  precision 0.705  recall 0.390  RR間隔MAE 10.45 ms
+
+=== 被験者ごとに最良しきい値を選んだ場合 (上限の目安、テストを見て選ぶので楽観的) ===
+  F1 0.657   選ばれたしきい値: subj1:0.30, subj2:0.20, subj5:0.10, subj9:0.05, subj10:0.10, subj13:0.15, subj14:0.10, subj16:0.10, subj17:0.20, subj29:0.15, subj30:0.20
+
+保存: /home/shunya/research/dog-radar-vitals/reports/height_sweep_loso.json

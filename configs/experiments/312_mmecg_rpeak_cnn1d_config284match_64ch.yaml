@@ -1,0 +1,41 @@
+# 312: config284(採用中のGNNモデル)と教師・前処理・学習設定を完全に揃えた上で、
+# モデルだけをプレーンな多チャネルCNN(重み共有なし・空間情報なし)に差し替える。
+# 単一変数(R4): data/train節はconfig284からのコピー。変えるのはmodel節のみ。
+#
+# 狙い(2026-08-27, ユーザ指摘): 「重み共有エンコーダの有無自体が独自性か」
+# 「当時と今とで教師データも学習設計も異なるので測り直しが必須」への対応。
+# 過去の0.356M版rpeak_cnn1d(RR-MAE 10.70ms, F1 0.256)は旧split・旧教師・旧評価
+# プロトコルでの値であり、config284と同じ条件での値ではなかった。
+#
+# 64ch = 元のdog-radar-vitals自身のベンチマーク規模(0.356M)をそのまま維持し、
+# 「サイズはそのまま、条件だけ現行に揃えるとどう変わるか」を見る。
+# サイズを現行モデル(0.034M)に合わせた版は313(16ch)を参照。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_rpeak_seq2seq
+  name: rpeak_cnn1d
+  in_channels: 50
+  channels: 64
+  n_layers: 6
+  kernel_size: 15
+  dropout: 0.1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

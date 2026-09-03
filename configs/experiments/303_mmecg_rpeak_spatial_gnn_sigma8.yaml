@@ -1,0 +1,63 @@
+# 303_s8: 301(MAD正規化 + 正例重み付きBCE) から heatmap_sigma_ms だけを 15.0 -> 8.0 に変えたプローブ (R4)。
+#
+# なぜ σ を触るか:
+#   目的が「RRI とその変動」に定まったので、効かせるべきは検出の有無ではなく **拍位置の精度** である。
+#   教師は R 位置に置いたガウス山であり、その幅 σ が位置推定の分解能の上限を決める。
+#   σ=15ms は 200Hz で ±3 サンプルの広がりを持ち、RR 間隔 MAE 9〜13ms とほぼ同じ桁にある。
+#   つまり **現在の RRI 誤差は教師の幅で説明できる可能性がある**。まずそれを測る。
+#
+# 対応する先行研究:
+#   Newell ら, Stacked Hourglass Networks, ECCV 2016 (ガウス heatmap による位置回帰の原型)
+#   Zhang ら, Distribution-Aware Coordinate Representation of Keypoint (DARK), CVPR 2020
+#     https://arxiv.org/abs/1910.06278
+#     → heatmap の幅と復号方法が位置推定の量子化誤差を決めることを示した。
+#       我々が入れている重心補正 (refine_peaks_centroid) はこの論文の復号側の対策に当たる。
+#
+# 注意 (交絡): σ を狭めると正例サンプル数が減るので、pos_weight=10 の実効的な強さが変わる。
+#   σ だけを変えた比較であることは保ちつつ、しきい値の再選択とセットで読むこと。
+#
+# 比較対象 (301, 同一 split, test 17/29/30, 10 epoch, h=0.5):
+#   F1@150ms 0.908 / MDR 8.70% / RR間隔MAE 9.33ms / RMSSD誤差 17.85ms / SDNN誤差 4.61ms
+#   (参考) 入力を見ずに一定RRを出すだけ: RMSSD誤差 25.16ms / SDNN誤差 6.43ms (この split)
+# 単独効果は測り終えている:
+#   MAD正規化(299, 10epoch, 同一split)      : F1@150ms 0.847 / MDR 16.92% / RR間隔MAE 9.58ms / RMSSD誤差 16.60ms
+#   pos_weight=10(295, 50epoch, 11-fold LOSO): F1@150ms 0.847 / MDR 12.13% / RMSSD誤差 17.99ms
+#   284(z-score+通常BCE, 50epoch, LOSO)      : F1@150ms 0.729 / MDR 33.40% / RMSSD誤差 16.94ms
+#   (参考) 入力を見ずに一定RRを出すだけ        : RMSSD誤差 41.83ms
+# 両者は「モデルは拍を見つけているのに確信度が出せない」という同じ症状に、
+# 前処理側と損失側から別々に効いている。組み合わせが加算的かを確かめる。
+#
+# **これは R4(単一変数)の対象外。** 切り分けは各単独実験で済んでおり、ここは最良構成を作る段階。
+# 両方とも出力を高くする方向なので precision が落ちてしきい値の最適点がずれるはず。
+# しきい値の選び直しとセットで評価すること。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  normalization: robust
+  heatmap_sigma_ms: 8.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 10
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
+  loss: weighted_bce
+  pos_weight: 10.0

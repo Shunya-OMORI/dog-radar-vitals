@@ -1,0 +1,39 @@
+# 319: config284(採用中)と完全に同じだが、入力の前処理だけを差し替える。
+# 単一変数(R4): data.preprocess のみ config284(既定"none") から "hilbert_envelope" に変更。
+#
+# 狙い(2026-08-28, ユーザ指示): IMU→ECG推定やBCG心拍推定で包絡線を重視する研究例が
+# あり、レーダのバイタルサイン計測でもHilbert包絡線がよく使われる
+# (Makwana ら, IJECE 2016／Choudhary ら, arXiv:1809.03174)。心拍帯バンドパス後の
+# Hilbert包絡線を入力にすると、raw waveformより検出が改善するかを見る。
+# 過去にapply_bandpass単体・ema_clutter・channel_weightはいずれも改善しなかった
+# (preprocess軸、§5.3(b)参照)が、包絡線への変換は「フィルタ」ではなく
+# 「信号の表現そのもの」を変える点で異なる。
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  preprocess: hilbert_envelope
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

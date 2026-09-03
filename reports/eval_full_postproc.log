@@ -1,0 +1,5 @@
+312_full_teacherfix: best_h(val)=0.9 test_f1=0.484 test_rr_mae_ms=16.21 rr_dropped=0/44
+313_full_teacherfix: best_h(val)=0.95 test_f1=0.629 test_rr_mae_ms=18.36 rr_dropped=0/44
+317_unet_full: best_h(val)=0.9 test_f1=0.566 test_rr_mae_ms=19.41 rr_dropped=0/44
+318_attn_unet_full: best_h(val)=0.9 test_f1=0.611 test_rr_mae_ms=18.90 rr_dropped=0/44
+284_baseline: best_h(val)=0.9 test_f1=0.641 test_rr_mae_ms=15.37 rr_dropped=0/44

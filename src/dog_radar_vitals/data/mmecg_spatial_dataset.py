@@ -32,6 +32,9 @@ class MMECGSpatialWindowDataset(Dataset):
         apply_bandpass: bool = False,
         preprocess: str = "none",
         heatmap_sigma_ms: float = 10.0,
+        target_mode: str = "all_peaks",
+        target_shape: str = "gaussian",
+        box_half_width_ms: float = 150.0,
     ) -> None:
         self._samples: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []
         window_fn = iter_peak_windows if heatmap else iter_windows
@@ -41,6 +44,14 @@ class MMECGSpatialWindowDataset(Dataset):
                 "apply_bandpass": apply_bandpass,
                 "preprocess": preprocess,
                 "heatmap_sigma_ms": heatmap_sigma_ms,
+                # 2026-08-25: heatmap 経路でも正規化を選べるようにした。
+                # 既定 "zscore" は従来と同じ。"robust" は中央値と MAD で正規化する。
+                "normalize": normalization,
+                # 2026-08-27: 教師を「窓内の全R波」から「窓中心に最も近い1点だけ」に
+                # 差し替えられるようにした（iter_peak_windowsのtarget_mode参照）。
+                "target_mode": target_mode,
+                "target_shape": target_shape,
+                "box_half_width_ms": box_half_width_ms,
             } if heatmap
             else {"normalization": normalization}
         )

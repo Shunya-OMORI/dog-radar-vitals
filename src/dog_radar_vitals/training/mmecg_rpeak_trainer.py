@@ -49,6 +49,12 @@ def _build_dataset(data_cfg: dict, raw_root: Path, split: str) -> MMECGRPeakWind
         data_cfg["window_sec"],
         data_cfg["stride_sec"],
         complex_input=data_cfg.get("complex_input", False),
+        rpeak_detector=data_cfg.get("rpeak_detector", "legacy"),
+        heatmap_sigma_ms=data_cfg.get("heatmap_sigma_ms", 10.0),
+        normalize=data_cfg.get("normalization", "zscore"),
+        target_mode=data_cfg.get("target_mode", "all_peaks"),
+        target_shape=data_cfg.get("target_shape", "gaussian"),
+        box_half_width_ms=data_cfg.get("box_half_width_ms", 150.0),
     )
 
 

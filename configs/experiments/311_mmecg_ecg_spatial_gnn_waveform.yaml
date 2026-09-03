@@ -1,0 +1,41 @@
+# 311: **波形回帰 vs heatmap 検出** の単一変数対照 (R4)。
+# 284 (heatmap 検出) からの変更点は model.name の 1 行のみ。
+#   rpeak_spatial_gnn : 出力に sigmoid、損失 BCE、教師は R 波ガウシアン heatmap
+#   ecg_spatial_gnn   : 出力に活性化なし、損失 MSE、教師は ECG 波形そのもの
+# **バックボーン(点ごとエンコーダ・位置埋め込み・GAT・時間デコーダ)は完全に同一**。
+#
+# 目的: 「波形再構成を経ずに拍位置を直接回帰する」という定式化が、
+# 何を買っているのかを切り分ける。radarODE 公式実装の実測では
+# shapeDecoder(波形を出す部分)だけで 6.01 M、全体 39.28 M = 本研究の 1156 倍。
+# ただしそれはアーキテクチャも違うので、ここで定式化だけを単独で見る。
+#
+# 比較 (284, 11分割LOSO, 許容150ms, 順位変換): F1 0.888 / RMSSD誤差 14.26ms
+#       一定RRのみ: RMSSD誤差 41.34ms
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: ecg_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2

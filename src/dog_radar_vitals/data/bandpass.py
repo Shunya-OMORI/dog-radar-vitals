@@ -10,11 +10,35 @@
 from __future__ import annotations
 
 import numpy as np
-from scipy.signal import butter, sosfiltfilt
+from scipy.signal import butter, hilbert, sosfiltfilt
 
 BANDPASS_LOW_HZ = 1.0
 BANDPASS_HIGH_HZ = 25.0
 BANDPASS_ORDER = 4
+
+
+def hilbert_envelope(x: np.ndarray, fs: int) -> np.ndarray:
+    """心拍帯バンドパス後の信号にHilbert変換をかけ、包絡線(解析信号の絶対値)を返す。
+
+    背景 (2026-08-28、ユーザ指摘): IMU→ECG推定やBCG(ballistocardiogram)の心拍推定では
+    包絡線を重視する研究例があり、レーダのバイタルサイン計測でもHilbert変換による
+    包絡線抽出が使われている。R波(QRS)は信号のエネルギーが瞬間的に高まる区間なので、
+    生波形の符号や位相ではなく「その瞬間どれだけ揺れが強いか」という包絡線のほうが、
+    ピーク位置の手がかりとして直接的である可能性がある。
+
+    先にbandpass_filter([1,25]Hz)で心拍帯に絞ってから包絡線を取る。生の広帯域信号は
+    エネルギーの98%が3-25Hzの高域雑音にあることが実測で分かっており(§5.3(d)の
+    RCGスペクトル解析)、フィルタなしで包絡線を取るとその雑音のエンベロープを
+    拾ってしまう。
+
+    対応する先行研究: Makwana ら, "Hilbert Transform Based Adaptive ECG R-Peak
+    Detection Technique," IJECE, 2016（Hilbert変換の包絡線でR波を直接検出する
+    古典手法）／Choudhary ら, "Heart Rate Estimation from Ballistocardiography
+    Based on Hilbert Transform and Phase Vocoder," arXiv:1809.03174, 2018
+    （BCGでHilbert包絡線から心拍を推定）。
+    """
+    filtered = bandpass_filter(x, fs)
+    return np.abs(hilbert(filtered))
 
 
 def bandpass_filter(x: np.ndarray, fs: int) -> np.ndarray:

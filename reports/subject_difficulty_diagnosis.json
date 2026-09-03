@@ -1,0 +1,138 @@
+{
+  "rows": [
+    {
+      "subject": 1,
+      "n_trials": 2,
+      "cardiac_max": 0.015884885098785162,
+      "cardiac_mean": 0.0061025154113303875,
+      "hr_mean": 65.99236430337396,
+      "rr_std": 37.89121598420389,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.414,
+      "loso_rr_mae": 9.99
+    },
+    {
+      "subject": 2,
+      "n_trials": 2,
+      "cardiac_max": 0.017336015589535236,
+      "cardiac_mean": 0.006053494531734031,
+      "hr_mean": 80.61025074389725,
+      "rr_std": 23.307383770885586,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.653,
+      "loso_rr_mae": 8.25
+    },
+    {
+      "subject": 5,
+      "n_trials": 12,
+      "cardiac_max": 0.03878029203042388,
+      "cardiac_mean": 0.010826494823825973,
+      "hr_mean": 81.09726023136422,
+      "rr_std": 40.79431090625389,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.244,
+      "loso_rr_mae": 8.6
+    },
+    {
+      "subject": 9,
+      "n_trials": 6,
+      "cardiac_max": 0.05651689413934946,
+      "cardiac_mean": 0.01245348574409339,
+      "hr_mean": 68.70438085345745,
+      "rr_std": 41.77904317878622,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.113,
+      "loso_rr_mae": 14.29
+    },
+    {
+      "subject": 10,
+      "n_trials": 3,
+      "cardiac_max": 0.05185675496856371,
+      "cardiac_mean": 0.011877601655821005,
+      "hr_mean": 74.04088326489689,
+      "rr_std": 81.19144184288517,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.743,
+      "loso_rr_mae": 13.36
+    },
+    {
+      "subject": 13,
+      "n_trials": 6,
+      "cardiac_max": 0.06341913420086105,
+      "cardiac_mean": 0.016942116543650628,
+      "hr_mean": 61.88871040215138,
+      "rr_std": 59.6886263103371,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.793,
+      "loso_rr_mae": 11.89
+    },
+    {
+      "subject": 14,
+      "n_trials": 9,
+      "cardiac_max": 0.0650084370540248,
+      "cardiac_mean": 0.012839213111470195,
+      "hr_mean": 68.88190905602134,
+      "rr_std": 81.21473929561441,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.548,
+      "loso_rr_mae": 11.26
+    },
+    {
+      "subject": 16,
+      "n_trials": 7,
+      "cardiac_max": 0.08547074933137212,
+      "cardiac_mean": 0.018010348039013996,
+      "hr_mean": 73.14034233012923,
+      "rr_std": 53.7303672239801,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.443,
+      "loso_rr_mae": 8.58
+    },
+    {
+      "subject": 17,
+      "n_trials": 9,
+      "cardiac_max": 0.03723208689027362,
+      "cardiac_mean": 0.011045546411510766,
+      "hr_mean": 64.66636951146695,
+      "rr_std": 55.5930732346021,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.906,
+      "loso_rr_mae": 9.31
+    },
+    {
+      "subject": 29,
+      "n_trials": 23,
+      "cardiac_max": 0.03655812253608652,
+      "cardiac_mean": 0.00980523449123923,
+      "hr_mean": 76.89699859800471,
+      "rr_std": 27.693386321875852,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.59,
+      "loso_rr_mae": 8.72
+    },
+    {
+      "subject": 30,
+      "n_trials": 12,
+      "cardiac_max": 0.048178280548503004,
+      "cardiac_mean": 0.014333744588269233,
+      "hr_mean": 75.53438967139842,
+      "rr_std": 42.526998446811284,
+      "ecg_nan_frac": 0.0,
+      "loso_f1": 0.787,
+      "loso_rr_mae": 11.22
+    }
+  ],
+  "spearman": {
+    "cardiac_max": -0.045454545454545456,
+    "cardiac_mean": 0.16363636363636364,
+    "hr_mean": -0.2545454545454545,
+    "rr_std": 0.36363636363636365,
+    "ecg_nan_frac": 0.509090909090909,
+    "n_trials": 0.18181818181818182,
+    "cardiac_max__rr": 0.38181818181818183,
+    "cardiac_mean__rr": 0.38181818181818183,
+    "hr_mean__rr": -0.5272727272727272,
+    "rr_std__rr": 0.5727272727272728,
+    "n_trials__rr": -0.18181818181818182
+  }
+}

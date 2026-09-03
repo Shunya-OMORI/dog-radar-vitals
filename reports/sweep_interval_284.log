@@ -1,0 +1,4 @@
+subject   1: val(subj 2) で選んだ h=0.40 → test F1=0.993 R=0.995 RR=12.04 ms RMSSD誤差=9.21 (一定RR 36.90) pNN50誤差=11.21 平均IBI誤差=0.43
+subject   2: val(subj 5) で選んだ h=0.20 → test F1=0.911 R=0.994 RR=12.70 ms RMSSD誤差=10.94 (一定RR 13.71) pNN50誤差=4.41 平均IBI誤差=1.41
+subject   5: val(subj 9) で選んだ h=0.20 → test F1=0.793 R=0.770 RR=17.81 ms RMSSD誤差=20.59 (一定RR 26.75) pNN50誤差=20.05 平均IBI誤差=60.77
+subject   9: val(subj 10) で選んだ h=0.20 → test F1=0.495 R=0.400 RR=34.51 ms RMSSD誤差=33.40 (一定RR 36.98) pNN50誤差=28.27 平均IBI誤差=78.39

@@ -1,0 +1,21 @@
+[
+  {
+    "fold": 0,
+    "test_subject": 1,
+    "val_subject": 2,
+    "train_subjects": [
+      5,
+      9,
+      10,
+      13,
+      14,
+      16,
+      17,
+      29,
+      30
+    ],
+    "run_dir": "/home/shunya/research/dog-radar-vitals/runs/20260825-100125_ecg_rpeak_spatial_gnn_lodo300_robustnorm_fold0_test1",
+    "checkpoint": "/home/shunya/research/dog-radar-vitals/runs/20260825-100125_ecg_rpeak_spatial_gnn_lodo300_robustnorm_fold0_test1/epoch_004.pt",
+    "checkpoint_exists": true
+  }
+]

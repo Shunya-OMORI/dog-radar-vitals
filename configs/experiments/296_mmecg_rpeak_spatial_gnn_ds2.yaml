@@ -1,0 +1,45 @@
+# 296: backbone の時間方向ダウンサンプリング段数を 3 段(8倍) から 2 段(4倍) に減らす。
+# 284 からの変更点は model.n_downsample のみ (R4: 単一変数)。
+#
+# 根拠 (2026-08-25 の入力スペクトル診断): 入力 RCG のエネルギーは 98.09% が [3,25) Hz の
+# 高域にあり、心拍基本波帯は 1.71% しかない。RCG のスペクトルピークから読める心拍数は
+# 正解 ECG と平均 53.3 bpm ずれる。つまり **R 波の情報は高域の急峻な変化として入っており、
+# 周期性としては入っていない**。過去に [1,25] Hz バンドパスが悪化した(248: 0.258 -> 254: 0.217)
+# のも、高域がノイズではなく R 波の急峻さを担う情報だったためと説明がつく。
+#
+# 現在の PerPointTemporalEncoder は 3 段(各 stride 2)で時間軸を 8 分の 1 に潰しており、
+# 200 Hz の入力が実質 25 Hz (1 フレーム 40 ms 相当) になる。R 波位置を ms 単位で決めるには粗い。
+# 同じ診断から段数を減らして解決した先例が config269 (mmECG 側) にある。
+# 段数を減らすのは補間による見かけの解像度ではなく、実際の情報量を残す変更である。
+#
+# 判定は下流指標 (F1@150ms / RR間隔MAE / RMSSD誤差) で行う。
+# 比較対象 (同一 split, test 17/29/30): F1@50ms 0.750 / RR間隔MAE 8.43 ms / RMSSD誤差 10.35 ms
+seed: 42
+task: ecg
+
+data:
+  raw_root: data/raw
+  window_sec: 4
+  stride_sec: 2
+  rpeak_detector: neurokit
+  heatmap_sigma_ms: 15.0
+  subjects:
+    train: [1, 2, 5, 9, 10, 13, 14]
+    val: [16]
+    test: [17, 29, 30]
+
+model:
+  family: mmecg_spatial_seq2seq
+  name: rpeak_spatial_gnn
+  n_points: 50
+  embed_dim: 32
+  k_neighbors: 6
+  n_gat_layers: 2
+  n_downsample: 2
+
+train:
+  batch_size: 32
+  epochs: 10
+  lr: 0.0005
+  weight_decay: 0.0001
+  num_workers: 2
